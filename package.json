@@ -17,7 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "cross-env NODE_ENV=production jest --config ./apps/core_app/test/jest-e2e.json",
+    "test:e2e": "cross-env NODE_ENV=TEST jest --runInBand",
     "build:utility_app": "nest build utility_app",
     "start:utility_app": "node dist/apps/utility_app/main",
     "start:dev:utility_app": "nest start utility_app --watch",
