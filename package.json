@@ -17,7 +17,13 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./apps/core_app/test/jest-e2e.json"
+    "test:e2e": "jest --config ./apps/core_app/test/jest-e2e.json",
+    "build:core_app": "nest build core_app",
+    "build:utility_app": "nest build utility_app",
+    "start:core_app": "node dist/apps/core_app/main",
+    "start:utility_app": "node dist/apps/utility_app/main",
+    "start:dev:core_app": "nest start core_app --watch",
+    "start:dev:utility_app": "nest start utility_app --watch"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
