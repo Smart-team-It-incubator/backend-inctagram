@@ -21,3 +21,9 @@ spec:
            ports:
              - containerPort: PORT_CONTAINER
 
+           env:
+             - name: DATABASE_URL_DEV
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-coreapp-production-config-secret
+                   key: DATABASE_URL_DEV
