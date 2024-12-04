@@ -3,13 +3,13 @@ pipeline {
     agent any
     environment {
         ENV_TYPE = "production"
-        PORT = 3690
+        PORT = 3691
         NAMESPACE = "smart-reg-org-ru"
         REGISTRY_HOSTNAME = "itlearning644"
-        PROJECT = "smart-group-backend-coreapp"
+        PROJECT = "smart-team-backend-coreapp"
         SERVICE="core_app"
         REGISTRY = "registry.hub.docker.com"
-        DEPLOYMENT_NAME = "smart-group-backend-coreapp-deployment"
+        DEPLOYMENT_NAME = "smart-team-backend-coreapp-deployment"
         IMAGE_NAME = "${env.BUILD_ID}_${env.ENV_TYPE}_${env.GIT_COMMIT}"
         DOCKER_BUILD_NAME = "${env.REGISTRY_HOSTNAME}/${env.PROJECT}:${env.IMAGE_NAME}"
     }
