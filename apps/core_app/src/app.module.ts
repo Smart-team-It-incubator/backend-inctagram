@@ -16,7 +16,7 @@ console.log(ENV);
   imports: [PrismaModule, UserModule,
     
     ConfigModule.forRoot({
-    envFilePath: `.${ENV}.env`, // Определяем какой из ENV файлов подгрузиться, чтобы в зависимости от команды определялась БД (Production or D)
+    envFilePath: `.${ENV}.env`, // Определяем какой из ENV файлов подгрузиться, чтобы в зависимости от команды определялась БД (Production or Development)
   })
   ,],
   controllers: [AppController, UserController],
