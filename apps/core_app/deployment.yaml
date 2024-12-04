@@ -32,8 +32,8 @@ spec:
                  secretKeyRef:
                    name: smart-team-backend-coreapp-production-config-secret
                    key: NODE_ENV
-             - name: DATABASE_URL_DEV
+             - name: DATABASE_URL_PROD
                valueFrom:
                  secretKeyRef:
                    name: smart-team-backend-coreapp-production-config-secret
-                   key: DATABASE_URL_DEV
+                   key: DATABASE_URL_PROD
