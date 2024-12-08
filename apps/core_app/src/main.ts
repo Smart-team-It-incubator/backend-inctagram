@@ -14,7 +14,7 @@ async function bootstrap() {
   .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('swagger', app, document); // Укажи путь к документации
+  SwaggerModule.setup('api/v1/swagger', app, document); // Укажи путь к документации
   
   await app.listen(process.env.PORT ?? 3000);
   console.log(`Приложение запущено на порту ${process.env.PORT} ?? 3000`);
