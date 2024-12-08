@@ -7,7 +7,6 @@ export class CreateUserCommand {
         public email: string,
         public name: string
         ) {
-        
     }
 }
 
