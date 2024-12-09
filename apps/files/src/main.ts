@@ -6,8 +6,8 @@ async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(FilesModule, {
     transport: Transport.TCP,
     options: {
-      host: '0.0.0.0', // Наименование сервиса в кубернетисе, нужен для установки связи
-      port: 3695, // Порт который присвоил Jenkins
+      host: process.env.FILES_SERVICE_HOST || '0.0.0.0',
+      port: Number(process.env.FILES_SERVICE_PORT) || 3695,
     }
   });
 

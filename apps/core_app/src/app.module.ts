@@ -19,7 +19,7 @@ console.log(ENV);
     name: 'FILES_SERVICE',
     transport: Transport.TCP,
     options: {
-      host: process.env.FILES_SERVICE_HOST || 'smart-team-backend-files-service',
+      host: process.env.FILES_SERVICE_HOST || '0.0.0.0',
       port: Number(process.env.FILES_SERVICE_PORT) || 3695,
     },
   }]),
