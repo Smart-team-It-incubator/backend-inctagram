@@ -5,6 +5,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api/v1'); 
   await app.listen(process.env.PORT ?? 3000);
-  console.log(`Приложение запущено на порту ${process.env.PORT} ?? 3000`);
+  console.log(`Приложение Core_app запущено на порту ${process.env.PORT} <> 3000`);
 }
 bootstrap();
