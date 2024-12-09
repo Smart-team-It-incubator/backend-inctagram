@@ -1,12 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
-import { FilesService } from './files.service';
+import { Controller } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
 
 @Controller()
 export class FilesController {
-  constructor(private readonly FilesService: FilesService) {}
-
-  @Get()
-  getHello(): string {
-    return this.FilesService.getHello();
+  @MessagePattern({ cmd: 'get_files' }) // Обработка команды 'get_files'
+  getFiles(data: any) {
+    console.log('Получен запрос:', data);
+    return { message: 'Список файлов', data };
   }
 }

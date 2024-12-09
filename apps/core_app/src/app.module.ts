@@ -8,6 +8,7 @@ import { UserController } from './infrastructure/modules/users/controllers/user.
 import { ConfigModule } from '@nestjs/config';
 import { GlobalModule } from './infrastructure/modules/global_module/global_module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { FilesGatewayController } from './infrastructure/modules/files_gateway/controllers/files.controller';
 
 const ENV = process.env.NODE_ENV;
 console.log(ENV);
@@ -28,7 +29,7 @@ console.log(ENV);
     envFilePath: `.${ENV}.env`, // Определяем какой из ENV файлов подгрузиться, чтобы в зависимости от команды определялась БД (Production or Development)
   })
   ,],
-  controllers: [AppController, UserController],
+  controllers: [AppController, UserController, FilesGatewayController],
   providers: [AppService, PrismaService],
 })
 export class AppModule {}
