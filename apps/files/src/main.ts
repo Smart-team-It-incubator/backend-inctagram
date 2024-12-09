@@ -6,7 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(FilesModule, {
     transport: Transport.TCP,
     options: {
-      host: process.env.FILES_SERVICE_HOST_ENV || '0.0.0.0',
+      host: '0.0.0.0', // тут ОБЯЗАТЕЛЬНО 0.0.0.0 иначе внутри контейнеров связи не будет
       port: Number(process.env.FILES_SERVICE_PORT_ENV) || 3695,
     }
   });
