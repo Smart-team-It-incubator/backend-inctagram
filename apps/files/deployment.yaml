@@ -22,13 +22,13 @@ spec:
              - containerPort: PORT_CONTAINER
 
            env:
-             - name: FILES_SERVICE_PORT
+             - name: FILES_SERVICE_PORT_ENV
                valueFrom:
                  secretKeyRef:
                    name: smart-team-backend-files-production-config-secret
-                   key: FILES_SERVICE_PORT
-             - name: FILES_SERVICE_HOST
+                   key: FILES_SERVICE_PORT_ENV
+             - name: FILES_SERVICE_HOST_ENV
                valueFrom:
                  secretKeyRef:
                    name: smart-team-backend-files-production-config-secret
-                   key: FILES_SERVICE_HOST
+                   key: FILES_SERVICE_HOST_ENV
