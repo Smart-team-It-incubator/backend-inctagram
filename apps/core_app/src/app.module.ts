@@ -18,8 +18,8 @@ console.log(ENV);
     name: 'FILES_SERVICE',
     transport: Transport.TCP,
     options: {
-      host: '0.0.0.0',
-      port: 3695,
+      host: process.env.FILES_SERVICE_HOST || 'smart-team-backend-files-service',
+      port: Number(process.env.FILES_SERVICE_PORT) || 3695,
     },
   }]),
     PrismaModule, UserModule, GlobalModule,
