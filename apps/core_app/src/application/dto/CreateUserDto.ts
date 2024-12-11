@@ -1,12 +1,13 @@
-import { IsEmail, IsString, MinLength, IsOptional, MaxLength, Matches, Max } from "@nestjs/class-validator";
+import { IsEmail, IsString, MinLength, IsOptional, MaxLength, Matches } from "@nestjs/class-validator";
 
 const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]).{6,}$/;
+const usernameRegExp = /^[A-Za-z0-9_-]+$/;
 
 
 export class CreateUserDto {
+
   @IsEmail()
   email: string;
-
 
   @Matches(passwordRegExp, {
     message:
@@ -17,6 +18,10 @@ export class CreateUserDto {
   @MaxLength(20, { message: 'Password must be at most 20 characters long' })
   password: string;
 
+  @Matches(usernameRegExp, {
+    message:
+      'Username must contain only alphanumeric characters, underscores (_), and hyphens (-). It should not contain any spaces or special characters.',
+  })
   @IsString()
   @MinLength(6, { message: 'Username must be at least 6 characters long' })
   @MaxLength(30, { message: 'Username must be at most 30 characters long' })
