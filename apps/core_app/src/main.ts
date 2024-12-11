@@ -10,7 +10,6 @@ async function bootstrap() {
   .setTitle('Core_app API') // Укажи название API
   .setDescription('В API представлены методы для таких модулей как: Users, Posts, Auth, Files') // Добавь описание
   .setVersion('1.0') // Укажи версию
-  .addBearerAuth() // Если используешь авторизацию, добавь её
   .build();
 
   const document = SwaggerModule.createDocument(app, config);
