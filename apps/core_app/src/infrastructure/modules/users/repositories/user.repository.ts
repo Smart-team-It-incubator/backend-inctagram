@@ -14,9 +14,9 @@ export class UsersRepository {
         return users
     }
 
-    async createUser(email: string, name: string): Promise<{}| null> {
+    async createUser(email: string, login: string): Promise<{}| null> {
         const createdUser = this.prisma.user.create({
-            data: { email, name },
+            data: { email, login },
           });
         return createdUser
       }

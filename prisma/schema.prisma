@@ -1,12 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-openssl-3.0.x"] // Необходимо для того, чтобы в контейнере развернулось корректно
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -15,19 +9,19 @@ datasource db {
 }
 
 model User {
-  id                String   @id @default(uuid()) // Уникальный ID
-  email             String   @unique              // Уникальный Email
-  passwordHash      String?                        // Хеш пароля
-  login             String?                       // Логин пользователя (опционально)
-  firstName         String?                        // Имя пользователя
-  lastName          String?                        // Фамилия пользователя
-  role              String   @default("user")     // Роль (user/admin)
-  profileImageUrl   String?                      // URL изображения профил
-  isEmailVerified   Boolean  @default(false)      // Флаг подтверждения Email
-  emailVerificationToken String?                 // Токен для подтверждения Email
-  resetPasswordToken    String?                 // Токен для сброса пароля
-  resetPasswordExpires  DateTime?               // Время истечения токена сброса пароля
-  lastLogin         DateTime?                    // Время последнего входа
-  createdAt         DateTime @default(now())     // Дата создания
-  updatedAt         DateTime? @updatedAt         // Дата обновления
+  id                     String    @id @default(uuid())
+  email                  String    @unique
+  createdAt              DateTime  @default(now())
+  emailVerificationToken String?
+  firstName              String
+  isEmailVerified        Boolean   @default(false)
+  lastLogin              DateTime?
+  lastName               String
+  username               String
+  password               String
+  profileImageUrl        String?
+  resetPasswordExpires   DateTime?
+  resetPasswordToken     String?
+  role                   String    @default("user")
+  updatedAt              DateTime? @updatedAt
 }
