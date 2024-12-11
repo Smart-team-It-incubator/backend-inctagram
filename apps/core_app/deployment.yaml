@@ -32,6 +32,16 @@ spec:
                  secretKeyRef:
                    name: smart-team-backend-coreapp-production-config-secret
                    key: NODE_ENV
+             - name: FILES_SERVICE_HOST
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-coreapp-production-config-secret
+                   key: FILES_SERVICE_HOST
+             - name: FILES_SERVICE_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-coreapp-production-config-secret
+                   key: FILES_SERVICE_PORT
              - name: DATABASE_URL_PROD
                valueFrom:
                  secretKeyRef:

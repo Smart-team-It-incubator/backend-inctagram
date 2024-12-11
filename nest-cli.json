@@ -19,13 +19,13 @@
         "tsConfigPath": "apps/core_app/tsconfig.app.json"
       }
     },
-    "utility_app": {
+    "files": {
       "type": "application",
-      "root": "apps/utility_app",
+      "root": "apps/files",
       "entryFile": "main",
-      "sourceRoot": "apps/utility_app/src",
+      "sourceRoot": "apps/files/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/utility_app/tsconfig.app.json"
+        "tsConfigPath": "apps/files/tsconfig.app.json"
       }
     }
   }
