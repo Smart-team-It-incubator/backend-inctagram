@@ -1,20 +1,12 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpException, HttpStatus, Put, Param, Delete } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { GetUsersCommand } from 'apps/core_app/src/application/commands/users_cases/get-users.use-case';
 import { CreateUserCommand } from 'apps/core_app/src/application/commands/users_cases/create-user.use-case';
 import { ApiBody, ApiOperation, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateUserDto } from 'apps/core_app/src/application/dto/CreateUserDto';
+import { UserViewModel } from 'apps/core_app/src/domain/interfaces/view_models/UserViewModel';
 
 
-
-// DTO для Swagger
-class CreateUserDto {
-  // Обязательно описываем класс нижеуказанной рефлексией, в противном случае информация не подтянется в Swagger
-  @ApiProperty({ description: 'Email пользователя', example: 'user@example.com' })
-  email: string;
-
-  @ApiProperty({ description: 'Имя пользователя', example: 'John Doe' })
-  name: string;
-}
 
 @ApiTags('Users API') // Группировка в Swagger
 @Controller('users')
@@ -25,8 +17,16 @@ export class UserController {
   @ApiOperation({ summary: 'Get all users' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'User list successfully received' }) // Описание ответа
   @Get()
-  async getUsers() {
-    return this.commandBus.execute(new GetUsersCommand()); }
+  async getUsers(): Promise<Partial<UserViewModel>[] | null> {
+    const users: Partial<UserViewModel>[] | null = await this.commandBus.execute(new GetUsersCommand()); 
+    if (!users) {
+      throw new HttpException('Users not found', HttpStatus.BAD_REQUEST);
+      
+    }
+    else if (users) {
+      return users
+    }
+  }
 
   @ApiOperation({ summary: 'Create user' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'User was created' }) // Описание ответа
@@ -35,7 +35,41 @@ export class UserController {
     type: CreateUserDto,
   })
   @Post()
-  async createUser(@Body() body: CreateUserDto) {
-    return this.commandBus.execute(new CreateUserCommand(body.email, body.name));
+  async createUser(@Body() body: CreateUserDto): Promise<Partial<UserViewModel> | null> {
+    const createUser: Partial<UserViewModel> | null = await this.commandBus.execute(new CreateUserCommand(body.email, body.password, body.username, body.firstName, body.lastName, body.city, body.country, body.dateOfBirthday));
+    if (!createUser) {
+      throw new HttpException('User not created', HttpStatus.BAD_REQUEST);
+      
+    }
+    else if (createUser) {
+      return createUser
+    }
   } 
+
+  // Метод для обновления пользователя
+  @ApiOperation({ summary: 'Update user' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'User was successfully updated' }) // Описание ответа
+  @ApiBody({
+    description: 'Данные для обновления пользователя',
+    type: CreateUserDto, // Это может быть другая DTO для обновления, которая может содержать только те поля, которые можно обновить.
+  })
+  @Put("/:userId") // Используем PUT для обновления
+  async updateUser(@Param('userId') userId: string): Promise<string> {
+    // Пока логика обновления не реализована, возвращаем описание того, что будет реализовано.
+    return `Метод updateUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;
+  }
+
+  // Метод для удаления пользователя
+  @ApiOperation({ summary: 'Delete user' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'User was successfully deleted' }) // Описание ответа
+  @ApiBody({
+    description: 'Данные для удаления пользователя',
+    type: CreateUserDto, // Можно использовать другой DTO, который содержит только идентификатор пользователя для удаления.
+  })
+  @Delete("/:userId") // Используем DELETE для удаления
+  async deleteUser(@Param('userId') userId: string): Promise<string> {
+    // Пока логика удаления не реализована, возвращаем описание того, что будет реализовано.
+    return `Метод deleteUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;
+  }
+
 }
