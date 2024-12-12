@@ -1,20 +1,12 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { GetUsersCommand } from 'apps/core_app/src/application/commands/users_cases/get-users.use-case';
 import { CreateUserCommand } from 'apps/core_app/src/application/commands/users_cases/create-user.use-case';
 import { ApiBody, ApiOperation, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateUserDto } from 'apps/core_app/src/application/dto/CreateUserDto';
+import { UserViewModel } from 'apps/core_app/src/domain/interfaces/view_models/UserViewModel';
 
 
-
-// DTO для Swagger
-class CreateUserDto {
-  // Обязательно описываем класс нижеуказанной рефлексией, в противном случае информация не подтянется в Swagger
-  @ApiProperty({ description: 'Email пользователя', example: 'user@example.com' })
-  email: string;
-
-  @ApiProperty({ description: 'Имя пользователя', example: 'John Doe' })
-  name: string;
-}
 
 @ApiTags('Users API') // Группировка в Swagger
 @Controller('users')
@@ -35,7 +27,14 @@ export class UserController {
     type: CreateUserDto,
   })
   @Post()
-  async createUser(@Body() body: CreateUserDto) {
-    return this.commandBus.execute(new CreateUserCommand(body.email, body.name));
+  async createUser(@Body() body: CreateUserDto): Promise<Partial<UserViewModel> | null> {
+    const createUser: Partial<UserViewModel> | null = await this.commandBus.execute(new CreateUserCommand(body.email, body.password, body.username, body.firstName, body.lastName,));
+    if (!createUser) {
+      throw new HttpException('User not created', HttpStatus.BAD_REQUEST);
+      
+    }
+    else if (createUser) {
+      return createUser
+    }
   } 
 }
