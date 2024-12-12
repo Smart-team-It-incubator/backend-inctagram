@@ -24,7 +24,7 @@ model User {
   updatedAt              DateTime? @updatedAt
   password               String
   username               String
-  city                   String?
-  country                String?
-  dateOfBirthday         DateTime?
+  city                   String
+  country                String
+  dateOfBirthday         DateTime
 }
