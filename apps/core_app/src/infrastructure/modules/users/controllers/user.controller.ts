@@ -17,8 +17,16 @@ export class UserController {
   @ApiOperation({ summary: 'Get all users' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'User list successfully received' }) // Описание ответа
   @Get()
-  async getUsers() {
-    return this.commandBus.execute(new GetUsersCommand()); }
+  async getUsers(): Promise<Partial<UserViewModel>[] | null> {
+    const users: Partial<UserViewModel>[] | null = await this.commandBus.execute(new GetUsersCommand()); 
+    if (!users) {
+      throw new HttpException('Users not found', HttpStatus.BAD_REQUEST);
+      
+    }
+    else if (users) {
+      return users
+    }
+  }
 
   @ApiOperation({ summary: 'Create user' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'User was created' }) // Описание ответа
