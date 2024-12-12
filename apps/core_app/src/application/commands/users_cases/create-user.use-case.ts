@@ -37,7 +37,6 @@ export class CreateUserUseCase {
             city: command.city,
             country: command.country,
             dateOfBirthday: command.dateOfBirthday
-
         }
         return await this.usersRepository.createUser(user)
     }

@@ -24,11 +24,17 @@
     "build:core_app": "nest build core_app",
     "start:core_app": "cross-env NODE_ENV=production node dist/apps/core_app/main",
     "start:dev:core_app": "cross-env NODE_ENV=development nest start core_app --watch",
+    "build:auth": "nest build auth",
+    "start:auth": "cross-env NODE_ENV=production node dist/apps/auth/main",
+    "start:dev:auth": "cross-env NODE_ENV=development nest start auth --watch",
     "migrate:dev": "dotenv -e .development.env -- npx prisma migrate dev",
     "migrate:prod": "dotenv -e .production.env -- npx prisma migrate deploy",
     "migrate:statusdev": "dotenv -e .development.env -- npx prisma migrate status",
     "migrate:statusprod": "dotenv -e .production.env -- npx prisma migrate status",
-    "migrate:hotfix": "dotenv -e .production.env -- npx prisma migrate resolve --applied"
+    "migrate:hotfix": "dotenv -e .production.env -- npx prisma migrate resolve --applied",
+    "migrate:auth:dev": "cross-env NODE_ENV=development npx prisma migrate dev --schema=apps/auth/prisma/schema.prisma",
+    "migrate:auth:prod": "cross-env NODE_ENV=production npx prisma migrate deploy --schema=apps/auth/prisma/schema.prisma",
+    "generate:auth": "npx prisma generate --schema=apps/auth/prisma/schema.prisma"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -39,6 +45,7 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^8.1.0",
     "@prisma/client": "^6.0.1",
+    "axios": "^1.7.9",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cross-env": "^7.0.3",
