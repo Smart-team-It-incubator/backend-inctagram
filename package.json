@@ -25,7 +25,10 @@
     "start:core_app": "cross-env NODE_ENV=production node dist/apps/core_app/main",
     "start:dev:core_app": "cross-env NODE_ENV=development nest start core_app --watch",
     "migrate:dev": "dotenv -e .development.env -- npx prisma migrate dev",
-    "migrate:prod": "dotenv -e .production.env -- npx prisma migrate deploy"
+    "migrate:prod": "dotenv -e .production.env -- npx prisma migrate deploy",
+    "migrate:statusdev": "dotenv -e .development.env -- npx prisma migrate status",
+    "migrate:statusprod": "dotenv -e .production.env -- npx prisma migrate status",
+    "migrate:hotfix": "dotenv -e .production.env -- npx prisma migrate resolve --applied"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

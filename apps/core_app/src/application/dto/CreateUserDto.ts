@@ -1,6 +1,6 @@
 
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, Matches, IsString, MinLength, MaxLength, IsOptional } from "class-validator";
+import { IsEmail, Matches, IsString, MinLength, MaxLength, IsOptional, IsDateString } from "class-validator";
 
 const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]).{6,}$/;
 const usernameRegExp = /^[A-Za-z0-9_-]+$/;
@@ -39,6 +39,21 @@ export class CreateUserDto {
   @MinLength(3, { message: 'LastName must be at least 3 characters long' })
   @MaxLength(30, { message: 'LastName must be at most 30 characters long' })
   lastName: string;
+  
+  @ApiProperty({ description: 'Страна пользователя', example: 'USA' })
+  @IsString()
+  @IsOptional()
+  country?: string;
+
+  @ApiProperty({ description: 'Город пользователя', example: 'New York' })
+  @IsString()
+  @IsOptional()
+  city?: string;
+
+  @ApiProperty({ description: 'Дата рождения пользователя', example: '2000-01-01' })
+  @IsDateString()
+  @IsOptional()
+  dateOfBirthday?: string; // ISO string, e.g., '2000-01-01'
 
   @IsString()
   @IsOptional()

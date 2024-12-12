@@ -17,11 +17,14 @@ model User {
   isEmailVerified        Boolean   @default(false)
   lastLogin              DateTime?
   lastName               String
-  username               String
-  password               String
   profileImageUrl        String?
   resetPasswordExpires   DateTime?
   resetPasswordToken     String?
   role                   String    @default("user")
   updatedAt              DateTime? @updatedAt
+  password               String
+  username               String
+  city                   String?
+  country                String?
+  dateOfBirthday         DateTime?
 }
