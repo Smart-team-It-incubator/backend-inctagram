@@ -36,7 +36,7 @@ export class UserController {
   })
   @Post()
   async createUser(@Body() body: CreateUserDto): Promise<Partial<UserViewModel> | null> {
-    const createUser: Partial<UserViewModel> | null = await this.commandBus.execute(new CreateUserCommand(body.email, body.password, body.username, body.firstName, body.lastName,));
+    const createUser: Partial<UserViewModel> | null = await this.commandBus.execute(new CreateUserCommand(body.email, body.password, body.username, body.firstName, body.lastName, body.city, body.country, body.dateOfBirthday));
     if (!createUser) {
       throw new HttpException('User not created', HttpStatus.BAD_REQUEST);
       

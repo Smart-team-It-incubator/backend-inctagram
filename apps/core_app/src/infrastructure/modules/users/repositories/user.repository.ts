@@ -27,12 +27,12 @@ export class UsersRepository {
 
     async createUser(user: CreateUserDto): Promise<Partial<UserViewModel> | null> {
       // Создание переменных на основании User сущности для Prisma
-      const { username, email, password, firstName, lastName } = user;
+      const { username, email, password, firstName, lastName, city, country, dateOfBirthday } = user;
     
       try {
         // Prisma получает только основные поля, остальные генерирует самостоятельно
         const createdUser: User = await this.prisma.user.create({
-          data: { username, email, password, firstName, lastName },
+          data: { username, email, password, firstName, lastName, city, country, dateOfBirthday: new Date(dateOfBirthday) },
         });
         // Отдаем публичный профиль в заранее определенном формате
         const userViewModel = new UserViewModel(createdUser);

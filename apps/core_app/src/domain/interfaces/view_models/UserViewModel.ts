@@ -13,6 +13,9 @@ export class UserViewModel implements IUserInterface {
     emailVerificationToken?: string;
     createdAt: Date;
     updatedAt: Date;
+    city: string;
+    country: string;
+    dateOfBirthday: Date
     constructor(private user: IUserInterface) {}
   
     getPublicProfile() {
@@ -22,6 +25,9 @@ export class UserViewModel implements IUserInterface {
         login: this.user.username,
         firstName: this.user.firstName,
         lastName: this.user.lastName,
+        city: this.user.city,
+        country: this.user.country,
+        dateOfBirthday: this.user.dateOfBirthday
       };
     }
   }

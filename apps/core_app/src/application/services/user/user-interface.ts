@@ -14,4 +14,7 @@ export interface IUserInterface {
     lastLogin?: Date;
     createdAt: Date;
     updatedAt: Date;
+    city: string;
+    country: string;
+    dateOfBirthday: Date
   }

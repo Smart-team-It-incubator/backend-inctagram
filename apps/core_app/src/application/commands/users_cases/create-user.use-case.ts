@@ -13,8 +13,12 @@ export class CreateUserCommand {
         public username: string,
         public firstName: string,
         public lastName: string,
+        public city: string, 
+        public country: string, 
+        public dateOfBirthday: Date,
         public role?: string,
         public profileImageUrl?: string,
+
         ) {
     }
 }
@@ -30,6 +34,9 @@ export class CreateUserUseCase {
             username: command.username,
             firstName: command.firstName,
             lastName: command.lastName,
+            city: command.city,
+            country: command.country,
+            dateOfBirthday: command.dateOfBirthday
 
         }
         return await this.usersRepository.createUser(user)

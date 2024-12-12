@@ -42,18 +42,15 @@ export class CreateUserDto {
   
   @ApiProperty({ description: 'Страна пользователя', example: 'USA' })
   @IsString()
-  @IsOptional()
-  country?: string;
+  country: string;
 
   @ApiProperty({ description: 'Город пользователя', example: 'New York' })
   @IsString()
-  @IsOptional()
-  city?: string;
+  city: string;
 
   @ApiProperty({ description: 'Дата рождения пользователя', example: '2000-01-01' })
   @IsDateString()
-  @IsOptional()
-  dateOfBirthday?: string; // ISO string, e.g., '2000-01-01'
+  dateOfBirthday: Date; // ISO string, e.g., '2000-01-01'
 
   @IsString()
   @IsOptional()
