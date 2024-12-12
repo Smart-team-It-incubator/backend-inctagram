@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AuthModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AuthModule);
   app.setGlobalPrefix('api/v1');
   await app.enableCors({
     origin: 'http://localhost:3000', // Разрешаем доступ из основного приложения
@@ -22,6 +22,8 @@ async function bootstrap() {
   SwaggerModule.setup('api/v1-json', app, document); // Swagger будет доступен по /api
 
   await app.listen(process.env.PORT ?? 4000);
+  console.log(`Приложение Auth запущено, ${process.env.PORT} ?? 4000`)
 
 }
 bootstrap();
+ 
