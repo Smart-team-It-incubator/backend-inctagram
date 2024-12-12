@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpException, HttpStatus, Put, Param, Delete } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { GetUsersCommand } from 'apps/core_app/src/application/commands/users_cases/get-users.use-case';
 import { CreateUserCommand } from 'apps/core_app/src/application/commands/users_cases/create-user.use-case';
@@ -45,4 +45,31 @@ export class UserController {
       return createUser
     }
   } 
+
+  // Метод для обновления пользователя
+  @ApiOperation({ summary: 'Update user' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'User was successfully updated' }) // Описание ответа
+  @ApiBody({
+    description: 'Данные для обновления пользователя',
+    type: CreateUserDto, // Это может быть другая DTO для обновления, которая может содержать только те поля, которые можно обновить.
+  })
+  @Put("/:userId") // Используем PUT для обновления
+  async updateUser(@Param('userId') userId: string): Promise<string> {
+    // Пока логика обновления не реализована, возвращаем описание того, что будет реализовано.
+    return `Метод updateUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;
+  }
+
+  // Метод для удаления пользователя
+  @ApiOperation({ summary: 'Delete user' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'User was successfully deleted' }) // Описание ответа
+  @ApiBody({
+    description: 'Данные для удаления пользователя',
+    type: CreateUserDto, // Можно использовать другой DTO, который содержит только идентификатор пользователя для удаления.
+  })
+  @Delete("/:userId") // Используем DELETE для удаления
+  async deleteUser(@Param('userId') userId: string): Promise<string> {
+    // Пока логика удаления не реализована, возвращаем описание того, что будет реализовано.
+    return `Метод deleteUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;
+  }
+
 }
