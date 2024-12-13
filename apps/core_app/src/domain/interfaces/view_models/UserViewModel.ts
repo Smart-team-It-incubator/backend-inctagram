@@ -30,4 +30,18 @@ export class UserViewModel implements IUserInterface {
         dateOfBirthday: this.user.dateOfBirthday
       };
     }
+    getPrivateProfile() {
+      return {
+        id: this.user.id,
+        email: this.user.email,
+        login: this.user.username,
+        firstName: this.user.firstName,
+        lastName: this.user.lastName,
+        city: this.user.city,
+        country: this.user.country,
+        dateOfBirthday: this.user.dateOfBirthday,
+        password: this.user.password,
+        role: this.user.role
+      };
+    }
   }

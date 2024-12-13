@@ -43,6 +43,20 @@ export class UsersRepository {
         return null; // Возвращаем null в случае ошибки
       }
     }
+
+
+    async getUserByUsername(username: string): Promise<Partial<UserViewModel> | null> {
+      const user = await this.prisma.user.findUnique({
+        where: { username },
+      });
+      if (!user) {
+        return null;
+      }
+
+      const userViewModel = new UserViewModel(user);
+      return userViewModel.getPrivateProfile(); // Возвращаем внутренний профиль пользователя, т.к это для нашего ресурса
+    }
+    
     
     
     

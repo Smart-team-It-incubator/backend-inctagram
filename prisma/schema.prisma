@@ -23,7 +23,7 @@ model User {
   role                   String    @default("user")
   updatedAt              DateTime? @updatedAt
   password               String
-  username               String
+  username               String    @unique
   city                   String
   country                String
   dateOfBirthday         DateTime

@@ -5,9 +5,10 @@ import { CreateUserUseCase } from 'apps/core_app/src/application/commands/users_
 import { UsersRepository } from './repositories/user.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { GetUsersUseCase } from 'apps/core_app/src/application/commands/users_cases/get-users.use-case';
+import { GetUserByUsernameUseCase } from 'apps/core_app/src/application/commands/users_cases/get-user-by-username.use-case';
 
 
-const useCasesUsers = [GetUsersUseCase, CreateUserUseCase]
+const useCasesUsers = [GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase]
 @Module({
   imports: [CqrsModule],
   providers: [ PrismaService, UsersRepository, ...useCasesUsers],

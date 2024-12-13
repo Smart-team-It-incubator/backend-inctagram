@@ -5,6 +5,7 @@ import { CreateUserCommand } from 'apps/core_app/src/application/commands/users_
 import { ApiBody, ApiOperation, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'apps/core_app/src/application/dto/CreateUserDto';
 import { UserViewModel } from 'apps/core_app/src/domain/interfaces/view_models/UserViewModel';
+import { GetUserByUsernameCommand } from 'apps/core_app/src/application/commands/users_cases/get-user-by-username.use-case';
 
 
 
@@ -71,5 +72,20 @@ export class UserController {
     // Пока логика удаления не реализована, возвращаем описание того, что будет реализовано.
     return `Метод deleteUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;
   }
+
+
+  //TODO - сделать метод закрытым, это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
+  // Метод для удаления пользователя
+  @ApiOperation({ summary: 'Get User by username' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'respone with required user' }) // Описание ответа
+  @Get("/:username") // Регистр username ВАЖЕН при поиске
+  async findUserByUsername(@Param('username') username: string): Promise<string> {
+    const user = await this.commandBus.execute(new GetUserByUsernameCommand(username));
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
+    return user
+  }
+
 
 }
