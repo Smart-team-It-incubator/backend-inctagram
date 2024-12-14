@@ -27,6 +27,42 @@
       "compilerOptions": {
         "tsConfigPath": "apps/files/tsconfig.app.json"
       }
+    },
+    "auth": {
+      "type": "application",
+      "root": "apps/auth",
+      "entryFile": "main",
+      "sourceRoot": "apps/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auth/tsconfig.app.json"
+      }
+    },
+    "shared-dto": {
+      "type": "library",
+      "root": "libs/shared-dto",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared-dto/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shared-dto/tsconfig.lib.json"
+      }
+    },
+    "core-app-api": {
+      "type": "library",
+      "root": "libs/core-app-api",
+      "entryFile": "index",
+      "sourceRoot": "libs/core-app-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/core-app-api/tsconfig.lib.json"
+      }
+    },
+    "auth-api": {
+      "type": "library",
+      "root": "libs/auth-api",
+      "entryFile": "index",
+      "sourceRoot": "libs/auth-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth-api/tsconfig.lib.json"
+      }
     }
   }
 }
