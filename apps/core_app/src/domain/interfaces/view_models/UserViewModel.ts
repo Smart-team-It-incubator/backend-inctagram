@@ -22,7 +22,7 @@ export class UserViewModel implements IUserInterface {
       return {
         id: this.user.id,
         email: this.user.email,
-        login: this.user.username,
+        username: this.user.username,
         firstName: this.user.firstName,
         lastName: this.user.lastName,
         city: this.user.city,
@@ -34,7 +34,7 @@ export class UserViewModel implements IUserInterface {
       return {
         id: this.user.id,
         email: this.user.email,
-        login: this.user.username,
+        username: this.user.username,
         firstName: this.user.firstName,
         lastName: this.user.lastName,
         city: this.user.city,

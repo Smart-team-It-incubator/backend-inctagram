@@ -1,3 +1,22 @@
+// DTO будет удалено отсюда, теперь DTO лежат в Librs shared-dto - для того чтобы шарить DTO между приложениями и менять только в одном месте.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // import { ApiProperty } from "@nestjs/swagger";
 // import { IsEmail, Matches, IsString, MinLength, MaxLength, IsOptional, IsDateString } from "class-validator";

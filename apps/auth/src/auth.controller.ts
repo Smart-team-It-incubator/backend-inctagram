@@ -1,6 +1,7 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, HttpStatus, HttpException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -8,11 +9,13 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  async login(
-    @Body('username') username: string,
-    @Body('password') password: string,
-  ) {
-    return await this.authService.login(username, password);
+  async login(@Body() loginDto: AuthForm) {
+    try {
+      const result = await this.authService.login(loginDto);
+      return result
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
   }
 
   @Post('logout')

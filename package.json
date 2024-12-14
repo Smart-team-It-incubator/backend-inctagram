@@ -107,7 +107,9 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@app/shared-dto(|/.*)$": "<rootDir>/libs/shared-dto/src/$1"
+      "^@app/shared-dto(|/.*)$": "<rootDir>/libs/shared-dto/src/$1",
+      "^@core-app-api/core-app-api(|/.*)$": "<rootDir>/libs/core-app-api/src/$1",
+      "^auth-api/auth-api(|/.*)$": "<rootDir>/libs/auth-api/src/$1"
     }
   },
   "main": "index.js",

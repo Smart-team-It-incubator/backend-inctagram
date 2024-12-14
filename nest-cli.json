@@ -45,6 +45,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/shared-dto/tsconfig.lib.json"
       }
+    },
+    "core-app-api": {
+      "type": "library",
+      "root": "libs/core-app-api",
+      "entryFile": "index",
+      "sourceRoot": "libs/core-app-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/core-app-api/tsconfig.lib.json"
+      }
+    },
+    "auth-api": {
+      "type": "library",
+      "root": "libs/auth-api",
+      "entryFile": "index",
+      "sourceRoot": "libs/auth-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth-api/tsconfig.lib.json"
+      }
     }
   }
 }

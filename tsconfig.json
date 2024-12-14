@@ -23,6 +23,18 @@
       ],
       "@app/shared-dto/*": [
         "libs/shared-dto/src/*"
+      ],
+      "@core-app-api/core-app-api": [
+        "libs/core-app-api/src"
+      ],
+      "@core-app-api/core-app-api/*": [
+        "libs/core-app-api/src/*"
+      ],
+      "auth-api/auth-api": [
+        "libs/auth-api/src"
+      ],
+      "auth-api/auth-api/*": [
+        "libs/auth-api/src/*"
       ]
     }
   }

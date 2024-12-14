@@ -4,39 +4,50 @@ import { AuthRepository } from './auth.repository';
 import { JwtService } from '@nestjs/jwt';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs'; // Импортируем firstValueFrom из RxJS
+import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
+import { CustomConfigService } from '../../../libs/shared-dto/src/config-service';
+import { CoreAppApiService } from '@core-app-api/core-app-api';
 
 
 @Injectable()
 export class AuthService {
+  private coreAppUrl: string
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
     private readonly httpService: HttpService,
-  ) { }
+    private readonly configService: CustomConfigService,
+    private readonly coreAppApiService: CoreAppApiService
+  ) { 
+    this.coreAppUrl = this.configService.getCoreAppUrl();
+  }
 
-  async login(username: string, password: string) {
-    // Запрос данных пользователя из Core_app
-    const userResponse = await firstValueFrom(
-      this.httpService.get(`http://core_app/api/v1/users/${username}`),
-    );
+  
 
-    const user = userResponse.data;
-    if (!user) {
-      throw new UnauthorizedException('User not found');
+  async login(loginDto: AuthForm) {
+    const { username, password } = loginDto;
+    console.log("Попали в логин" , this.coreAppUrl)
+    //console.log(username, password);
+
+    // Шаг 2: Получение данных пользователя из Core_app
+    const userResponse = await this.getUserByUsername(username);
+    if (!userResponse) {
+      throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
     }
 
-    // Проверка пароля
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    const { password: passwordHash, ...userData } = userResponse;
+
+    //console.log (userResponse)
+
+    // Шаг 3: Проверка пароля
+    const isPasswordValid = await bcrypt.compare(password, passwordHash);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
     }
 
-    // Генерация токенов
-    const payload = { userId: user.id, username: user.username, role: user.role };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
-
-    // (Можно сохранить refreshToken в базе данных Auth, если потребуется)
+    // Шаг 4: Генерация токенов
+    const accessToken = this.generateAccessToken(userData);
+    const refreshToken = this.generateRefreshToken(userData);
 
     return { accessToken, refreshToken };
   }
@@ -58,14 +69,14 @@ export class AuthService {
     return
   }
   // Генерация Access Token для пользователя
-  async generateAccessToken(userId: string): Promise<string> {
+  async generateAccessToken(username: string): Promise<string> {
     // Получаем данные пользователя через HTTP запрос в Core_app
-    const user = await this.getUserFromCoreApp(userId);
+    const user = await this.getUserByUsername(username);
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const payload = { userId: user.id, username: user.username };
+    const payload = { userId: user.id, username: user.username, role: user.role }; 
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_ACCESS_SECRET, // Секретный ключ для Access Token
       expiresIn: '15m', // Время жизни токена, например, 15 минут
@@ -73,14 +84,14 @@ export class AuthService {
   }
 
   // Генерация Refresh Token для пользователя
-  async generateRefreshToken(userId: string): Promise<string> {
+  async generateRefreshToken(username: string): Promise<string> {
     // Получаем данные пользователя через HTTP запрос в Core_app
-    const user = await this.getUserFromCoreApp(userId);
+    const user = await this.getUserByUsername(username);
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const payload = { userId: user.id };
+    const payload = { userId: user.id, username: user.username, role: user.role }; 
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_SECRET, // Секретный ключ для Refresh Token
       expiresIn: '7d', // Время жизни refresh токена, например, 7 дней
@@ -102,13 +113,27 @@ export class AuthService {
   }
 
   // Получение данных пользователя из Core_app через HTTP запрос
+  private async getUserByUsername(username: string) {
+    try {
+      // const response = await firstValueFrom(
+      //   this.httpService.get(`${this.coreAppUrl}/users/${username}`),
+      // );
+      const response = await this.coreAppApiService.getUserByUsername(username);
+      console.log(response.data)
+      return response.data;
+    } catch (error) {
+      return null; // Если пользователь не найден или ошибка, возвращаем null
+    }
+  }
+
   private async getUserFromCoreApp(userId: string) {
     try {
-      const response = await firstValueFrom(this.httpService.get(`http://localhost:3000/api/v1/users/${userId}`)); // Заменили toPromise на firstValueFrom
-      return response.data; // Возвращаем данные пользователя
+      const response = await firstValueFrom(
+        this.httpService.get(`http://core_app_url/users/private/${userId}`),
+      );
+      return response.data;
     } catch (error) {
-      // Обработка ошибок, если не удалось получить данные пользователя
-      throw new HttpException('Error fetching user data from Core_app', HttpStatus.INTERNAL_SERVER_ERROR);
+      return null; // Если пользователь не найден или ошибка, возвращаем null
     }
   }
 
@@ -121,4 +146,9 @@ export class AuthService {
   async verifyRefreshTokenHash(token: string, hash: string): Promise<boolean> {
     return bcrypt.compare(token, hash);
   }
+
+  async _generateHash(password: string, salt: string) {
+    const hash = await bcrypt.hash(password, salt)
+    return hash
+}
 }
