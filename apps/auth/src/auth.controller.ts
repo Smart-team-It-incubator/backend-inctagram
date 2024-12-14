@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get, HttpStatus, HttpException, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
 
 @ApiTags('Auth')
@@ -9,6 +9,29 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @ApiOperation({ summary: 'Авторизация пользователя' })
+  @ApiBody({
+    description: 'Данные для авторизации',
+    type: AuthForm, // DTO для тела запроса
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Успешная авторизация. Возвращает accessToken и устанавливает refreshToken в cookie.',
+    schema: {
+      type: 'object',
+      properties: {
+        accessToken: {
+          type: 'string',
+          description: 'Токен для доступа (JWT)',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Ошибка авторизации. Неверный логин или пароль.',
+  })
+  @ApiCookieAuth() // Добавляем информацию о cookie для refreshToken
   async login(@Body() loginDto: AuthForm, @Res() res) {
     try {
       const result = await this.authService.login(loginDto);
