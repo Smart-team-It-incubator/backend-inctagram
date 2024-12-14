@@ -1,3 +1,4 @@
+import { HttpModule, HttpService } from "@nestjs/axios";
 import { Global, Module } from "@nestjs/common";
 import { CqrsModule } from "@nestjs/cqrs";
 

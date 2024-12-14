@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, HttpStatus, HttpException } from '@nestjs/common';
+import { Controller, Post, Body, Get, HttpStatus, HttpException, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
@@ -9,10 +9,16 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  async login(@Body() loginDto: AuthForm) {
+  async login(@Body() loginDto: AuthForm, @Res() res) {
     try {
       const result = await this.authService.login(loginDto);
-      return result
+      res
+      .cookie("refreshToken", result.refreshToken, {
+          httpOnly: true,
+          secure: true //process.env.NODE_ENV === "production"
+      })
+      .status(200)
+      .send({ accessToken: result.accessToken });
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
     }
@@ -96,6 +102,12 @@ export class AuthController {
   async revokeAllSessions(): Promise<{ message: string }> {
     // TODO: Implement logic to revoke all sessions for the user
     return { message: 'All sessions revoked successfully.' };
+  }
+
+  @Post('hash-password')
+  async hashPassword(@Body('password') password: string): Promise<{ hashedPassword: string }> {
+    const hashedPassword = await this.authService._generateHash(password);
+    return { hashedPassword };
   }
   
 

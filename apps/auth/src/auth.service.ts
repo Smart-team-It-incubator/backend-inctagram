@@ -11,7 +11,8 @@ import { CoreAppApiService } from '@core-app-api/core-app-api';
 
 @Injectable()
 export class AuthService {
-  private coreAppUrl: string
+  private jwtAccessSecret: string
+  private jwtRefreshSecret: string 
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
@@ -19,35 +20,32 @@ export class AuthService {
     private readonly configService: CustomConfigService,
     private readonly coreAppApiService: CoreAppApiService
   ) { 
-    this.coreAppUrl = this.configService.getCoreAppUrl();
+    this.jwtAccessSecret = this.configService.getJwtAccessSecret();
+    this.jwtRefreshSecret = this.configService.getJwtRefreshSecret();
   }
 
   
 
-  async login(loginDto: AuthForm) {
+  async login(loginDto: AuthForm): Promise<{ accessToken: string; refreshToken: string }> {
     const { username, password } = loginDto;
-    console.log("Попали в логин" , this.coreAppUrl)
-    //console.log(username, password);
 
-    // Шаг 2: Получение данных пользователя из Core_app
-    const userResponse = await this.getUserByUsername(username);
+    // Шаг 1: Получение данных пользователя из Core_app
+    const userResponse = await this.coreAppApiService.getUserByUsername(username);
     if (!userResponse) {
       throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
     }
 
     const { password: passwordHash, ...userData } = userResponse;
 
-    //console.log (userResponse)
-
-    // Шаг 3: Проверка пароля
+    // Шаг 2: Проверка пароля
     const isPasswordValid = await bcrypt.compare(password, passwordHash);
     if (!isPasswordValid) {
       throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
     }
 
-    // Шаг 4: Генерация токенов
-    const accessToken = this.generateAccessToken(userData);
-    const refreshToken = this.generateRefreshToken(userData);
+    // Шаг 3: Генерация токенов
+    const accessToken = await this.generateAccessToken(userResponse.username);
+    const refreshToken = await this.generateRefreshToken(userResponse.username);
 
     return { accessToken, refreshToken };
   }
@@ -71,31 +69,32 @@ export class AuthService {
   // Генерация Access Token для пользователя
   async generateAccessToken(username: string): Promise<string> {
     // Получаем данные пользователя через HTTP запрос в Core_app
-    const user = await this.getUserByUsername(username);
+    const user = await this.coreAppApiService.getUserByUsername(username);
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-
     const payload = { userId: user.id, username: user.username, role: user.role }; 
-    return this.jwtService.sign(payload, {
-      secret: process.env.JWT_ACCESS_SECRET, // Секретный ключ для Access Token
+    const accessToken = this.jwtService.sign(payload, {
+      secret: this.jwtAccessSecret, // Секретный ключ для Access Token
       expiresIn: '15m', // Время жизни токена, например, 15 минут
     });
+    return accessToken
   }
 
   // Генерация Refresh Token для пользователя
   async generateRefreshToken(username: string): Promise<string> {
     // Получаем данные пользователя через HTTP запрос в Core_app
-    const user = await this.getUserByUsername(username);
+    const user = await this.coreAppApiService.getUserByUsername(username);
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
     const payload = { userId: user.id, username: user.username, role: user.role }; 
-    return this.jwtService.sign(payload, {
-      secret: process.env.JWT_REFRESH_SECRET, // Секретный ключ для Refresh Token
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: this.jwtRefreshSecret, // Секретный ключ для Refresh Token
       expiresIn: '7d', // Время жизни refresh токена, например, 7 дней
     });
+    return refreshToken
   }
 
   // Проверка, был ли токен отозван
@@ -113,18 +112,14 @@ export class AuthService {
   }
 
   // Получение данных пользователя из Core_app через HTTP запрос
-  private async getUserByUsername(username: string) {
-    try {
-      // const response = await firstValueFrom(
-      //   this.httpService.get(`${this.coreAppUrl}/users/${username}`),
-      // );
-      const response = await this.coreAppApiService.getUserByUsername(username);
-      console.log(response.data)
-      return response.data;
-    } catch (error) {
-      return null; // Если пользователь не найден или ошибка, возвращаем null
-    }
-  }
+  // private async getUserByUsername(username: string) {
+  //   try {
+  //     const response = await this.coreAppApiService.getUserByUsername(username);
+  //     return response; //
+  //   } catch (error) {
+  //     return null; // Если пользователь не найден или ошибка, возвращаем null
+  //   }
+  // }
 
   private async getUserFromCoreApp(userId: string) {
     try {
@@ -137,18 +132,18 @@ export class AuthService {
     }
   }
 
-  // Метод для хеширования refresh токенов (если нужно)
-  async hashRefreshToken(token: string): Promise<string> {
-    return bcrypt.hash(token, 10);
-  }
+  // // Метод для хеширования refresh токенов (если нужно)
+  // async hashRefreshToken(token: string): Promise<string> {
+  //   return bcrypt.hash(token, 10);
+  // }
 
-  // Метод для проверки хеша refresh токена (если нужно)
-  async verifyRefreshTokenHash(token: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(token, hash);
-  }
+  // // Метод для проверки хеша refresh токена (если нужно)
+  // async verifyRefreshTokenHash(token: string, hash: string): Promise<boolean> {
+  //   return bcrypt.compare(token, hash);
+  // }
 
-  async _generateHash(password: string, salt: string) {
-    const hash = await bcrypt.hash(password, salt)
+  async _generateHash(password: string) {
+    const hash = await bcrypt.hash(password, 10);
     return hash
 }
 }

@@ -5,6 +5,8 @@ import { ConfigService } from '@nestjs/config';
 export class CustomConfigService {
   private databaseUrl: string;
   private coreAppUrl: string;
+  private jwtAccessSecret: string;
+  private jwtRefreshSecret: string;
 
   constructor(private readonly configService: ConfigService) {
     
@@ -17,6 +19,8 @@ export class CustomConfigService {
         : this.configService.get<string>('DATABASE_URL_DEV');
 
     this.coreAppUrl = this.configService.get<string>('CORE_APP_URL');
+    this.jwtAccessSecret = this.configService.get<string>('JWT_ACCESS_SECRET');
+    this.jwtRefreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET');
   }
 
   getDatabaseUrl(): string {
@@ -26,4 +30,12 @@ export class CustomConfigService {
   getCoreAppUrl(): string {
     return this.coreAppUrl;
   }
+
+  getJwtAccessSecret(): string {
+    return this.jwtAccessSecret;
+  }
+
+  getJwtRefreshSecret(): string {
+    return this.jwtRefreshSecret;
+  } 
 }

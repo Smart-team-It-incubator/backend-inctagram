@@ -6,12 +6,14 @@ import { UsersRepository } from './repositories/user.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { GetUsersUseCase } from 'apps/core_app/src/application/commands/users_cases/get-users.use-case';
 import { GetUserByUsernameUseCase } from 'apps/core_app/src/application/commands/users_cases/get-user-by-username.use-case';
+import { AuthApiService } from 'auth-api/auth-api';
+import { HttpModule } from '@nestjs/axios';
 
 
 const useCasesUsers = [GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase]
 @Module({
-  imports: [CqrsModule],
-  providers: [ PrismaService, UsersRepository, ...useCasesUsers],
+  imports: [CqrsModule,HttpModule],
+  providers: [ PrismaService, UsersRepository, ...useCasesUsers, AuthApiService],
   controllers: [UserController]
 })
 export class UserModule {}

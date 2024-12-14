@@ -14,11 +14,9 @@ export class CoreAppApiService {
     // Получение данных пользователя по username
     async getUserByUsername(username: string): Promise<any> {
         try {
-            //console.log("мы в библиотеке", this.coreAppUrl);
             const response = await firstValueFrom(
                 this.httpService.get(`${this.coreAppUrl}/users/${username}`),
             );
-            //console.log(response.data);
             return response.data;
         } catch (error) {
             throw new HttpException(

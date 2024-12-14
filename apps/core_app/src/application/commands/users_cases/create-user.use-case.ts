@@ -2,6 +2,7 @@ import { CommandHandler } from "@nestjs/cqrs"
 import { UsersRepository } from "apps/core_app/src/infrastructure/modules/users/repositories/user.repository"
 import { UserViewModel } from "apps/core_app/src/domain/interfaces/view_models/UserViewModel"
 import { CreateUserDto } from "@app/shared-dto"
+import { AuthApiService } from "auth-api/auth-api";
 
 
 export class CreateUserCommand {
@@ -23,12 +24,16 @@ export class CreateUserCommand {
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserUseCase {
-    constructor (protected usersRepository: UsersRepository ) {}
+    constructor (protected usersRepository: UsersRepository,
+        private readonly authApiService: AuthApiService
+        
+    ) {}
 
     async execute(command: CreateUserCommand): Promise<Partial<UserViewModel>> {
+        const hashedPassword = await this.authApiService.hashPassword(command.password);
         const user: CreateUserDto = {
             email: command.email,
-            password: command.password,
+            password: hashedPassword,
             username: command.username,
             firstName: command.firstName,
             lastName: command.lastName,
