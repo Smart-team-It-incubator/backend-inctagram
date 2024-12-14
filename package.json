@@ -33,6 +33,7 @@
     "migrate:statusprod": "dotenv -e .production.env -- npx prisma migrate status",
     "migrate:hotfix": "dotenv -e .production.env -- npx prisma migrate resolve --applied",
     "migrate:auth:dev": "cross-env NODE_ENV=development npx prisma migrate dev --schema=apps/auth/prisma/schema.prisma",
+    "migrate:auth:def": "dotenv -e .development.env npx prisma migrate dev --schema=apps/auth/prisma/schema.prisma",
     "migrate:auth:prod": "cross-env NODE_ENV=production npx prisma migrate deploy --schema=apps/auth/prisma/schema.prisma",
     "generate:auth": "npx prisma generate --schema=apps/auth/prisma/schema.prisma"
   },
