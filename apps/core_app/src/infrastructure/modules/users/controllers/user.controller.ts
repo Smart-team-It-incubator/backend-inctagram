@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, HttpException, HttpStatus, Put, Param, Del
 import { CommandBus } from '@nestjs/cqrs';
 import { GetUsersCommand } from 'apps/core_app/src/application/commands/users_cases/get-users.use-case';
 import { CreateUserCommand } from 'apps/core_app/src/application/commands/users_cases/create-user.use-case';
-import { ApiBody, ApiOperation, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'apps/core_app/src/application/dto/CreateUserDto';
 import { UserViewModel } from 'apps/core_app/src/domain/interfaces/view_models/UserViewModel';
 import { GetUserByUsernameCommand } from 'apps/core_app/src/application/commands/users_cases/get-user-by-username.use-case';
