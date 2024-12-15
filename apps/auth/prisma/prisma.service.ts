@@ -9,7 +9,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       process.env.NODE_ENV === 'production'
         ? process.env.DATABASE_URL_PROD
         : process.env.DATABASE_URL_DEV;
-        
+      
+        //console.log("DATABASE_URL полученный по команде для запуска auth:",databaseUrl);
     // Передаём URL в PrismaClient
     super({
       datasources: {

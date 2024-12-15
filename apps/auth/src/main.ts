@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AuthModule } from './auth.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+console.log("Переменная", process.env.DATABASE_URL_DEV);
+
 async function bootstrap() {
   const app = await NestFactory.create(AuthModule);
   app.setGlobalPrefix('api/v1');

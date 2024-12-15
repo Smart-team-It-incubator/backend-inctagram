@@ -1,3 +1,4 @@
+
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -10,13 +11,12 @@ import { JwtService } from '@nestjs/jwt';
 import { CustomConfigService } from '../../../libs/shared-dto/src/config-service';
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 
-const ENV = process.env.NODE_ENV;
-console.log("ENV полученный по команде для запуска auth:",ENV);
 
+//console.log('DATABASE_URL из process.env:', process.env.DATABASE_URL_DEV);
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
-    envFilePath: `.${ENV}.env`, // Определяем какой из ENV файлов подгрузиться, чтобы в зависимости от команды определялась БД (Production or Development)
+    envFilePath: process.env.ENV_FILE, // Загружаем файл из переменной окружения, если нужно
   }), PrismaModule, HttpModule],
   controllers: [AuthController],
   providers: [PrismaService, AuthService, AuthRepository, JwtService, CustomConfigService, CoreAppApiService],
