@@ -1,17 +1,18 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaModule } from './infrastructure/database/prisma/prisma.module';
 import { UserModule } from './infrastructure/modules/users/user.module';
-import { PrismaService } from './infrastructure/database/prisma/prisma.service';
+
 import { UserController } from './infrastructure/modules/users/controllers/user.controller';
 import { ConfigModule } from '@nestjs/config';
 import { GlobalModule } from './infrastructure/modules/global_module/global_module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { FilesGatewayController } from './infrastructure/modules/files_gateway/controllers/files.controller';
+import { PrismaCoreAppService } from '../prisma/prisma.service';
+import { PrismaModule } from '../prisma/prisma.module';
 
-const ENV = process.env.NODE_ENV;
-console.log(ENV);
+// const ENV = process.env.NODE_ENV;
+// console.log(ENV);
 
 
 @Module({
@@ -26,10 +27,11 @@ console.log(ENV);
     PrismaModule, UserModule, GlobalModule,
     
     ConfigModule.forRoot({
-    envFilePath: `.${ENV}.env`, // Определяем какой из ENV файлов подгрузиться, чтобы в зависимости от команды определялась БД (Production or Development)
-  })
+      isGlobal: true,
+      envFilePath: process.env.ENV_FILE, // Загружаем файл из переменной окружения, если нужно
+    })
   ,],
   controllers: [AppController, UserController, FilesGatewayController],
-  providers: [AppService, PrismaService],
+  providers: [AppService, PrismaCoreAppService],
 })
 export class AppModule {}

@@ -1,14 +1,15 @@
-import { Injectable } from "@nestjs/common"
-import { PrismaService } from "../../../database/prisma/prisma.service";
-import { User } from "@prisma/client";
 import { UserViewModel } from "apps/core_app/src/domain/interfaces/view_models/UserViewModel";
 import { CreateUserDto } from "@app/shared-dto";
+import { Injectable } from "@nestjs/common/decorators/core";
+import { User } from "apps/core_app/src/domain/entities/user-entities";
+import { PrismaCoreAppService } from "apps/core_app/prisma/prisma.service";
+
 
 
 @Injectable()
 export class UsersRepository {
 
-    constructor (private readonly prisma: PrismaService
+    constructor (private readonly prisma: PrismaCoreAppService
     ) {
 
     }
@@ -28,7 +29,7 @@ export class UsersRepository {
     async createUser(user: CreateUserDto): Promise<Partial<UserViewModel> | null> {
       // Создание переменных на основании User сущности для Prisma
       const { username, email, password, firstName, lastName, city, country, dateOfBirthday } = user;
-    
+      console.log(password)
       try {
         // Prisma получает только основные поля, остальные генерирует самостоятельно
         const createdUser: User = await this.prisma.user.create({

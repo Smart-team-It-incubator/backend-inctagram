@@ -31,6 +31,7 @@ export class CreateUserUseCase {
 
     async execute(command: CreateUserCommand): Promise<Partial<UserViewModel>> {
         const hashedPassword = await this.authApiService.hashPassword(command.password);
+        console.log("hashedPassword", hashedPassword)   
         const user: CreateUserDto = {
             email: command.email,
             password: hashedPassword,
