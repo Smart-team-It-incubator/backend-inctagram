@@ -47,6 +47,9 @@ export class AuthService {
     const accessToken = await this.generateAccessToken(userResponse.username);
     const refreshToken = await this.generateRefreshToken(userResponse.username);
 
+    // Шаг 4: Сохранение токенов в базе данных
+    await this.authRepository.saveRefreshToken(userResponse.username, refreshToken);
+
     return { accessToken, refreshToken };
   }
 

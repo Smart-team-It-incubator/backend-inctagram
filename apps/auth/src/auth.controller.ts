@@ -128,10 +128,10 @@ export class AuthController {
   }
 
   @Post('hash-password')
-  async hashPassword(@Body('password') password: string): Promise<{ hashedPassword: string }> {
-    console.log("мы попали в controller Auth hash-password", password);
-    const hashedPassword = await this.authService._generateHash(password);
-    return { hashedPassword };
+  async hashPassword(@Body('password') passwordByUser: string): Promise<{ hashedPassword: string }> {
+    console.log("мы попали в controller Auth hash-password", passwordByUser);
+    const password = await this.authService._generateHash(passwordByUser);
+    return password;
   }
   
 

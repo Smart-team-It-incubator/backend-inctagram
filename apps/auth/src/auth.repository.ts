@@ -1,24 +1,22 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';  // Для преобразования Observable в Promise
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthRepository {
-  constructor(private httpService: HttpService) {}
+  constructor(private httpService: HttpService,
+    private readonly prisma: PrismaService
+  ) { }
 
-  // Пример метода для создания пользователя
-  async createUser(userData: any) {
-    const response = await firstValueFrom(
-      this.httpService.post('http://core_app/api/v1/users', userData)
-    );
-    return response.data;  // Возвращаем данные, полученные от Core_app
-  }
-
-  // Пример метода для получения пользователя по имени
-  async getUserByUsername(username: string) {
-    const response = await firstValueFrom(
-      this.httpService.get(`http://core_app/api/v1/users/${username}`)
-    );
-    return response.data;  // Возвращаем данные пользователя
+  // Сохранение Refresh Token в базе данных или Redis
+  async saveRefreshToken(username: string, refreshToken: string): Promise<void> {
+    // try {
+    //   await prisma.refreshToken.create({ data: { username, refreshToken } });
+    //   console.log(response.data); // Выводим ответ от Core_app в консоль
+    // } catch (error) {
+    //   console.error('Error saving refresh token:', error);
+    // }
+    return
   }
 }

@@ -27,20 +27,16 @@
   "build:auth": "nest build auth",
   "start:auth": "cross-env ENV_FILE=./apps/auth/.production.env node dist/apps/auth/main",
   "start:dev:auth": "cross-env ENV_FILE=./apps/auth/.development.env nest start auth --watch",
-  "migrate:core-app:dev": "cross-env ENV_FILE=./apps/core_app/.development.env npx prisma migrate dev --schema=apps/core_app/prisma/schema.prisma",
-  "migrate:core-app:prod": "cross-env ENV_FILE=./apps/core_app/.production.env npx prisma migrate deploy --schema=apps/core_app/prisma/schema.prisma",
+  "migrate:core-app:dev": "dotenv -e ./apps/core_app/.development.env -- npx prisma migrate dev --schema=./apps/core_app/prisma/schema.prisma",
+  "migrate:core-app:prod": "dotenv -e ./apps/core_app/.production.env -- npx prisma migrate deploy --schema=./apps/core_app/prisma/schema.prisma",
   "migrate:statusdev": "cross-env ENV_FILE=.development.env npx prisma migrate status",
   "migrate:statusprod": "cross-env ENV_FILE=.production.env npx prisma migrate status",
   "migrate:hotfix": "cross-env ENV_FILE=.production.env npx prisma migrate resolve --applied",
-  "migrate:auth:dev": "cross-env ENV_FILE=./apps/auth/.development.env npx prisma migrate dev --schema=apps/auth/prisma/schema.prisma",
-  "migrate:auth:prod": "cross-env ENV_FILE=./apps/auth/.production.env npx prisma migrate deploy --schema=apps/auth/prisma/schema.prisma",
-  "generate:auth": "cross-env ENV_FILE=./apps/auth/.development.env npx prisma generate --schema=apps/auth/prisma/schema.prisma",
-  "generate:core-app": "cross-env ENV_FILE=./apps/core_app/.development.env npx prisma generate --schema=apps/core_app/prisma/schema.prisma",
+  "migrate:auth:dev": "dotenv -e ./apps/auth/.development.env -- npx prisma migrate dev --schema=./apps/auth/prisma/schema.prisma",
+  "migrate:auth:prod": "dotenv -e ./apps/auth/.production.env -- npx prisma migrate deploy --schema=./apps/auth/prisma/schema.prisma",
+  "generate:auth": "dotenv -e ./apps/core_app/.development.env -- npx prisma generate --schema=./apps/auth/prisma/schema.prisma",
+  "generate:core_app": "dotenv -e ./apps/core_app/.development.env -- npx prisma generate --schema=./apps/core_app/prisma/schema.prisma",
   "libs:builds": "nest build shared-dto && nest build auth-api && nest build core-app-api"
-},
-  "prisma": {
-  "schema": "apps/auth/prisma/schema.prisma",
-  "schema2": "apps/core_app/prisma/schema.prisma"
 },
   "dependencies": {
     "@libs/shared-dto": "file:./libs/shared-dto",

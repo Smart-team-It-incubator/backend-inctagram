@@ -14,14 +14,14 @@ export class AuthApiService {
   // Метод для хеширования пароля
   async hashPassword(password: string): Promise<string> {
     try {
-      console.log(`${this.authAppUrl}/hash-password`, { password }); 
+      //console.log(`${this.authAppUrl}/hash-password`, { password }); 
       const response = await firstValueFrom(
         this.httpService.post(`${this.authAppUrl}/hash-password`, { password }),
       );
-      
-      return response.data.password; // Предполагаем, что ответ содержит hashedPassword
+      //console.log("response", response.data)
+      return response.data; // Возвращается строка password сразу в виде хэша
     } catch (error) {
-      //console.error('Error details:', error.response?.data || error.message || error);
+      console.error('Error details:', error.response?.data || error.message || error);
       throw new HttpException(
         'Error hashing password via Auth microservice',
         HttpStatus.INTERNAL_SERVER_ERROR,
