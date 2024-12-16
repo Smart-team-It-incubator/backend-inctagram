@@ -1,6 +1,5 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-import { firstValueFrom } from 'rxjs';  // Для преобразования Observable в Promise
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -11,12 +10,12 @@ export class AuthRepository {
 
   // Сохранение Refresh Token в базе данных или Redis
   async saveRefreshToken(username: string, refreshToken: string): Promise<void> {
-    // try {
-    //   await prisma.refreshToken.create({ data: { username, refreshToken } });
-    //   console.log(response.data); // Выводим ответ от Core_app в консоль
-    // } catch (error) {
-    //   console.error('Error saving refresh token:', error);
-    // }
+    try {
+      //await this.prisma.refreshToken.create({ data: { username, refreshToken } });
+
+    } catch (error) {
+      console.error('Error saving refresh token:', error);
+    }
     return
   }
 }
