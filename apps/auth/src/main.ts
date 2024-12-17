@@ -1,12 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AuthModule } from './auth.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 
-console.log("Переменная", process.env.DATABASE_URL_DEV);
+console.log("Переменная", process.env.DATABASE_URL);
 
 async function bootstrap() {
   const app = await NestFactory.create(AuthModule);
   app.setGlobalPrefix('api/v1');
+  app.use(cookieParser());
   await app.enableCors({
     origin: 'http://localhost:3000', // Разрешаем доступ из основного приложения
     methods: 'GET,POST,PUT,DELETE',

@@ -3,11 +3,13 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { CustomValidationPipe } from './domain/exceptions/Pipe/Custom_global_validation_pipe';
 import axios from 'axios';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // Глобальный префикс для всех эндпоинтов
   app.setGlobalPrefix('api/v1');
+  app.use(cookieParser());
 
   // Подключение глобального пайпа для кастомизации и структурирования ошибок + проверки DTO которые приходят в контроллеры
   app.useGlobalPipes(
@@ -25,7 +27,7 @@ async function bootstrap() {
     const coreDoc = SwaggerModule.createDocument(app, config);
     // Получение документации для auth микросервиса
     const authDoc = await axios.get('http://localhost:4000/api/v1-json'); // Путь к Swagger документации для auth, в настоящем пути "-json" нет, но это необходимо указать для того чтобы склеить документацию.
-    console.log(authDoc.data)
+    //console.log(authDoc.data)
     const combinedDoc = {
       ...coreDoc,
       paths: {

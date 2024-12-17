@@ -2,6 +2,8 @@
 /dist
 /node_modules
 /build
+/apps/auth/prisma/schema_generate
+/apps/core_app/prisma/schema_generate
 
 # Logs
 logs
