@@ -28,10 +28,10 @@ export class AuthService {
 
 
   async login(loginDto: AuthForm): Promise<{ accessToken: string; refreshToken: string }> {
-    const { username, password } = loginDto;
+    const { email, password } = loginDto;
 
     // Шаг 1: Получение данных пользователя из Core_app
-    const userResponse = await this.coreAppApiService.getUserByUsername(username);
+    const userResponse = await this.coreAppApiService.getUserByEmail(email);
     if (!userResponse) {
       throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
     }
