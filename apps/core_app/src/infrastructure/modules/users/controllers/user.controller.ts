@@ -6,6 +6,7 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserViewModel } from 'apps/core_app/src/domain/interfaces/view_models/UserViewModel';
 import { GetUserByUsernameCommand } from 'apps/core_app/src/application/commands/users_cases/get-user-by-username.use-case';
 import { CreateUserDto } from '@app/shared-dto';
+import { GetUserByEmailCommand } from 'apps/core_app/src/application/commands/users_cases/get-user-by-email.use-case';
 
 
 
@@ -75,7 +76,7 @@ export class UserController {
 
 
   //TODO - сделать метод закрытым, это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
-  // Метод для удаления пользователя
+  // Метод для получения пользователя по Username
   @ApiOperation({ summary: 'Get User by username' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'respone with required user' }) // Описание ответа
   @Get("/:username") // Регистр username ВАЖЕН при поиске
@@ -86,6 +87,21 @@ export class UserController {
     }
     return user
   }
+
+    //TODO - сделать метод закрытым, это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
+  // Метод для получения пользователя по Email
+  @ApiOperation({ summary: 'Get User by email' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'respone with required user' }) // Описание ответа
+  @Get("/getByEmail/:email") // Регистр email ВАЖЕН при поиске
+  async findUserByEmail(@Param('email') email: string): Promise<string> {
+    const user = await this.commandBus.execute(new GetUserByEmailCommand(email));
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
+    return user
+  }
+
+
 
 
 }
