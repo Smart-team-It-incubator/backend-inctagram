@@ -32,9 +32,11 @@ export class AuthController {
     description: 'Ошибка авторизации. Неверный логин или пароль.',
   })
   @ApiCookieAuth() // Добавляем информацию о cookie для refreshToken
-  async login(@Body() loginDto: AuthForm, @Res() res) {
+  async login(@Body() loginDto: AuthForm, @Res() res, @Req() req) {
     try {
-      const result = await this.authService.login(loginDto);
+      const ip = req.ip
+      const useragent = req.headers['user-agent'];
+      const result = await this.authService.login(loginDto, useragent, ip);
       res
         .cookie("refreshToken", result.refreshToken, {
           httpOnly: true,
@@ -105,12 +107,14 @@ export class AuthController {
   @Post('refresh-token')
   async updateRefreshToken(@Req() req, @Res() res) {
     try {
+      const ip = req.ip
+      const useragent = req.headers['user-agent'];
       const refreshToken = req.cookies?.refreshToken; // Получаем токен из Cookie
       //console.log("К нам пришел refresh token /auth/refresh-token:",refreshToken)
       if (!refreshToken) {
         throw new UnauthorizedException('Refresh token not found');
       }
-      const { accessToken, newRefreshToken } = await this.authService.updateRefreshToken(refreshToken);
+      const { accessToken, newRefreshToken } = await this.authService.updateRefreshToken(refreshToken, useragent, ip);
   
       res.cookie('refreshToken', newRefreshToken, {
         httpOnly: true,
@@ -180,7 +184,7 @@ export class AuthController {
     ];
   }
 
-  // Revoke Session
+  // Revoke specific Session
   @Post('sessions/revoke')
   @ApiResponse({ status: 200, description: 'Session revoked successfully.' })
   @ApiBody({ schema: { example: { sessionId: 'session1' } } })

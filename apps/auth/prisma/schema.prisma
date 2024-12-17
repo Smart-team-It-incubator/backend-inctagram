@@ -1,7 +1,8 @@
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
-  output = "schema_generate"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"] // Нужно для деплоя
+  output = "schema_generate" // Путь куда попадают 
+  log      = ["query", "info", "warn", "error"] // Логирование запросов, информационных сообщений, предупреждений и ошибок
 }
 
 datasource db {
@@ -13,14 +14,31 @@ datasource db {
 model RefreshToken {
   id          String   @id @default(uuid())
   username    String
-  tokenHash   String
+  tokenHash   String   @unique
   userId      String
   expiresAt   DateTime
   revoked     Boolean  @default(false)
+  userAgent   String?  // User-Agent браузера или устройства
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  session     Session? @relation(fields: [tokenHash], references: [tokenHash]) // Указываем связь здесь
 }
+
+model Session {
+  id             String   @id @default(uuid()) @map("id")
+  userId         String   // ID пользователя
+  deviceId       String
+  ip             String
+  tokenHash      String   @unique
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+  lastVisit      DateTime @updatedAt
+
+  refreshToken   RefreshToken? // Здесь связь объявлять не нужно дополнительно
+}
+
+
 
 model PasswordResetRequest {
   id              String   @id @default(uuid())
@@ -37,3 +55,4 @@ model RevokedToken {
   tokenHash  String
   revokedAt  DateTime @default(now())
 }
+
