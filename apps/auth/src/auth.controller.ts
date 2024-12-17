@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, Req, UnauthorizedException, Delete } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
@@ -208,5 +208,9 @@ export class AuthController {
     return password;
   }
 
-
+  // For Dev
+  @Delete('drop-db')
+  async dropDb() {
+    return this.authService.dropDb();
+  }
 }

@@ -96,4 +96,20 @@ export class AuthRepository {
 
   return tokens.map((t) => t.tokenHash);
 }
+
+async dropDb() {
+  try {
+    // Удаляем данные из каждой таблицы, но структура остаётся
+    await this.prisma.$transaction([
+      this.prisma.refreshToken.deleteMany({}),
+      this.prisma.session.deleteMany({}),
+      this.prisma.passwordResetRequest.deleteMany({}),
+      this.prisma.revokedToken.deleteMany({}),
+      // Добавьте другие таблицы, из которых нужно удалить данные
+    ]);
+    console.log('Данные успешно удалены из таблиц.');
+  } catch (error) {
+    console.error('Ошибка при удалении данных:', error);
+  }
+}
 }

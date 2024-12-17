@@ -196,4 +196,9 @@ export class AuthService {
     }
   }
 
+
+  async dropDb() {
+    return this.authRepository.dropDb();
+  }
+
 }
