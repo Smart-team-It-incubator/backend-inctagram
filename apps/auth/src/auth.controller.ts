@@ -31,12 +31,18 @@ export class AuthController {
     status: 401,
     description: 'Ошибка авторизации. Неверный логин или пароль.',
   })
+  @ApiResponse({
+    status: 409,
+    description: 'Сессия уже существует для этого устройства.',
+  })
   @ApiCookieAuth() // Добавляем информацию о cookie для refreshToken
   async login(@Body() loginDto: AuthForm, @Res() res, @Req() req) {
     try {
       const ip = req.ip
       const useragent = req.headers['user-agent'];
-      const result = await this.authService.login(loginDto, useragent, ip);
+      const refreshTokenExist = req.cookies?.refreshToken; // Получаем токен из Cookie
+      const result = await this.authService.login(loginDto, useragent, ip, refreshTokenExist);
+      
       res
         .cookie("refreshToken", result.refreshToken, {
           httpOnly: true,
@@ -45,6 +51,9 @@ export class AuthController {
         .status(200)
         .send({ accessToken: result.accessToken });
     } catch (error) {
+      if (error.message === 'Active session exists') {
+        throw new HttpException('Уже существует активная сессия для устройства с этим Refresh Token, если нужно обновить, обратись на refresh-token.', HttpStatus.CONFLICT);
+      }
       throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
     }
   }
@@ -129,10 +138,6 @@ export class AuthController {
     }
   }
 
-  @Post('validate-token')
-  async validateToken(@Body() userData: any) {
-    return this.authService.validateToken(userData);
-  }
 
   @Post('password-reset/request')
   @ApiResponse({ status: 200, description: 'Password reset request submitted successfully.' })

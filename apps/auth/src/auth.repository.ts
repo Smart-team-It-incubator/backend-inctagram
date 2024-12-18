@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtPayload } from '@app/shared-dto/dtos/jwt-payload.dto';
 import { randomUUID } from 'crypto';
+import { Session } from 'inspector/promises';
 
 @Injectable()
 export class AuthRepository {
@@ -96,6 +97,34 @@ export class AuthRepository {
 
   return tokens.map((t) => t.tokenHash);
 }
+
+async findActiveSession(userId: string, deviceId: string): Promise<object> {
+  const sessions = await this.prisma.session.findFirst({
+    where: {
+      userId, 
+      deviceId,
+      expiresAt: {
+        gt: new Date(),
+      }
+    }
+
+    
+  })
+  return sessions
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 async dropDb() {
   try {
