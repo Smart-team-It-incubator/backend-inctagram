@@ -13,7 +13,8 @@
     "start:debug": "nest start auth --debug --watch",
     "start:prod": "cross-env NODE_ENV=production node dist/apps/core_app/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
+    "test1": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -113,7 +114,9 @@
     "moduleNameMapper": {
       "^@app/shared-dto(|/.*)$": "<rootDir>/libs/shared-dto/src/$1",
       "^@core-app-api/core-app-api(|/.*)$": "<rootDir>/libs/core-app-api/src/$1",
-      "^auth-api/auth-api(|/.*)$": "<rootDir>/libs/auth-api/src/$1"
+      "^auth-api/auth-api(|/.*)$": "<rootDir>/libs/auth-api/src/$1",
+      "^@prisma/auth(|/.*)$": "<rootDir>/apps/auth/prisma/schema_generate/$1",
+      "^@prisma/core_app(|/.*)$": "<rootDir>/apps/core_app/prisma/schema_generate/$1"
     }
   },
   "main": "index.js",
