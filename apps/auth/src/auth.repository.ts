@@ -3,12 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtPayload } from '@app/shared-dto/dtos/jwt-payload.dto';
 import { randomUUID } from 'crypto';
-import { Session } from 'inspector/promises';
 
 @Injectable()
 export class AuthRepository {
   constructor(private httpService: HttpService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) { }
 
   // Сохранение Refresh Token в базе данных или Redis
@@ -98,7 +97,8 @@ export class AuthRepository {
   return tokens.map((t) => t.tokenHash);
 }
 
-async findActiveSession(userId: string, deviceId: string): Promise<object> {
+// Поиск одной конкретной сессии
+async findOneActiveSession(userId: string, deviceId: string): Promise<object> {
   const sessions = await this.prisma.session.findFirst({
     where: {
       userId, 
@@ -113,6 +113,56 @@ async findActiveSession(userId: string, deviceId: string): Promise<object> {
   return sessions
 }
 
+async findAllActiveSession(userId: string): Promise<object> {
+  const sessions = await this.prisma.session.findMany({
+    where: {
+      userId, 
+      expiresAt: {
+        gt: new Date(),
+      }
+    }
+  })
+  if (!sessions) return null
+  return sessions
+}
+
+
+  async revokeSessionBySessionId(sessionId: string): Promise<boolean> {
+
+    try {
+      const session = await this.prisma.session.delete({
+        where: {
+          id: sessionId,
+        },
+      });
+  
+      // Если удаление успешно, `session` содержит удаленную запись
+      return !!session;
+    } catch (error) {
+      console.error('Error revoking session:', error);
+      return false; // Если удаление не удалось
+    }
+}
+async revokeAllActiveSession(userId: string, deviceId: string): Promise<boolean> {
+  try {
+    const result = await this.prisma.session.deleteMany({
+      where: {
+        userId, // Удаляем только сессии пользователя
+        deviceId: {
+          not: deviceId, // Исключаем указанное устройство
+        },
+        expiresAt: {
+          gt: new Date(), // Только активные сессии
+        },
+      },
+    });
+
+    // `result.count` содержит количество удаленных записей
+    return result.count > 0;
+  } catch (error) {
+    return false; // Если удаление не удалось
+  }
+}
 
 
 

@@ -12,31 +12,34 @@ datasource db {
 
 
 model RefreshToken {
-  id          String   @id @default(uuid())
-  username    String
-  tokenHash   String   @unique
-  userId      String
-  expiresAt   DateTime
-  revoked     Boolean  @default(false)
-  userAgent   String?  // User-Agent браузера или устройства
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          String   @id @default(uuid())  // Уникальный идентификатор
+  username    String                             // Имя пользователя
+  tokenHash   String   @unique                  // Уникальный хэш токена
+  userId      String                             // ID пользователя
+  expiresAt   DateTime                          // Время истечения токена
+  revoked     Boolean  @default(false)          // Флаг отзыва токена
+  userAgent   String?                           // User-Agent браузера или устройства
+  createdAt   DateTime @default(now())          // Дата создания токена
+  updatedAt   DateTime @updatedAt               // Дата последнего обновления
 
-  session     Session? @relation(fields: [tokenHash], references: [tokenHash]) // Указываем связь здесь
+  session     Session? @relation(fields: [tokenHash], references: [tokenHash], onDelete: Cascade) 
+  // Связываем RefreshToken с Session через tokenHash.
+  // При удалении записи в Session, автоматически удалится и связанный RefreshToken.
 }
 
 model Session {
-  id             String   @id @default(uuid()) @map("id")
-  userId         String   // ID пользователя
-  deviceId       String
-  ip             String
-  tokenHash      String   @unique
-  expiresAt      DateTime
-  createdAt      DateTime @default(now())
-  lastVisit      DateTime @updatedAt
+  id           String         @id @default(uuid()) @map("id")  // Уникальный идентификатор
+  userId       String                                     // ID пользователя
+  deviceId     String                                     // Уникальный ID устройства
+  ip           String                                     // IP-адрес устройства
+  tokenHash    String         @unique                    // Уникальный хэш токена
+  expiresAt    DateTime                                  // Время истечения сессии
+  createdAt    DateTime       @default(now())            // Дата создания сессии
+  lastVisit    DateTime       @updatedAt                 // Дата последнего визита
 
-  refreshToken   RefreshToken? // Здесь связь объявлять не нужно дополнительно
+  refreshToken RefreshToken?                             // Обратная связь на RefreshToken
 }
+
 
 
 

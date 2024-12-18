@@ -1,7 +1,8 @@
-import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, Req, UnauthorizedException, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, Req, UnauthorizedException, Delete, Query, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
+import { Session } from '@prisma/auth';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -181,36 +182,61 @@ export class AuthController {
       ]
     }
   })
-  async getActiveSessions(): Promise<any[]> {
-    // TODO: Implement logic to fetch active sessions
-    return [
-      { sessionId: 'session1', device: 'Chrome on Windows', ip: '192.168.1.1', lastActive: '2024-12-13T12:00:00Z' },
-      { sessionId: 'session2', device: 'Safari on Mac', ip: '192.168.1.2', lastActive: '2024-12-12T18:30:00Z' },
-    ];
+  async getActiveSessions(@Req() req): Promise<object> {
+    try {
+      const refreshToken = req.cookies?.refreshToken; // Получаем токен из Cookie
+      const activeSessions = await this.authService.getActiveSessions(refreshToken);
+      return activeSessions
+    } catch (error) {
+      return error.message
+    }
   }
 
   // Revoke specific Session
-  @Post('sessions/revoke')
+  @Delete('sessions/revoke/:sessionId')
   @ApiResponse({ status: 200, description: 'Session revoked successfully.' })
   @ApiBody({ schema: { example: { sessionId: 'session1' } } })
-  async revokeSession(@Body('sessionId') sessionId: string): Promise<{ message: string }> {
-    // TODO: Implement logic to revoke a specific session
-    return { message: `Session ${sessionId} revoked successfully.` };
+  async revokeSession(@Param('sessionId') sessionId: string): Promise<{ message: string }> {
+    try {
+      console.log(sessionId)
+      const result = await this.authService.revokeSessionBySessionId(sessionId);
+      if (!result) throw new HttpException('Session not found', HttpStatus.NOT_FOUND);
+      return { message: `Session ${sessionId} revoked successfully.` };
+    } catch (error) {
+      // Обрабатываем ошибку, чтобы не возвращать 200
+      throw error; // Повторно выбрасываем ошибку для корректной обработки HTTP статуса
+    }
   }
 
   // Revoke All Sessions
-  @Post('sessions/revoke-all')
+  @Delete('sessions/revoke-all')
   @ApiResponse({ status: 200, description: 'All sessions revoked successfully.' })
-  async revokeAllSessions(): Promise<{ message: string }> {
-    // TODO: Implement logic to revoke all sessions for the user
-    return { message: 'All sessions revoked successfully.' };
+  async revokeAllSessions(@Req() req): Promise<{ message: string }> {
+    try {
+      const refreshToken = req.cookies?.refreshToken; // Получаем токен из Cookie
+      if (!refreshToken) {
+        throw new UnauthorizedException('Refresh token not found');
+      }
+      const result: boolean = await this.authService.revokeAllActiveSessions(refreshToken);
+      if (!result) throw new HttpException('Active sessions not found', HttpStatus.NOT_FOUND);
+      return { message: 'All sessions revoked successfully.' };
+    } catch (error) {
+      // Обрабатываем ошибку, чтобы не возвращать 200
+      throw error; // Повторно выбрасываем ошибку для корректной обработки HTTP статуса
+    }
+    
   }
 
   @Post('hash-password')
   async hashPassword(@Body('password') passwordByUser: string): Promise<{ hashedPassword: string }> {
-    console.log("мы попали в controller Auth hash-password", passwordByUser);
-    const password = await this.authService._generateHash(passwordByUser);
-    return password;
+    try {
+      console.log("мы попали в controller Auth hash-password", passwordByUser);
+      const password = await this.authService._generateHash(passwordByUser);
+      return password;
+    } catch (error) {
+      return error.message
+    }
+
   }
 
   // For Dev

@@ -47,7 +47,7 @@ export class AuthService {
 
     // Шаг 3: Проверка на случай, если к нам пришел запрос с уже существующим, действующим, Refresh Token - в таком случае отказываем в выдаче новой сессии, для обновления токенов есть отдельный метод
     const existRefreshTokenPayload: JwtPayload = await this.extractPayloadFromToken(refreshTokenExist, false);
-    const existingSession = await this.authRepository.findActiveSession(userResponse.userId, existRefreshTokenPayload.deviceId);
+    const existingSession = await this.authRepository.findOneActiveSession(userResponse.userId, existRefreshTokenPayload.deviceId);
     console.log("existingSession:", existingSession);
     if (existingSession) {
       throw new Error('Active session exists');
@@ -143,7 +143,7 @@ export class AuthService {
   }
 
 
-  
+
   // Генерация Access Token для пользователя
   async generateAccessToken(username: string, deviceId: string): Promise<string> {
     // Получаем данные пользователя через HTTP запрос в Core_app
@@ -207,4 +207,23 @@ export class AuthService {
     return this.authRepository.dropDb();
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+
+async getActiveSessions(refreshToken: string): Promise <object> {
+  const refreshTokenPayload = await this.extractPayloadFromToken(refreshToken, false);
+  const activeSessions = await this.authRepository.findAllActiveSession(refreshTokenPayload.userId);
+  return activeSessions
+}
+
+async revokeSessionBySessionId(sessionId: string): Promise<boolean> {
+  const result = await this.authRepository.revokeSessionBySessionId(sessionId);
+  return result
+}
+
+async revokeAllActiveSessions(refreshToken: string): Promise<boolean> {
+  const refreshTokenPayload = await this.extractPayloadFromToken(refreshToken, false);
+  const result = await this.authRepository.revokeAllActiveSession(refreshTokenPayload.userId, refreshTokenPayload.deviceId);
+  return result
+}
 }
