@@ -8,6 +8,7 @@ import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
 import { CustomConfigService } from '../../../libs/shared-dto/src/config-service';
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { JwtPayload } from '@app/shared-dto/dtos/jwt-payload.dto';
+import { randomUUID } from 'crypto';
 
 
 @Injectable()
@@ -27,11 +28,11 @@ export class AuthService {
 
 
 
-  async login(loginDto: AuthForm): Promise<{ accessToken: string; refreshToken: string }> {
-    const { username, password } = loginDto;
+  async login(loginDto: AuthForm, useragent: string, ip: string, refreshTokenExist?: string): Promise<{ accessToken: string; refreshToken: string }> {
+    const { email, password } = loginDto;
 
     // Шаг 1: Получение данных пользователя из Core_app
-    const userResponse = await this.coreAppApiService.getUserByUsername(username);
+    const userResponse = await this.coreAppApiService.getUserByEmail(email);
     if (!userResponse) {
       throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
     }
@@ -44,21 +45,30 @@ export class AuthService {
       throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
     }
 
+    // Шаг 3: Проверка на случай, если к нам пришел запрос с уже существующим, действующим, Refresh Token - в таком случае отказываем в выдаче новой сессии, для обновления токенов есть отдельный метод
+    const existRefreshTokenPayload: JwtPayload = await this.extractPayloadFromToken(refreshTokenExist, false);
+    const existingSession = await this.authRepository.findOneActiveSession(userResponse.userId, existRefreshTokenPayload.deviceId);
+    console.log("existingSession:", existingSession);
+    if (existingSession) {
+      throw new Error('Active session exists');
+    }
+
     // Шаг 3: Генерация токенов
-    const accessToken = await this.generateAccessToken(userResponse.username);
-    const refreshToken = await this.generateRefreshToken(userResponse.username);
+    const deviceId = randomUUID(); // Генерируем DeviceId перед вызовом функций, чтобы внутри access и refresh токенов лежал один deviceId 
+    const accessToken = await this.generateAccessToken(userResponse.username, deviceId);
+    const refreshToken = await this.generateRefreshToken(userResponse.username, deviceId);
 
-    // Шаг 4: Удаление старых токенов
-    await this.authRepository.deleteRefreshTokenByUserId(userResponse.id);
-
-    // Шаг 5: Сохранение токенов в базе данных, для возможности дальнейшего отзыва токенов и проверки их валидности
-
+    // Шаг 4: Сохранение токенов в базе данных, для возможности дальнейшего отзыва токенов и проверки их валидности
     // Извлекаем Payload токена чтобы положить его в базу
     const refreshTokenPayload: JwtPayload = await this.extractPayloadFromToken(refreshToken, false);
     // Хешируем токен т.к напрямую хранить токен нельзя
     const hashRefreshToken = await this.hashRefreshToken(refreshToken);
-    // Сохраняем токен в базе данных
-    await this.authRepository.saveRefreshToken(userResponse.username, hashRefreshToken, refreshTokenPayload);
+    // Сохраняем токен в базе данных + создаем сессию для этого токена (устройства)
+    await this.authRepository.saveRefreshToken(userResponse.username, hashRefreshToken, refreshTokenPayload, useragent, ip);
+
+    // Шаг 5: Удаление старых токенов c учетом сессии (hashRefreshToken выступает как связь)
+    //await this.authRepository.deleteRefreshTokenByUserId(userResponse.id, hashRefreshToken);
+    // Вопрос на подумать, нужно ли тут удалять что-либо
 
     return { accessToken, refreshToken };
   }
@@ -72,8 +82,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    // Шаг 2: Ищем сохранённые хеши токенов для пользователя
-    const tokenHashes = await this.authRepository.getRefreshTokensByUserId(payload.userId);
+    // Шаг 2: Ищем сохранённые хеши токенов для пользователя с учетом сессии (deviceId)
+    const tokenHashes = await this.authRepository.getRefreshTokensByUserId(payload.userId, payload.deviceId);
 
     if (!tokenHashes || tokenHashes.length === 0) {
       throw new UnauthorizedException('Refresh token not found');
@@ -92,13 +102,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    // Шаг 4: Удаляем найденный хеш токена
+    // Шаг 4: Удаляем найденный хеш токена (параллельно удаление сессии из-за связи таблиц) 
     await this.authRepository.deleteRefreshTokenByHash(validHash);
   }
 
 
   // Метод для обновления уже существующего AccessToken на основании RefreshToken
-  async updateRefreshToken(refreshToken: string): Promise<{ accessToken: string; newRefreshToken: string }> {
+  async updateRefreshToken(refreshToken: string, useragent: string, ip: string): Promise<{ accessToken: string; newRefreshToken: string }> {
     // Шаг 1: Извлекаем Payload и одновременно проверяем на валидность токен т.к внутри jwt.verify метод
     const refreshTokenPayload: JwtPayload = await this.extractPayloadFromToken(refreshToken, false);
     //console.log("refreshTokenPayload", refreshTokenPayload);
@@ -111,33 +121,38 @@ export class AuthService {
       throw new UnauthorizedException('Refresh token expired');
     }
     
-    // Шаг 2: Удаление старых токенов
-    await this.authRepository.deleteRefreshTokenByUserId(refreshTokenPayload.userId);
-    
-    // Шаг 3: Генерация новых токенов
-    const accessToken = await this.generateAccessToken(refreshTokenPayload.username)
-    const newRefreshToken = await this.generateRefreshToken(refreshTokenPayload.username);
+    // Шаг 2: Ищем сохранённые хеши токенов для пользователя с учетом сессии (deviceId)
+    const tokenHashes = await this.authRepository.getRefreshTokensByUserId(refreshTokenPayload.userId, refreshTokenPayload.deviceId);
+    if (!tokenHashes || tokenHashes.length === 0) {
+      throw new UnauthorizedException('Refresh token with the specified deviceId not found');
+    }
 
-    // Шаг 4: Хешируем токен т.к напрямую хранить токен нельзя
+    // Шаг 3: Удаление старых токенов
+    await this.authRepository.deleteRefreshTokenByUserId(refreshTokenPayload.userId, tokenHashes[0]);
+    
+    // Шаг 4: Генерация новых токенов, с передачей уже существующего deviceId
+    const accessToken = await this.generateAccessToken(refreshTokenPayload.username, refreshTokenPayload.deviceId)
+    const newRefreshToken = await this.generateRefreshToken(refreshTokenPayload.username, refreshTokenPayload.deviceId);
+
+    // Шаг 5: Хешируем токен т.к напрямую хранить токен нельзя
     const hashRefreshToken = await this.hashRefreshToken(refreshToken);
     // Сохраняем токен в базе данных
-    await this.authRepository.saveRefreshToken(refreshTokenPayload.username, hashRefreshToken, refreshTokenPayload);
+    await this.authRepository.saveRefreshToken(refreshTokenPayload.username, hashRefreshToken, refreshTokenPayload, useragent, ip);
 
     return { accessToken, newRefreshToken };
   }
 
-  async validateToken(userData: any) {
-    // Ваш код для регистрации пользователя
-    return
-  }
+
+
   // Генерация Access Token для пользователя
-  async generateAccessToken(username: string): Promise<string> {
+  async generateAccessToken(username: string, deviceId: string): Promise<string> {
     // Получаем данные пользователя через HTTP запрос в Core_app
     const user = await this.coreAppApiService.getUserByUsername(username);
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-    const payload = { userId: user.id, username: user.username, role: user.role };
+
+    const payload = { userId: user.id, username: user.username, role: user.role, deviceId };
     const accessToken = this.jwtService.sign(payload, {
       secret: this.jwtAccessSecret, // Секретный ключ для Access Token
       expiresIn: '15m', // Время жизни токена, например, 15 минут
@@ -146,54 +161,18 @@ export class AuthService {
   }
 
   // Генерация Refresh Token для пользователя
-  async generateRefreshToken(username: string): Promise<string> {
+  async generateRefreshToken(username: string, deviceId: string): Promise<string> {
     // Получаем данные пользователя через HTTP запрос в Core_app
     const user = await this.coreAppApiService.getUserByUsername(username);
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-
-    const payload = { userId: user.id, username: user.username, role: user.role };
+    const payload = { userId: user.id, username: user.username, role: user.role, deviceId };
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.jwtRefreshSecret, // Секретный ключ для Refresh Token
       expiresIn: '7d', // Время жизни refresh токена, например, 7 дней
     });
     return refreshToken
-  }
-
-  // Проверка, был ли токен отозван
-  async isTokenRevoked(token: string): Promise<boolean> {
-    // Для проверки отозванности токенов нам нужно хранить список отозванных токенов
-    // Например, в базе данных или Redis. Здесь пока делаем заглушку.
-    const revokedTokens = await this.getRevokedTokens();
-    return revokedTokens.includes(token);
-  }
-
-  // Заглушка для получения отозванных токенов
-  private async getRevokedTokens(): Promise<string[]> {
-    // Логика получения отозванных токенов (например, из базы данных или Redis)
-    return []; // Пустой список означает, что нет отозванных токенов
-  }
-
-  // Получение данных пользователя из Core_app через HTTP запрос
-  // private async getUserByUsername(username: string) {
-  //   try {
-  //     const response = await this.coreAppApiService.getUserByUsername(username);
-  //     return response; //
-  //   } catch (error) {
-  //     return null; // Если пользователь не найден или ошибка, возвращаем null
-  //   }
-  // }
-
-  private async getUserFromCoreApp(userId: string) {
-    try {
-      const response = await firstValueFrom(
-        this.httpService.get(`http://core_app_url/users/private/${userId}`),
-      );
-      return response.data;
-    } catch (error) {
-      return null; // Если пользователь не найден или ошибка, возвращаем null
-    }
   }
 
   // Метод для хеширования refresh токенов (если нужно)
@@ -223,4 +202,28 @@ export class AuthService {
     }
   }
 
+
+  async dropDb() {
+    return this.authRepository.dropDb();
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+
+async getActiveSessions(refreshToken: string): Promise <object> {
+  const refreshTokenPayload = await this.extractPayloadFromToken(refreshToken, false);
+  const activeSessions = await this.authRepository.findAllActiveSession(refreshTokenPayload.userId);
+  return activeSessions
+}
+
+async revokeSessionBySessionId(sessionId: string): Promise<boolean> {
+  const result = await this.authRepository.revokeSessionBySessionId(sessionId);
+  return result
+}
+
+async revokeAllActiveSessions(refreshToken: string): Promise<boolean> {
+  const refreshTokenPayload = await this.extractPayloadFromToken(refreshToken, false);
+  const result = await this.authRepository.revokeAllActiveSession(refreshTokenPayload.userId, refreshTokenPayload.deviceId);
+  return result
+}
 }

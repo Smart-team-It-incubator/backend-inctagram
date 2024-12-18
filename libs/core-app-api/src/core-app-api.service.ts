@@ -25,4 +25,19 @@ export class CoreAppApiService {
             );
         }
     }
+
+        // Получение данных пользователя по username
+        async getUserByEmail(email: string): Promise<any> {
+            try {
+                const response = await firstValueFrom(
+                    this.httpService.get(`${this.coreAppUrl}/users/getByEmail/${email}`),
+                );
+                return response.data;
+            } catch (error) {
+                throw new HttpException(
+                    'User not found or Core_app unavailable',
+                    HttpStatus.NOT_FOUND,
+                );
+            }
+        }
 }
