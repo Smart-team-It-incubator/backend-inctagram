@@ -186,7 +186,7 @@ async dropDb() {
       this.prisma.revokedToken.deleteMany({}),
       // Добавьте другие таблицы, из которых нужно удалить данные
     ]);
-    console.log('Данные успешно удалены из таблиц.');
+    console.log('Данные успешно удалены из таблиц Auth');
   } catch (error) {
     console.error('Ошибка при удалении данных:', error);
   }

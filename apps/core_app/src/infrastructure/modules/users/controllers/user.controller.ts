@@ -7,6 +7,7 @@ import { UserViewModel } from '@core_app/src/domain/interfaces/view_models/UserV
 import { GetUserByUsernameCommand } from '@core_app/src/application/commands/users_cases/get-user-by-username.use-case';
 import { CreateUserDto } from '@app/shared-dto';
 import { GetUserByEmailCommand } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
+import { DropDBCommand } from '@core_app/src/application/commands/users_cases/drop_user_db.use-case';
 
 
 
@@ -61,18 +62,18 @@ export class UserController {
     return `Метод updateUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;
   }
 
-  // Метод для удаления пользователя
-  @ApiOperation({ summary: 'Delete user' }) // Описание эндпоинта
-  @ApiResponse({ status: 200, description: 'User was successfully deleted' }) // Описание ответа
-  @ApiBody({
-    description: 'Данные для удаления пользователя',
-    type: CreateUserDto, // Можно использовать другой DTO, который содержит только идентификатор пользователя для удаления.
-  })
-  @Delete("/:userId") // Используем DELETE для удаления
-  async deleteUser(@Param('userId') userId: string): Promise<string> {
-    // Пока логика удаления не реализована, возвращаем описание того, что будет реализовано.
-    return `Метод deleteUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;
-  }
+  // // Метод для удаления пользователя
+  // @ApiOperation({ summary: 'Delete user' }) // Описание эндпоинта
+  // @ApiResponse({ status: 200, description: 'User was successfully deleted' }) // Описание ответа
+  // @ApiBody({
+  //   description: 'Данные для удаления пользователя',
+  //   type: CreateUserDto, // Можно использовать другой DTO, который содержит только идентификатор пользователя для удаления.
+  // })
+  // @Delete("/:userId") // Используем DELETE для удаления
+  // async deleteUser(@Param('userId') userId: string): Promise<string> {
+  //   // Пока логика удаления не реализована, возвращаем описание того, что будет реализовано.
+  //   return `Метод deleteUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;
+  // }
 
 
   //TODO - сделать метод закрытым, это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
@@ -100,6 +101,13 @@ export class UserController {
     }
     return user
   }
+
+
+    // For Dev
+    @Delete('/drop-db')
+    async dropDb() {
+      return this.commandBus.execute(new DropDBCommand())
+    }
 
   
 

@@ -14,18 +14,26 @@ export const RouteNames = {
 			full: 'auth/logout',
 		},
 	},
-    TESTING: {
+	TESTING_AUTH: {
 		value: 'testing',
 		ALL_DATA: {
 			value: 'drop-db',
 			full: 'auth/drop-db',
 		},
+		
 	},
-    USERS: {
-        value: 'users',
-        REGISTRATION: {
-            value: 'registration',
-            full: 'users/registration',
-        },
-    }
+	TESTING_CORE: {
+		value: 'testing',
+		ALL_DATA: {
+			value: 'drop-db',
+			full: 'users/drop-db',
+		},
+	},
+	USERS: {
+		value: 'users',
+		REGISTRATION: {
+			value: 'registration',
+			full: 'users/registration',
+		},
+	}
 }

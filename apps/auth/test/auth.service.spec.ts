@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import cookieParser from 'cookie-parser';
 import { postRequest } from './utils/common';
 import { RouteNames } from '../src/routesConfig/routeNames';
-import { clearAllDB } from './utils/clearDB';
+import { clearAuthDB, clearCoreDB } from './utils/clearDB';
 import { PrismaCoreAppService } from '@core_app/prisma/prisma.service';
 import { UserModule } from '@core_app/src/infrastructure/modules/users/user.module';
 
@@ -46,30 +46,34 @@ describe('Database Connection Test', () => {
 
     prismaServiceAuth = appAuth.get<PrismaService>(PrismaService);
     prismaServiceCoreApp = appCoreApp.get<PrismaCoreAppService>(PrismaCoreAppService);
+
+    await clearAuthDB(appAuth)
+    await clearCoreDB(appCoreApp)
   });
 
-  it('should connect to the database AUTH successfully', async () => {
-    try {
-      await prismaServiceAuth.$connect();
-      console.log('Database connected successfully!');
-    } catch (error) {
-      console.error('Database connection failed:', error);
-      throw error;
-    }
-  });
-  it('should connect to the database CORE_APP successfully', async () => {
-    try {
-      await prismaServiceCoreApp.$connect();
-      console.log('Database connected successfully!');
-    } catch (error) {
-      console.error('Database connection failed:', error);
-      throw error;
-    }
-  });
+  // it('should connect to the database AUTH successfully', async () => {
+  //   try {
+  //     await prismaServiceAuth.$connect();
+  //     console.log('Database connected successfully!');
+  //   } catch (error) {
+  //     console.error('Database connection failed:', error);
+  //     throw error;
+  //   }
+  // });
+  // it('should connect to the database CORE_APP successfully', async () => {
+  //   try {
+  //     await prismaServiceCoreApp.$connect();
+  //     console.log('Database connected successfully!');
+  //   } catch (error) {
+  //     console.error('Database connection failed:', error);
+  //     throw error;
+  //   }
+  // });
 
-  beforeEach(async () => {
-		await clearAllDB(appAuth)
-	})
+  // beforeEach(async () => {
+	// 	await clearAuthDB(appAuth)
+  //   await clearCoreDB(appCoreApp)
+	// })
 
   afterAll(async () => {
     await prismaServiceAuth.$disconnect();
@@ -84,10 +88,10 @@ describe('Database Connection Test', () => {
     it("Осуществляем регистрацию пользователя в USERS модуле", async () => {
       await postRequest(appCoreApp, RouteNames.USERS.REGISTRATION.full)
         .send(userForTest)
-        .expect(200);
+        .expect(201);
     })
     it("Производим вход в систему, получаем токены", async () => {
-      await postRequest(appAuth, "/auth/login")
+      await postRequest(appAuth, RouteNames.AUTH.LOGIN.full)
         .send({
           email: 'testUser11@gmail.com',
           password: 'Testpassword1!',
