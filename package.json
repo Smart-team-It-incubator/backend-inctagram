@@ -13,7 +13,8 @@
     "start:debug": "nest start auth --debug --watch",
     "start:prod": "cross-env NODE_ENV=production node dist/apps/core_app/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest --passWithNoTests",
+    "test": "dotenv -e ./apps/auth/.test.env jest",
+    "test1": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -24,16 +25,20 @@
     "build:core_app": "nest build core_app",
     "start:core_app": "cross-env ENV_FILE=./apps/core_app/.production.env node dist/apps/core_app/main",
     "start:dev:core_app": "cross-env ENV_FILE=./apps/core_app/.development.env nest start core_app --watch --debug=9009",
+    "start:test:core_app": "cross-env ENV_FILE=./apps/core_app/.test.env nest start core_app --watch --debug=9009",
     "build:auth": "nest build auth",
     "start:auth": "cross-env ENV_FILE=./apps/auth/.production.env node dist/apps/auth/main",
     "start:dev:auth": "cross-env ENV_FILE=./apps/auth/.development.env nest start auth --watch --debug",
+    "start:test:auth": "cross-env ENV_FILE=./apps/auth/.test.env nest start auth --watch --debug",
     "migrate:core-app:dev": "dotenv -e ./apps/core_app/.development.env -- npx prisma migrate dev --schema=./apps/core_app/prisma/schema.prisma",
     "migrate:core-app:prod": "dotenv -e ./apps/core_app/.production.env -- npx prisma migrate deploy --schema=./apps/core_app/prisma/schema.prisma",
+    "migrate:core-app:test": "dotenv -e ./apps/core_app/.test.env -- npx prisma migrate dev --schema=./apps/core_app/prisma/schema.prisma",
     "migrate:statusdev": "cross-env ENV_FILE=.development.env npx prisma migrate status",
     "migrate:statusprod": "cross-env ENV_FILE=.production.env npx prisma migrate status",
     "migrate:hotfix": "cross-env ENV_FILE=.production.env npx prisma migrate resolve --applied",
     "migrate:auth:dev": "dotenv -e ./apps/auth/.development.env -- npx prisma migrate dev --schema=./apps/auth/prisma/schema.prisma",
     "migrate:auth:prod": "dotenv -e ./apps/auth/.production.env -- npx prisma migrate deploy --schema=./apps/auth/prisma/schema.prisma",
+    "migrate:auth:test": "dotenv -e ./apps/auth/.test.env -- npx prisma migrate dev --schema=./apps/auth/prisma/schema.prisma",
     "generate:auth": "dotenv -e ./apps/core_app/.development.env -- npx prisma generate --schema=./apps/auth/prisma/schema.prisma",
     "generate:core_app": "dotenv -e ./apps/core_app/.development.env -- npx prisma generate --schema=./apps/core_app/prisma/schema.prisma",
     "libs:builds": "nest build shared-dto && nest build auth-api && nest build core-app-api"
@@ -113,7 +118,11 @@
     "moduleNameMapper": {
       "^@app/shared-dto(|/.*)$": "<rootDir>/libs/shared-dto/src/$1",
       "^@core-app-api/core-app-api(|/.*)$": "<rootDir>/libs/core-app-api/src/$1",
-      "^auth-api/auth-api(|/.*)$": "<rootDir>/libs/auth-api/src/$1"
+      "^auth-api/auth-api(|/.*)$": "<rootDir>/libs/auth-api/src/$1",
+      "^@prisma/auth(|/.*)$": "<rootDir>/apps/auth/prisma/schema_generate/$1",
+      "^@prisma/core_app(|/.*)$": "<rootDir>/apps/core_app/prisma/schema_generate/$1",
+      "@core_app(|/.*)$": "<rootDir>/apps/core_app/$1",
+      "@auth(|/.*)$": "<rootDir>/apps/auth/$1"
     }
   },
   "main": "index.js",

@@ -1,6 +1,6 @@
 import { CommandHandler } from "@nestjs/cqrs"
-import { UsersRepository } from "apps/core_app/src/infrastructure/modules/users/repositories/user.repository"
-import { UserViewModel } from "apps/core_app/src/domain/interfaces/view_models/UserViewModel"
+import { UsersRepository } from "@core_app/src/infrastructure/modules/users/repositories/user.repository"
+import { UserViewModel } from "@core_app/src/domain/interfaces/view_models/UserViewModel"
 
 
 export class GetUserByEmailCommand {

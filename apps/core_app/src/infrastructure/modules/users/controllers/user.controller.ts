@@ -1,12 +1,13 @@
 import { Controller, Get, Post, Body, HttpException, HttpStatus, Put, Param, Delete } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { GetUsersCommand } from 'apps/core_app/src/application/commands/users_cases/get-users.use-case';
-import { CreateUserCommand } from 'apps/core_app/src/application/commands/users_cases/create-user.use-case';
+import { GetUsersCommand } from '@core_app/src/application/commands/users_cases/get-users.use-case';
+import { CreateUserCommand } from '@core_app/src/application/commands/users_cases/create-user.use-case';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserViewModel } from 'apps/core_app/src/domain/interfaces/view_models/UserViewModel';
-import { GetUserByUsernameCommand } from 'apps/core_app/src/application/commands/users_cases/get-user-by-username.use-case';
+import { UserViewModel } from '@core_app/src/domain/interfaces/view_models/UserViewModel';
+import { GetUserByUsernameCommand } from '@core_app/src/application/commands/users_cases/get-user-by-username.use-case';
 import { CreateUserDto } from '@app/shared-dto';
-import { GetUserByEmailCommand } from 'apps/core_app/src/application/commands/users_cases/get-user-by-email.use-case';
+import { GetUserByEmailCommand } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
+import { DropDBCommand } from '@core_app/src/application/commands/users_cases/drop_user_db.use-case';
 
 
 
@@ -36,7 +37,7 @@ export class UserController {
     description: 'Данные для создания пользователя',
     type: CreateUserDto,
   })
-  @Post()
+  @Post("/registration")
   async registration(@Body() body: CreateUserDto): Promise<Partial<UserViewModel> | null> {
     const createUser: Partial<UserViewModel> | null = await this.commandBus.execute(new CreateUserCommand(body.email, body.password, body.username, body.firstName, body.lastName, body.city, body.country, body.dateOfBirthday));
     if (!createUser) {
@@ -55,24 +56,24 @@ export class UserController {
     description: 'Данные для обновления пользователя',
     type: CreateUserDto, // Это может быть другая DTO для обновления, которая может содержать только те поля, которые можно обновить.
   })
-  @Put("/:userId") // Используем PUT для обновления
+  @Put("update/:userId") // Используем PUT для обновления
   async updateUser(@Param('userId') userId: string): Promise<string> {
     // Пока логика обновления не реализована, возвращаем описание того, что будет реализовано.
     return `Метод updateUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;
   }
 
-  // Метод для удаления пользователя
-  @ApiOperation({ summary: 'Delete user' }) // Описание эндпоинта
-  @ApiResponse({ status: 200, description: 'User was successfully deleted' }) // Описание ответа
-  @ApiBody({
-    description: 'Данные для удаления пользователя',
-    type: CreateUserDto, // Можно использовать другой DTO, который содержит только идентификатор пользователя для удаления.
-  })
-  @Delete("/:userId") // Используем DELETE для удаления
-  async deleteUser(@Param('userId') userId: string): Promise<string> {
-    // Пока логика удаления не реализована, возвращаем описание того, что будет реализовано.
-    return `Метод deleteUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;
-  }
+  // // Метод для удаления пользователя
+  // @ApiOperation({ summary: 'Delete user' }) // Описание эндпоинта
+  // @ApiResponse({ status: 200, description: 'User was successfully deleted' }) // Описание ответа
+  // @ApiBody({
+  //   description: 'Данные для удаления пользователя',
+  //   type: CreateUserDto, // Можно использовать другой DTO, который содержит только идентификатор пользователя для удаления.
+  // })
+  // @Delete("/:userId") // Используем DELETE для удаления
+  // async deleteUser(@Param('userId') userId: string): Promise<string> {
+  //   // Пока логика удаления не реализована, возвращаем описание того, что будет реализовано.
+  //   return `Метод deleteUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;
+  // }
 
 
   //TODO - сделать метод закрытым, это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
@@ -100,6 +101,13 @@ export class UserController {
     }
     return user
   }
+
+
+    // For Dev
+    @Delete('/drop-db')
+    async dropDb() {
+      return this.commandBus.execute(new DropDBCommand())
+    }
 
   
 

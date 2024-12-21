@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AuthModule } from './auth.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 
 console.log("Переменная", process.env.DATABASE_URL);
 

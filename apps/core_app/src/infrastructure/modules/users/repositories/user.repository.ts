@@ -1,8 +1,8 @@
-import { UserViewModel } from "apps/core_app/src/domain/interfaces/view_models/UserViewModel";
+import { UserViewModel } from "@core_app/src/domain/interfaces/view_models/UserViewModel";
 import { CreateUserDto } from "@app/shared-dto";
 import { Injectable } from "@nestjs/common/decorators/core";
-import { User } from "apps/core_app/src/domain/entities/user-entities";
-import { PrismaCoreAppService } from "apps/core_app/prisma/prisma.service";
+import { User } from "@core_app/src/domain/entities/user-entities";
+import { PrismaCoreAppService } from "@core_app/prisma/prisma.service";
 
 
 
@@ -70,6 +70,21 @@ export class UsersRepository {
       return userViewModel.getPrivateProfile(); // Возвращаем внутренний профиль пользователя, т.к это для нашего ресурса
     }
     
+
+
+    
+async dropDb() {
+  try {
+    // Удаляем данные из каждой таблицы, но структура остаётся
+    await this.prisma.$transaction([
+      this.prisma.user.deleteMany({}),
+      // Добавьте другие таблицы, из которых нужно удалить данные
+    ]);
+    console.log('Данные успешно удалены из таблиц User');
+  } catch (error) {
+    console.error('Ошибка при удалении данных:', error);
+  }
+}
     
     
     

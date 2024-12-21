@@ -6,7 +6,7 @@ import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthRepository {
-  constructor(private httpService: HttpService,
+  constructor(
     private readonly prisma: PrismaService,
   ) { }
 
@@ -186,7 +186,7 @@ async dropDb() {
       this.prisma.revokedToken.deleteMany({}),
       // Добавьте другие таблицы, из которых нужно удалить данные
     ]);
-    console.log('Данные успешно удалены из таблиц.');
+    console.log('Данные успешно удалены из таблиц Auth');
   } catch (error) {
     console.error('Ошибка при удалении данных:', error);
   }

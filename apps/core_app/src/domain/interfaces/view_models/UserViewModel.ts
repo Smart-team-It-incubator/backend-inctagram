@@ -1,4 +1,4 @@
-import { IUserInterface } from "apps/core_app/src/application/services/user/user-interface";
+import { IUserInterface } from "@core_app/src/application/services/user/user-interface";
 
 export class UserViewModel implements IUserInterface {
     id: string;

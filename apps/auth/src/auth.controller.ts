@@ -240,7 +240,7 @@ export class AuthController {
   }
 
   // For Dev
-  @Delete('drop-db')
+  @Delete('/drop-db')
   async dropDb() {
     return this.authService.dropDb();
   }

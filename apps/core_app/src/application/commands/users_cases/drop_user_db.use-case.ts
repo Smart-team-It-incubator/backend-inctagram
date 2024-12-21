@@ -3,19 +3,19 @@ import { UserViewModel } from "@core_app/src/domain/interfaces/view_models/UserV
 import { UsersRepository } from "@core_app/src/infrastructure/modules/users/repositories/user.repository"
 
 
-export class GetUsersCommand {
+export class DropDBCommand {
     constructor(
         ) {
         
     }
 }
 
-@CommandHandler(GetUsersCommand)
-export class GetUsersUseCase {
+@CommandHandler(DropDBCommand)
+export class DropDBUseCase {
     constructor (protected usersRepository: UsersRepository ) {}
 
-    async execute(command: GetUsersCommand): Promise<Partial<UserViewModel>[] | null> {
-        return await this.usersRepository.getUsers()
+    async execute(command: DropDBCommand) {
+        return await this.usersRepository.dropDb()
     }
 }
 
