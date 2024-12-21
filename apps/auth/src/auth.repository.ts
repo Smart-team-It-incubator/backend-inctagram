@@ -6,7 +6,7 @@ import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthRepository {
-  constructor(private httpService: HttpService,
+  constructor(
     private readonly prisma: PrismaService,
   ) { }
 

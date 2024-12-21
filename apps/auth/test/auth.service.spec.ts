@@ -1,138 +1,101 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpException, HttpStatus } from '@nestjs/common';
-import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
-import { AuthController } from '../src/auth.controller';
-import { AuthService } from '../src/auth.service';
+import { INestApplication } from '@nestjs/common';
+import { AuthModule } from '../src/auth.module';
+import { PrismaService } from '../prisma/prisma.service';
+import cookieParser from 'cookie-parser';
+import { postRequest } from './utils/common';
+import { RouteNames } from '../src/routesConfig/routeNames';
+import { clearAllDB } from './utils/clearDB';
+import { PrismaCoreAppService } from '@core_app/prisma/prisma.service';
+import { UserModule } from '@core_app/src/infrastructure/modules/users/user.module';
 
-describe('AuthController', () => {
-  let authController: AuthController;
-  let authService: AuthService;
+describe('Database Connection Test', () => {
+  let appAuth: INestApplication;
+  let appCoreApp: INestApplication;
+  let prismaServiceAuth: PrismaService;
+  let prismaServiceCoreApp: PrismaCoreAppService;
 
-  const mockAuthService = {
-    login: jest.fn(),
-  };
+  const userForTest = {
+    email:"testUser11@gmail.com",
+    username: "UserWithHash2",
+    password: "Testpassword1!",
+    firstName: "Bobby",
+    lastName: "Kubob",
+    country: "USA",
+    city: "New York",
+    dateOfBirthday: "2001-01-01"
+    }
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [AuthController],
-      providers: [
-        {
-          provide: AuthService,
-          useValue: mockAuthService,
-        },
-      ],
+  beforeAll(async () => {
+    const authModuleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AuthModule],
     }).compile();
 
-    authController = module.get<AuthController>(AuthController);
-    authService = module.get<AuthService>(AuthService);
+    const coreAppModuleFixture: TestingModule = await Test.createTestingModule({
+      imports: [UserModule],
+    }).compile();
+
+    appAuth = authModuleFixture.createNestApplication();
+    appCoreApp = coreAppModuleFixture.createNestApplication();
+
+    await appAuth.use(cookieParser());
+    await appCoreApp.use(cookieParser());
+
+    await appAuth.init();
+    await appCoreApp.init();
+
+    prismaServiceAuth = appAuth.get<PrismaService>(PrismaService);
+    prismaServiceCoreApp = appCoreApp.get<PrismaCoreAppService>(PrismaCoreAppService);
   });
 
-  describe('login', () => {
-    const loginDto: AuthForm = { email: 'testuser@example.com', password: 'testpass' }; // Example DTO
-
-    it('should return accessToken and set refreshToken in cookie on successful login', async () => {
-      const result = {
-        accessToken: 'someAccessToken',
-        refreshToken: 'someRefreshToken',
-      };
-
-      mockAuthService.login.mockResolvedValue(result);
-
-      const res = {
-        cookie: jest.fn().mockReturnThis(),
-        status: jest.fn().mockReturnThis(),
-        send: jest.fn(),
-      };
-
-      const req = {
-        ip: '127.0.0.1',
-        headers: { 'user-agent': 'test-agent' },
-        cookies: {},
-      };
-
-      await authController.login(loginDto, res, req);
-
-      expect(res.cookie).toHaveBeenCalledWith('refreshToken', result.refreshToken, {
-        httpOnly: true,
-        secure: true,
-      });
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.send).toHaveBeenCalledWith({ accessToken: result.accessToken });
-    });
-
-    it('should throw 401 error if login fails due to invalid credentials', async () => {
-      mockAuthService.login.mockRejectedValue(new Error('Invalid credentials'));
-
-      const res = {};
-      const req = {
-        ip: '127.0.0.1',
-        headers: { 'user-agent': 'test-agent' },
-        cookies: {},
-      };
-
-      await expect(authController.login(loginDto, res, req)).rejects.toThrow(HttpException);
-      await expect(authController.login(loginDto, res, req)).rejects.toThrow('Invalid credentials');
-      //await expect(authController.login(loginDto, res, req)).rejects.toThrow(new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED));
-    });
-
-    it('should throw 409 error if an active session exists', async () => {
-      mockAuthService.login.mockRejectedValue(new Error('Active session exists'));
-
-      const res = {};
-      const req = {
-        ip: '127.0.0.1',
-        headers: { 'user-agent': 'test-agent' },
-        cookies: {},
-      };
-
-      await expect(authController.login(loginDto, res, req)).rejects.toThrow(HttpException);
-      await expect(authController.login(loginDto, res, req)).rejects.toThrow('Уже существует активная сессия для устройства с этим Refresh Token, если нужно обновить, обратись на refresh-token.');
-      //await expect(authController.login(loginDto, res, req)).rejects.toThrow(new HttpException('Conflict', HttpStatus.CONFLICT),);
-    });
-
-    it('should handle cases where refreshToken exists in cookies', async () => {
-      const result = {
-        accessToken: 'someAccessToken',
-        refreshToken: 'someRefreshToken',
-      };
-
-      mockAuthService.login.mockResolvedValue(result);
-
-      const res = {
-        cookie: jest.fn().mockReturnThis(),
-        status: jest.fn().mockReturnThis(),
-        send: jest.fn(),
-      };
-
-      const req = {
-        ip: '127.0.0.1',
-        headers: { 'user-agent': 'test-agent' },
-        cookies: { refreshToken: 'existingRefreshToken' },
-      };
-
-      await authController.login(loginDto, res, req);
-
-      expect(res.cookie).toHaveBeenCalledWith('refreshToken', result.refreshToken, {
-        httpOnly: true,
-        secure: true,
-      });
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.send).toHaveBeenCalledWith({ accessToken: result.accessToken });
-    });
-
-    it('should throw an error if an unexpected error occurs', async () => {
-      mockAuthService.login.mockRejectedValue(new Error('Unexpected error'));
-
-      const res = {};
-      const req = {
-        ip: '127.0.0.1',
-        headers: { 'user-agent': 'test-agent' },
-        cookies: {},
-      };
-
-      await expect(authController.login(loginDto, res, req)).rejects.toThrow(HttpException);
-      await expect(authController.login(loginDto, res, req)).rejects.toThrow('Unexpected error');
-      //await expect(authController.login(loginDto, res, req)).rejects.toThrow(new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED));
-    });
+  it('should connect to the database AUTH successfully', async () => {
+    try {
+      await prismaServiceAuth.$connect();
+      console.log('Database connected successfully!');
+    } catch (error) {
+      console.error('Database connection failed:', error);
+      throw error;
+    }
   });
+  it('should connect to the database CORE_APP successfully', async () => {
+    try {
+      await prismaServiceCoreApp.$connect();
+      console.log('Database connected successfully!');
+    } catch (error) {
+      console.error('Database connection failed:', error);
+      throw error;
+    }
+  });
+
+  beforeEach(async () => {
+		await clearAllDB(appAuth)
+	})
+
+  afterAll(async () => {
+    await prismaServiceAuth.$disconnect();
+    await prismaServiceCoreApp.$disconnect();
+    await appAuth.close();
+    await appCoreApp.close();
+  });
+
+
+  describe("Auth flow", () => {
+
+    it("Осуществляем регистрацию пользователя в USERS модуле", async () => {
+      console.log("логирование роута для Registration", RouteNames.USERS.REGISTRATION.full )
+      await postRequest(appAuth, RouteNames.USERS.REGISTRATION.full)
+        .send(userForTest)
+        .expect(200);
+    })
+    it("Производим вход в систему, получаем токены", async () => {
+      console.log("логирование роута для Login", RouteNames.AUTH.LOGIN.full )
+      await postRequest(appAuth, RouteNames.AUTH.LOGIN.full)
+        .send({
+          email: 'testUser11@gmail.com',
+          password: 'Testpassword1!',
+        })
+        .expect(200);
+    })
+  }
+    )
 });

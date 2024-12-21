@@ -40,7 +40,9 @@
         "libs/auth-api/src/*"
       ],
       "@prisma/auth": ["apps/auth/prisma/schema_generate"],
-      "@prisma/core_app": ["apps/core_app/prisma/schema_generate"]
+      "@prisma/core_app": ["apps/core_app/prisma/schema_generate"],
+      "@core_app/*": ["apps/core_app/*"],
+      "@auth/*": ["apps/auth/*"]
     }
   }
 }
