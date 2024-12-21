@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/core_app';
 export class PrismaCoreAppService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor() {
     // Выбираем базу данных в зависимости от окружения
-    const databaseUrl = process.env.DATABASE_URL
+    const databaseUrl = process.env.DATABASE_URL_CORE
 
     console.log("DATABASE_URL полученный по команде для запуска core_app:", databaseUrl);
     // Передаём URL в PrismaClient
