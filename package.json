@@ -120,8 +120,7 @@
       "^@prisma/auth(|/.*)$": "<rootDir>/apps/auth/prisma/schema_generate/$1",
       "^@prisma/core_app(|/.*)$": "<rootDir>/apps/core_app/prisma/schema_generate/$1",
       "@core_app(|/.*)$": "<rootDir>/apps/core_app/$1",
-      "@auth(|/.*)$": "<rootDir>/apps/auth/$1",
-      "^@app/global-config(|/.*)$": "<rootDir>/libs/global-config/src/$1"
+      "@auth(|/.*)$": "<rootDir>/apps/auth/$1"
     }
   },
   "main": "index.js",

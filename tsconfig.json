@@ -51,12 +51,6 @@
       "@auth/*": [
         "apps/auth/*"
       ],
-      "@app/global-config": [
-        "libs/global-config/src"
-      ],
-      "@app/global-config/*": [
-        "libs/global-config/src/*"
-      ]
     }
   }
 }
