@@ -1,8 +1,8 @@
-import { UserViewModel } from "apps/core_app/src/domain/interfaces/view_models/UserViewModel";
+import { UserViewModel } from "@core_app/src/domain/interfaces/view_models/UserViewModel";
 import { CreateUserDto } from "@app/shared-dto";
 import { Injectable } from "@nestjs/common/decorators/core";
-import { User } from "apps/core_app/src/domain/entities/user-entities";
-import { PrismaCoreAppService } from "apps/core_app/prisma/prisma.service";
+import { User } from "@core_app/src/domain/entities/user-entities";
+import { PrismaCoreAppService } from "@core_app/prisma/prisma.service";
 
 
 

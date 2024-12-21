@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Body, HttpException, HttpStatus, Put, Param, Delete } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { GetUsersCommand } from 'apps/core_app/src/application/commands/users_cases/get-users.use-case';
-import { CreateUserCommand } from 'apps/core_app/src/application/commands/users_cases/create-user.use-case';
+import { GetUsersCommand } from '@core_app/src/application/commands/users_cases/get-users.use-case';
+import { CreateUserCommand } from '@core_app/src/application/commands/users_cases/create-user.use-case';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserViewModel } from 'apps/core_app/src/domain/interfaces/view_models/UserViewModel';
-import { GetUserByUsernameCommand } from 'apps/core_app/src/application/commands/users_cases/get-user-by-username.use-case';
+import { UserViewModel } from '@core_app/src/domain/interfaces/view_models/UserViewModel';
+import { GetUserByUsernameCommand } from '@core_app/src/application/commands/users_cases/get-user-by-username.use-case';
 import { CreateUserDto } from '@app/shared-dto';
-import { GetUserByEmailCommand } from 'apps/core_app/src/application/commands/users_cases/get-user-by-email.use-case';
+import { GetUserByEmailCommand } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
 
 
 
