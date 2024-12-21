@@ -15,7 +15,7 @@ export class PrismaCoreAppService extends PrismaClient implements OnModuleInit, 
           url: databaseUrl,
         },
       },
-      log: ['query', 'info', 'warn', 'error'], // Подключаем логирование
+      //log: ['query', 'info', 'warn', 'error'], // Подключаем логирование
     });
   }
 

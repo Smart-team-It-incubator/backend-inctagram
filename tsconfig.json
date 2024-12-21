@@ -39,10 +39,24 @@
       "auth-api/auth-api/*": [
         "libs/auth-api/src/*"
       ],
-      "@prisma/auth": ["apps/auth/prisma/schema_generate"],
-      "@prisma/core_app": ["apps/core_app/prisma/schema_generate"],
-      "@core_app/*": ["apps/core_app/*"],
-      "@auth/*": ["apps/auth/*"]
+      "@prisma/auth": [
+        "apps/auth/prisma/schema_generate"
+      ],
+      "@prisma/core_app": [
+        "apps/core_app/prisma/schema_generate"
+      ],
+      "@core_app/*": [
+        "apps/core_app/*"
+      ],
+      "@auth/*": [
+        "apps/auth/*"
+      ],
+      "@app/global-config": [
+        "libs/global-config/src"
+      ],
+      "@app/global-config/*": [
+        "libs/global-config/src/*"
+      ]
     }
   }
 }

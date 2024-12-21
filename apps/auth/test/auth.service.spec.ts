@@ -82,14 +82,12 @@ describe('Database Connection Test', () => {
   describe("Auth flow", () => {
 
     it("Осуществляем регистрацию пользователя в USERS модуле", async () => {
-      console.log("логирование роута для Registration", RouteNames.USERS.REGISTRATION.full )
-      await postRequest(appAuth, RouteNames.USERS.REGISTRATION.full)
+      await postRequest(appCoreApp, RouteNames.USERS.REGISTRATION.full)
         .send(userForTest)
         .expect(200);
     })
     it("Производим вход в систему, получаем токены", async () => {
-      console.log("логирование роута для Login", RouteNames.AUTH.LOGIN.full )
-      await postRequest(appAuth, RouteNames.AUTH.LOGIN.full)
+      await postRequest(appAuth, "/auth/login")
         .send({
           email: 'testUser11@gmail.com',
           password: 'Testpassword1!',

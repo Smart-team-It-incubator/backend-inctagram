@@ -36,7 +36,7 @@ export class UserController {
     description: 'Данные для создания пользователя',
     type: CreateUserDto,
   })
-  @Post()
+  @Post("/registration")
   async registration(@Body() body: CreateUserDto): Promise<Partial<UserViewModel> | null> {
     const createUser: Partial<UserViewModel> | null = await this.commandBus.execute(new CreateUserCommand(body.email, body.password, body.username, body.firstName, body.lastName, body.city, body.country, body.dateOfBirthday));
     if (!createUser) {
@@ -55,7 +55,7 @@ export class UserController {
     description: 'Данные для обновления пользователя',
     type: CreateUserDto, // Это может быть другая DTO для обновления, которая может содержать только те поля, которые можно обновить.
   })
-  @Put("/:userId") // Используем PUT для обновления
+  @Put("update/:userId") // Используем PUT для обновления
   async updateUser(@Param('userId') userId: string): Promise<string> {
     // Пока логика обновления не реализована, возвращаем описание того, что будет реализовано.
     return `Метод updateUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;

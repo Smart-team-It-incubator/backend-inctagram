@@ -39,7 +39,7 @@
     "migrate:auth:test": "dotenv -e ./apps/auth/.test.env -- npx prisma migrate dev --schema=./apps/auth/prisma/schema.prisma",
     "generate:auth": "dotenv -e ./apps/core_app/.development.env -- npx prisma generate --schema=./apps/auth/prisma/schema.prisma",
     "generate:core_app": "dotenv -e ./apps/core_app/.development.env -- npx prisma generate --schema=./apps/core_app/prisma/schema.prisma",
-    "libs:builds": "nest build shared-dto && nest build auth-api && nest build core-app-api"
+    "libs:builds": "nest build shared-dto && nest build auth-api && nest build core-app-api && nest build global-config"
   },
   "dependencies": {
     "@libs/shared-dto": "file:./libs/shared-dto",
@@ -120,7 +120,8 @@
       "^@prisma/auth(|/.*)$": "<rootDir>/apps/auth/prisma/schema_generate/$1",
       "^@prisma/core_app(|/.*)$": "<rootDir>/apps/core_app/prisma/schema_generate/$1",
       "@core_app(|/.*)$": "<rootDir>/apps/core_app/$1",
-      "@auth(|/.*)$": "<rootDir>/apps/auth/$1"
+      "@auth(|/.*)$": "<rootDir>/apps/auth/$1",
+      "^@app/global-config(|/.*)$": "<rootDir>/libs/global-config/src/$1"
     }
   },
   "main": "index.js",

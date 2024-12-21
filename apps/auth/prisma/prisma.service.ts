@@ -7,7 +7,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     // Выбираем базу данных в зависимости от окружения
     const databaseUrl = process.env.DATABASE_URL
 
-    console.log("DATABASE_URL полученный по команде для запуска auth:", databaseUrl);
+    //console.log("DATABASE_URL полученный по команде для запуска auth:", databaseUrl);
     // Передаём URL в PrismaClient
     super({
       datasources: {
@@ -15,7 +15,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
           url: databaseUrl,
         },
       },
-      log: ['query', 'info', 'warn', 'error'], // Подключаем логирование
+      //log: ['query', 'info', 'warn', 'error'], // Подключаем логирование
     });
   }
 
