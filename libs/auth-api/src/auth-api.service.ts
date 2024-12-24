@@ -8,13 +8,13 @@ export class AuthApiService {
 
   constructor(private readonly httpService: HttpService) {
     // Адрес микросервиса Auth берется из переменных окружения
-    this.authAppUrl = process.env.AUTH_APP_URL || 'http://localhost:4000';
+    this.authAppUrl = process.env.AUTH_APP_URL || 'http://127.0.0.1:4000/auth';
   }
 
   // Метод для хеширования пароля
   async hashPassword(password: string): Promise<string> {
     try {
-      //console.log(`${this.authAppUrl}/hash-password`, { password }); 
+      console.log(`${this.authAppUrl}/hash-password`, { password }, "ПОПАДАНИЕ ТЕСТОВ В БИБЛИОТЕКУ"); 
       const response = await firstValueFrom(
         this.httpService.post(`${this.authAppUrl}/hash-password`, { password }),
       );

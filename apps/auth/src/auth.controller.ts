@@ -9,7 +9,7 @@ import { Session } from '@prisma/auth';
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
-  @Post('login')
+  @Post('/login')
   @ApiOperation({ summary: 'Авторизация пользователя' })
   @ApiBody({
     description: 'Данные для авторизации',
@@ -43,7 +43,6 @@ export class AuthController {
       const useragent = req.headers['user-agent'];
       const refreshTokenExist = req.cookies?.refreshToken; // Получаем токен из Cookie
       const result = await this.authService.login(loginDto, useragent, ip, refreshTokenExist);
-      
       res
         .cookie("refreshToken", result.refreshToken, {
           httpOnly: true,
@@ -60,7 +59,7 @@ export class AuthController {
   }
 
   @ApiTags('Auth') // Группировка методов по тегу 'Auth'
-  @Post('logout')
+  @Post('/logout')
   @ApiOperation({
     summary: 'Logout user', 
     description: 'Handles logout by invalidating the refresh token and logging the user out.'
@@ -114,7 +113,7 @@ export class AuthController {
       example: { message: 'Invalid or expired refresh token' }
     }
   })
-  @Post('refresh-token')
+  @Post('/refresh-token')
   async updateRefreshToken(@Req() req, @Res() res) {
     try {
       const ip = req.ip
@@ -140,7 +139,7 @@ export class AuthController {
   }
 
 
-  @Post('password-reset/request')
+  @Post('/password-reset/request')
   @ApiResponse({ status: 200, description: 'Password reset request submitted successfully.' })
   @ApiBody({ schema: { example: { email: 'user@example.com' } } })
   async requestPasswordReset(@Body('email') email: string): Promise<{ message: string }> {
@@ -149,7 +148,7 @@ export class AuthController {
   }
 
   // Reset Password
-  @Post('password-reset/confirm')
+  @Post('/password-reset/confirm')
   @ApiResponse({ status: 200, description: 'Password reset successfully.' })
   @ApiBody({ schema: { example: { resetToken: 'token123', newPassword: 'newStrongPassword' } } })
   async resetPassword(
@@ -161,7 +160,7 @@ export class AuthController {
   }
 
   // Change Password
-  @Post('password/change')
+  @Post('/password/change')
   @ApiResponse({ status: 200, description: 'Password changed successfully.' })
   @ApiBody({ schema: { example: { currentPassword: 'oldPassword123', newPassword: 'newStrongPassword' } } })
   async changePassword(
@@ -173,7 +172,7 @@ export class AuthController {
   }
 
   // Get Active Sessions
-  @Get('sessions')
+  @Get('/sessions')
   @ApiResponse({
     status: 200, description: 'List of active sessions.', schema: {
       example: [
@@ -193,7 +192,7 @@ export class AuthController {
   }
 
   // Revoke specific Session
-  @Delete('sessions/revoke/:sessionId')
+  @Delete('/sessions/revoke/:sessionId')
   @ApiResponse({ status: 200, description: 'Session revoked successfully.' })
   @ApiBody({ schema: { example: { sessionId: 'session1' } } })
   async revokeSession(@Param('sessionId') sessionId: string): Promise<{ message: string }> {
@@ -209,7 +208,7 @@ export class AuthController {
   }
 
   // Revoke All Sessions
-  @Delete('sessions/revoke-all')
+  @Delete('/sessions/revoke-all')
   @ApiResponse({ status: 200, description: 'All sessions revoked successfully.' })
   async revokeAllSessions(@Req() req): Promise<{ message: string }> {
     try {
@@ -227,7 +226,7 @@ export class AuthController {
     
   }
 
-  @Post('hash-password')
+  @Post('/hash-password')
   async hashPassword(@Body('password') passwordByUser: string): Promise<{ hashedPassword: string }> {
     try {
       console.log("мы попали в controller Auth hash-password", passwordByUser);
@@ -243,5 +242,9 @@ export class AuthController {
   @Delete('/drop-db')
   async dropDb() {
     return this.authService.dropDb();
+  }
+  @Get('/health') 
+  async heath() {
+    return {"status": "ok"}
   }
 }

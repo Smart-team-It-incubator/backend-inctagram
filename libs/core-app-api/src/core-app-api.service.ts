@@ -8,14 +8,14 @@ export class CoreAppApiService {
 
     constructor(private readonly httpService: HttpService) {
         // Здесь мы предполагаем, что URL Core_app задается через переменную окружения
-        this.coreAppUrl = process.env.CORE_APP_URL || 'http://localhost:3000';
+        this.coreAppUrl = process.env.CORE_APP_URL || 'http://127.0.0.1:3000';
     }
 
     // Получение данных пользователя по username
     async getUserByUsername(username: string): Promise<any> {
         try {
             const response = await firstValueFrom(
-                this.httpService.get(`${this.coreAppUrl}/users/${username}`),
+                this.httpService.get(`${this.coreAppUrl}/users/getByUsername/${username}`),
             );
             return response.data;
         } catch (error) {

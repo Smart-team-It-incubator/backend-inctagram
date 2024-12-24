@@ -80,7 +80,7 @@ export class UserController {
   // Метод для получения пользователя по Username
   @ApiOperation({ summary: 'Get User by username' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'respone with required user' }) // Описание ответа
-  @Get("/:username") // Регистр username ВАЖЕН при поиске
+  @Get("/getByUsername/:username") // Регистр username ВАЖЕН при поиске
   async findUserByUsername(@Param('username') username: string): Promise<string> {
     const user = await this.commandBus.execute(new GetUserByUsernameCommand(username));
     if (!user) {
@@ -107,6 +107,11 @@ export class UserController {
     @Delete('/drop-db')
     async dropDb() {
       return this.commandBus.execute(new DropDBCommand())
+    }
+
+    @Get('/health') 
+    async heath() {
+      return {"status": "ok"}
     }
 
   
