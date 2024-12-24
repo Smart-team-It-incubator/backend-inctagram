@@ -2,8 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { AuthModule } from '../src/auth.module';
 import { PrismaService } from '../prisma/prisma.service';
-import cookieParser from 'cookie-parser';
-import { getRequest, postRequest } from './utils/common';
+import { getFieldInErrorObject, getRequest, postRequest } from './utils/common';
 import { RouteNames } from '../src/routesConfig/routeNames';
 import { clearAuthDB, clearCoreDB } from './utils/clearDB';
 import { PrismaCoreAppService } from '@core_app/prisma/prisma.service';
@@ -31,15 +30,18 @@ describe('E2E registration user/auth flow', () => {
   }
 
   const incorrectDtoForRegistation = {
-    email: "wrong-email",
-    username: "UserWithHash2",
-    password: "bad",
+    email: "wrong-email", // Не Email
+    username: "User", // Заведомо короткое имя
+    password: "bad", // Короткий пароль
     firstName: "Bobby",
     lastName: "Kubob",
     country: "USA",
     city: "New York",
     dateOfBirthday: "2001-01-01"
   }
+
+  let globalAccessToken = ''
+  let globalRefreshToken = ''
 
   beforeAll(async () => {
     const authModuleFixture: TestingModule = await Test.createTestingModule({
@@ -54,25 +56,15 @@ describe('E2E registration user/auth flow', () => {
     appAuth = authModuleFixture.createNestApplication();
     appCoreApp = coreAppModuleFixture.createNestApplication();
 
-    // Применяем настройки из функции
+    // Применяем настройки к приложениям (Порт, Префиксы, Пайпы) из функции
     await app_auth_settings(appAuth);
     await app_coreApp_settings(appCoreApp);
-    
 
-    // appAuth.setGlobalPrefix('api/v1');
-    // appCoreApp.setGlobalPrefix('api/v1');
-
-    // appAuth.use(cookieParser());
-    // appCoreApp.use(cookieParser());
-
-    // await appAuth.init();
-    // await appCoreApp.init();
-    // await appAuth.listen(4000);
-    // await appCoreApp.listen(3000);
-
+    // Создаем экземпляры сервисов нашей Prisma, чтобы их можно было использовать в тестах напрямую
     prismaServiceAuth = appAuth.get<PrismaService>(PrismaService);
     prismaServiceCoreApp = appCoreApp.get<PrismaCoreAppService>(PrismaCoreAppService);
 
+    // Чистим тестовые БД перед запуском
     await clearAuthDB(appAuth)
     await clearCoreDB(appCoreApp)
   });
@@ -108,19 +100,18 @@ describe('E2E registration user/auth flow', () => {
     await appCoreApp.close();
   });
 
-
+  // Методы ничего не возвращают кроме 200, просто проверяем что приложения подняты и доступны
   describe("Проверяем доступность основных приложений", () => {
     jest.setTimeout(20000);
 
     it('should return 200 from the Auth application', async () => {
-      const response = await getRequest(appAuth, "api/v1/auth/health")
+      await getRequest(appAuth, "api/v1/auth/health")
         .expect(200);
     });
 
-
     it('should return 200 from the Core_app application', async () => {
 
-      const response = await getRequest(appCoreApp, "api/v1/users/health")
+      await getRequest(appCoreApp, "api/v1/users/health")
         .expect(200);
     });
   })
@@ -140,32 +131,145 @@ describe('E2E registration user/auth flow', () => {
   describe("Регистрация пользователя, вход в систему, получение токенов", () => {
     it("Should return 400 if dto incorrect", async () => {
       await postRequest(appCoreApp, RouteNames.USERS.REGISTRATION.full)
-      .expect(400);
+        .expect(400);
 
       const badResponse = await postRequest(appCoreApp, RouteNames.USERS.REGISTRATION.full)
-      .send(incorrectDtoForRegistation)
-      .expect(400)
+        .send(incorrectDtoForRegistation)
+        .expect(400)
 
-      console.log(badResponse.body)
+      // Вытаскиваем текст ошибки из ErrorResponse
+      const [nameFieldErrText, passwordFieldErrText, emailFieldErrText] =
+        getFieldInErrorObject(badResponse.body, ['username', 'password', 'email'])
+      // Берем первый элемент т.к возвращается строка в массиве
+      expect(nameFieldErrText[0]).toBe('Username must be at least 6 characters long')
+      expect(passwordFieldErrText[0]).toBe('Password must be at least 6 characters long')
+      expect(emailFieldErrText[0]).toBe('email must be an email')
 
     })
     it("Осуществляем регистрацию пользователя в USERS модуле", async () => {
-      await postRequest(appCoreApp, RouteNames.USERS.REGISTRATION.full)
+      const response = await postRequest(appCoreApp, RouteNames.USERS.REGISTRATION.full)
         .send(userForTest)
         .expect(201);
-    })
+
+      // Проверяем, что возвращенный объект соответствует ожидаемому формату
+      expect(response.body).toEqual({
+        id: expect.any(String), // UUID
+        email: userForTest.email,
+        username: userForTest.username,
+        firstName: userForTest.firstName,
+        lastName: userForTest.lastName,
+        city: userForTest.city,
+        country: userForTest.country,
+        dateOfBirthday: expect.any(String), // Дата
+      });
+    });
+
     it("Проверяем наличие пользователя которого создали", async () => {
-      await getRequest(appCoreApp, RouteNames.USERS.GET_USER_BY_EMAIL.full + `/${userForTest.email}`)
+      const response = await getRequest(appCoreApp, RouteNames.USERS.GET_USER_BY_EMAIL.full + `/${userForTest.email}`)
         .expect(200);
+
+      // Проверяем, что возвращенный объект соответствует ожидаемому формату, эндпоинт далее будет как внутренний, поэтому пока что возвращает Role и PasswordHash
+      expect(response.body).toEqual({
+        id: expect.any(String), // UUID
+        email: userForTest.email,
+        username: userForTest.username,
+        firstName: userForTest.firstName,
+        lastName: userForTest.lastName,
+        city: userForTest.city,
+        country: userForTest.country,
+        password: expect.any(String),
+        role: "user",
+        dateOfBirthday: expect.any(String), // Дата
+      });
     })
+
     it("Производим вход в систему, получаем токены", async () => {
-      await postRequest(appAuth, RouteNames.AUTH.LOGIN.full)
+      // Успешный вход
+      const loginResponse = await postRequest(appAuth, RouteNames.AUTH.LOGIN.full)
         .send({
           email: userForTest.email,
           password: userForTest.password,
         })
         .expect(200);
-    })
+
+      // Проверяем тело ответа
+      expect(loginResponse.body).toEqual({
+        accessToken: expect.any(String), // Проверяем наличие accessToken
+      });
+
+      // Проверяем, что refreshToken установлен в cookie
+      const cookies = loginResponse.headers['set-cookie'];
+      expect(cookies).toBeDefined();
+      const refreshTokenCookie = cookies?.[0]; // Предположим, что refreshToken — это первая cookie
+      globalAccessToken = loginResponse.body.accessToken;
+      globalRefreshToken = refreshTokenCookie.split(';')[0].split('=')[1];
+      expect(refreshTokenCookie).toBeDefined();
+      expect(refreshTokenCookie).toContain('refreshToken='); // Проверяем, что cookie содержит refreshToken
+      expect(refreshTokenCookie).toContain('HttpOnly'); // Убедимся, что cookie защищены
+
+      // Проверяем формат accessToken
+      const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
+      expect(loginResponse.body.accessToken).toMatch(jwtRegex);
+
+      // Повторный вход (если сессия существует)
+      const conflictResponse = await postRequest(appAuth, RouteNames.AUTH.LOGIN.full)
+        .set('Cookie', refreshTokenCookie) // Отправляем предыдущий refreshToken
+        .send({
+          email: userForTest.email,
+          password: userForTest.password,
+        })
+        .expect(409);
+
+      expect(conflictResponse.body.message).toBe(
+        'Уже существует активная сессия для устройства с этим Refresh Token, если нужно обновить, обратись на refresh-token.',
+      );
+
+      // Вход с неверными данными
+      await postRequest(appAuth, RouteNames.AUTH.LOGIN.full)
+        .send({
+          email: userForTest.email,
+          password: 'WrongPassword123!',
+        })
+        .expect(401)
+        .then((errorResponse) => {
+          expect(errorResponse.body.message).toBe('Invalid password'); // Сообщение об ошибке
+        });
+    });
+
+    it("Выход из системы, удаление токена, невозможность входа с тем же refreshToken", async () => {
+      // Выходим из системы
+      await postRequest(appAuth, RouteNames.AUTH.LOGOUT.full)
+        .set('Cookie', `refreshToken=${globalRefreshToken}`)
+        .expect(200)
+        .then((logoutResponse) => {
+          expect(logoutResponse.body.message).toBe('Logout successful');
+        });
+    
+      // Попытка обновления токена после Logout (ожидаем 401 Unauthorized)
+      await postRequest(appAuth, RouteNames.AUTH.REFRESH_TOKEN.full)
+        .set('Cookie', `refreshToken=${globalRefreshToken}`)
+        .expect(401)
+        .then((errorResponse) => {
+          expect(errorResponse.body.message).toBe('Invalid or expired refresh token');
+        });
+        
+
+      // TODO - Возвращается почему-то 409, хотя должен быть 401, из таблицы SESSION при Logout не удаляется refreshToken
+      // Повторный вход с тем же refreshToken (ожидаем 401 Unauthorized)
+      await postRequest(appAuth, RouteNames.AUTH.LOGIN.full)
+        .set('Cookie', `refreshToken=${globalRefreshToken}`)
+        .send({
+          email: userForTest.email,
+          password: userForTest.password,
+        })
+        .expect(401)
+        .then((errorResponse) => {
+          expect(errorResponse.body.message).toBe('Unauthorized');
+        });
+    });
+    
+
+
   }
   )
 
