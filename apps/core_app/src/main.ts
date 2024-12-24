@@ -4,17 +4,19 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { CustomValidationPipe } from './domain/exceptions/Pipe/Custom_global_validation_pipe';
 import axios from 'axios';
 import cookieParser from 'cookie-parser';
+import { app_coreApp_settings } from './infrastructure/app_coreApp_settings';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  await app_coreApp_settings(app)
   // Глобальный префикс для всех эндпоинтов
-  app.setGlobalPrefix('api/v1');
-  app.use(cookieParser());
+  // app.setGlobalPrefix('api/v1');
+  // app.use(cookieParser());
 
-  // Подключение глобального пайпа для кастомизации и структурирования ошибок + проверки DTO которые приходят в контроллеры
-  app.useGlobalPipes(
-    new CustomValidationPipe(),
-  );
+  // // Подключение глобального пайпа для кастомизации и структурирования ошибок + проверки DTO которые приходят в контроллеры
+  // app.useGlobalPipes(
+  //   new CustomValidationPipe(),
+  // );
 
 
   try {
@@ -42,7 +44,7 @@ async function bootstrap() {
   }
 
 
-  await app.listen(process.env.PORT ?? 3000);
-  console.log(`Приложение запущено на порту ${process.env.PORT} ?? 3000`);
+  // await app.listen(process.env.PORT ?? 3000);
+  // console.log(`Приложение запущено на порту ${process.env.PORT} ?? 3000`);
 }
 bootstrap();
