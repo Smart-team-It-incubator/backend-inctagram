@@ -29,7 +29,6 @@ export class AuthService {
 
   async login(loginDto: AuthForm, useragent: string, ip: string, refreshTokenExist?: string): Promise<{ accessToken: string; refreshToken: string }> {
     const { email, password } = loginDto;
-
     // Шаг 1: Получение данных пользователя из Core_app
     const userResponse = await this.coreAppApiService.getUserByEmail(email);
     if (!userResponse) {
@@ -55,7 +54,6 @@ export class AuthService {
       }
     }
 
-
     // Шаг 5: Генерация токенов
     const deviceId = randomUUID(); // Генерируем DeviceId перед вызовом функций, чтобы внутри access и refresh токенов лежал один deviceId 
     const accessToken = await this.generateAccessToken(userResponse.username, deviceId);
@@ -66,6 +64,7 @@ export class AuthService {
     const refreshTokenPayload: JwtPayload = await this.extractPayloadFromToken(refreshToken, false);
     // Хешируем токен т.к напрямую хранить токен нельзя
     const hashRefreshToken = await this.hashRefreshToken(refreshToken);
+   
     // Сохраняем токен в базе данных + создаем сессию для этого токена (устройства)
     await this.authRepository.saveRefreshToken(userResponse.username, hashRefreshToken, refreshTokenPayload, useragent, ip);
 
@@ -154,7 +153,6 @@ export class AuthService {
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-
     const payload = { userId: user.id, username: user.username, role: user.role, deviceId };
     const accessToken = this.jwtService.sign(payload, {
       secret: this.jwtAccessSecret, // Секретный ключ для Access Token

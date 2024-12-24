@@ -3,22 +3,22 @@ export const RouteNames = {
 		value: 'auth',
 		LOGIN: {
 			value: 'login',
-			full: 'auth/login',
+			full: 'api/v1/auth/login',
 		},
 		REFRESH_TOKEN: {
 			value: 'refresh-token',
-			full: 'auth/refresh-token',
+			full: 'api/v1/auth/refresh-token',
 		},
 		LOGOUT: {
 			value: 'logout',
-			full: 'auth/logout',
+			full: 'api/v1/auth/logout',
 		},
 	},
 	TESTING_AUTH: {
 		value: 'testing',
 		ALL_DATA: {
 			value: 'drop-db',
-			full: 'auth/drop-db',
+			full: 'api/v1/auth/drop-db',
 		},
 		
 	},
@@ -26,14 +26,18 @@ export const RouteNames = {
 		value: 'testing',
 		ALL_DATA: {
 			value: 'drop-db',
-			full: 'users/drop-db',
+			full: 'api/v1/users/drop-db',
 		},
 	},
 	USERS: {
 		value: 'users',
 		REGISTRATION: {
 			value: 'registration',
-			full: 'users/registration',
+			full: 'api/v1/users/registration',
+		},
+		GET_USER_BY_EMAIL: {
+			value: 'getByEmail',
+			full: 'api/v1/users/getByEmail',
 		},
 	}
 }

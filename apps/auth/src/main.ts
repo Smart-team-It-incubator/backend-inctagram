@@ -1,19 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { AuthModule } from './auth.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import cookieParser from 'cookie-parser';
+import { app_auth_settings } from './app_auth_settings';
 
-console.log("Переменная", process.env.DATABASE_URL);
 
 async function bootstrap() {
   const app = await NestFactory.create(AuthModule);
-  app.setGlobalPrefix('api/v1');
-  app.use(cookieParser());
-  await app.enableCors({
-    origin: 'http://localhost:3000', // Разрешаем доступ из основного приложения
-    methods: 'GET,POST,PUT,DELETE',
-    allowedHeaders: 'Content-Type,Authorization',
-  });
+  await app_auth_settings(app)
+  // app.setGlobalPrefix('api/v1');
+  // app.use(cookieParser());
+  // await app.enableCors({
+  //   origin: 'http://localhost:3000', // Разрешаем доступ из основного приложения
+  //   methods: 'GET,POST,PUT,DELETE',
+  //   allowedHeaders: 'Content-Type,Authorization',
+  // });
   // Конфигурация Swagger для auth
   const config = new DocumentBuilder()
     .setTitle('Auth Service API')
@@ -25,8 +25,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/v1', app, document); // Swagger будет доступен по /api
 
-  await app.listen(process.env.PORT ?? 4000);
-  console.log(`Приложение Auth запущено, ${process.env.PORT} ?? 4000`)
+  // await app.listen(process.env.PORT ?? 4000);
+  // console.log(`Приложение Auth запущено, ${process.env.PORT} ?? 4000`)
 
 }
 bootstrap();
