@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { UserController } from './controllers/user.controller';
+import { UserController } from './user.controller';
 import { CreateUserUseCase } from '@core_app/src/application/commands/users_cases/create-user.use-case';
-import { UsersRepository } from './repositories/user.repository';
+import { UsersRepository } from './user.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { GetUsersUseCase } from '@core_app/src/application/commands/users_cases/get-users.use-case';
 import { GetUserByUsernameUseCase } from '@core_app/src/application/commands/users_cases/get-user-by-username.use-case';

@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, Req, UnauthorizedException, Delete, Query, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBody, ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiCookieAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
 
 @ApiTags('Auth')
@@ -137,7 +137,7 @@ export class AuthController {
     }
   }
 
-
+  @ApiExcludeEndpoint()
   @Post('/password-reset/request')
   @ApiResponse({ status: 200, description: 'Password reset request submitted successfully.' })
   @ApiBody({ schema: { example: { email: 'user@example.com' } } })
@@ -147,6 +147,7 @@ export class AuthController {
   }
 
   // Reset Password
+  @ApiExcludeEndpoint()
   @Post('/password-reset/confirm')
   @ApiResponse({ status: 200, description: 'Password reset successfully.' })
   @ApiBody({ schema: { example: { resetToken: 'token123', newPassword: 'newStrongPassword' } } })
@@ -160,8 +161,9 @@ export class AuthController {
 
   // Change Password
   @Post('/password/change')
-  @ApiResponse({ status: 200, description: 'Password changed successfully.' })
-  @ApiBody({ schema: { example: { currentPassword: 'oldPassword123', newPassword: 'newStrongPassword' } } })
+  //@ApiResponse({ status: 200, description: 'Password changed successfully.' })
+  //@ApiBody({ schema: { example: { currentPassword: 'oldPassword123', newPassword: 'newStrongPassword' } } })
+  @ApiExcludeEndpoint()
   async changePassword(
     @Body('currentPassword') currentPassword: string,
     @Body('newPassword') newPassword: string,
@@ -224,7 +226,7 @@ export class AuthController {
     }
     
   }
-
+  @ApiExcludeEndpoint()
   @Post('/hash-password')
   async hashPassword(@Body('password') passwordByUser: string): Promise<{ hashedPassword: string }> {
     try {
@@ -238,10 +240,12 @@ export class AuthController {
   }
 
   // For Dev
+  @ApiExcludeEndpoint()
   @Delete('/drop-db')
   async dropDb() {
     return this.authService.dropDb();
   }
+  @ApiOperation({ summary: 'Проверка модуля Auth на работоспособность' }) // Описание эндпоинта
   @Get('/health') 
   async heath() {
     return {"status": "ok"}

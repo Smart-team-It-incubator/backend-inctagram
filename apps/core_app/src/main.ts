@@ -44,7 +44,7 @@ async function bootstrap() {
   }
 
 
-  // await app.listen(process.env.PORT ?? 3000);
-  // console.log(`Приложение запущено на порту ${process.env.PORT} ?? 3000`);
+  await app.listen(process.env.PORT ?? 3000);
+  console.log(`Приложение запущено на порту ${process.env.PORT} ?? 3000`);
 }
 bootstrap();

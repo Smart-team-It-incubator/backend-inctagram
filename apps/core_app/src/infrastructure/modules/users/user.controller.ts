@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, HttpException, HttpStatus, Put, Param, Del
 import { CommandBus } from '@nestjs/cqrs';
 import { GetUsersCommand } from '@core_app/src/application/commands/users_cases/get-users.use-case';
 import { CreateUserCommand } from '@core_app/src/application/commands/users_cases/create-user.use-case';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserViewModel } from '@core_app/src/domain/interfaces/view_models/UserViewModel';
 import { GetUserByUsernameCommand } from '@core_app/src/application/commands/users_cases/get-user-by-username.use-case';
 import { CreateUserDto } from '@app/shared-dto';
@@ -104,11 +104,12 @@ export class UserController {
 
 
     // For Dev
+    @ApiExcludeEndpoint()
     @Delete('/drop-db')
     async dropDb() {
       return this.commandBus.execute(new DropDBCommand())
     }
-
+    @ApiOperation({ summary: 'Проверка модуля Users на работоспособность' }) // Описание эндпоинта
     @Get('/health') 
     async heath() {
       return {"status": "ok"}

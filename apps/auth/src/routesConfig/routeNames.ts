@@ -13,6 +13,18 @@ export const RouteNames = {
 			value: 'logout',
 			full: 'api/v1/auth/logout',
 		},
+		GET_ALL_SESSION: {
+			value: 'get-all-session',
+			full: 'api/v1/auth/sessions',
+		},
+		DEL_SPECIFIC_SESSION: {
+			value: 'del-specific-session',
+			full: 'api/v1/auth/sessions/revoke/:sessionId', // /sessions/revoke/:sessionId
+		},
+		DEL_ALL_SESSION: {
+			value: 'del-all-session',
+			full: 'api/v1/auth/sessions/revoke-all',
+		}
 	},
 	TESTING_AUTH: {
 		value: 'testing',
