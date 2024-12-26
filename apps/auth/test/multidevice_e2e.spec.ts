@@ -230,34 +230,52 @@ describe('E2e Multidevice Flow', () => {
             expect(sessionsResponse.body.length).toBe(2); // Убедимся, что возвращено 2 сессии
         });
     })
-    it('Отзыв одной сессии для User1', async () => {
+    it('Отзыв одной сессии для User1 и проверка сессий для User2', async () => {
         // Запрос для получения всех сессий User1 до отзыва
-        const sessionsResponseBeforeRevoke = await getRequest(appAuth, RouteNames.AUTH.GET_ALL_SESSION.full)
-            .set('Cookie', `refreshToken=${refreshTokenUser1}`)
-            .expect(200);
-
+        const sessionsResponseBeforeRevokeUser1 = await getRequest(appAuth, RouteNames.AUTH.GET_ALL_SESSION.full)
+          .set('Cookie', `refreshToken=${refreshTokenUser1}`)
+          .expect(200);
+      
         // Проверяем, что у User1 есть 2 сессии
-        expect(sessionsResponseBeforeRevoke.body.length).toBe(2);
-        const [session1BeforeRevoke, session2BeforeRevoke] = sessionsResponseBeforeRevoke.body;
-
-        // Отзываем первую сессию
-        const revokeSessionResponse = await deleteRequest(appAuth, RouteNames.AUTH.DEL_SPECIFIC_SESSION.full.replace(':sessionId', session1BeforeRevoke.id))
-            .expect(200);
-
+        expect(sessionsResponseBeforeRevokeUser1.body.length).toBe(2);
+        const [session1BeforeRevokeUser1, session2BeforeRevokeUser1] = sessionsResponseBeforeRevokeUser1.body;
+      
+        // Отзываем первую сессию User1
+        const revokeSessionResponse = await deleteRequest(appAuth, RouteNames.AUTH.DEL_SPECIFIC_SESSION.full.replace(':sessionId', session1BeforeRevokeUser1.id))
+          .expect(200);
+      
         // Проверяем, что сессия была успешно отозвана
-        expect(revokeSessionResponse.body.message).toBe(`Session ${session1BeforeRevoke.id} revoked successfully.`);
-
-        // Запрос для получения всех сессий после отзыва
-        const sessionsResponseAfterRevoke = await getRequest(appAuth, RouteNames.AUTH.GET_ALL_SESSION.full)
-            .set('Cookie', `refreshToken=${refreshTokenUser1}`)
-            .expect(200);
-
-        // Проверяем, что осталась только одна сессия
-        expect(sessionsResponseAfterRevoke.body.length).toBe(1);
-
+        expect(revokeSessionResponse.body.message).toBe(`Session ${session1BeforeRevokeUser1.id} revoked successfully.`);
+      
+        // Запрос для получения всех сессий User1 после отзыва
+        const sessionsResponseAfterRevokeUser1 = await getRequest(appAuth, RouteNames.AUTH.GET_ALL_SESSION.full)
+          .set('Cookie', `refreshToken=${refreshTokenUser1}`)
+          .expect(200);
+      
+        // Проверяем, что осталась только одна сессия у User1
+        expect(sessionsResponseAfterRevokeUser1.body.length).toBe(1);
+      
         // Проверяем, что в оставшейся сессии идентификатор не совпадает с отозванной
-        expect(sessionsResponseAfterRevoke.body[0].id).not.toEqual(session1BeforeRevoke.id);
-        expect(sessionsResponseAfterRevoke.body[0].id).toEqual(session2BeforeRevoke.id);
-    });
-
+        expect(sessionsResponseAfterRevokeUser1.body[0].id).not.toEqual(session1BeforeRevokeUser1.id);
+        expect(sessionsResponseAfterRevokeUser1.body[0].id).toEqual(session2BeforeRevokeUser1.id);
+      
+        // Запрос для получения всех сессий User2 до отзыва сессии у User1
+        const sessionsResponseBeforeRevokeUser2 = await getRequest(appAuth, RouteNames.AUTH.GET_ALL_SESSION.full)
+          .set('Cookie', `refreshToken=${refreshTokenUser2}`)
+          .expect(200);
+      
+        // Проверяем, что у User2 есть 2 сессии
+        expect(sessionsResponseBeforeRevokeUser2.body.length).toBe(2);
+        const [session1BeforeRevokeUser2, session2BeforeRevokeUser2] = sessionsResponseBeforeRevokeUser2.body;
+      
+        // Проверяем, что сессии User2 остались на месте
+        const sessionsResponseAfterRevokeUser2 = await getRequest(appAuth, RouteNames.AUTH.GET_ALL_SESSION.full)
+          .set('Cookie', `refreshToken=${refreshTokenUser2}`)
+          .expect(200);
+      
+        // Проверяем, что у User2 все сессии остались
+        expect(sessionsResponseAfterRevokeUser2.body.length).toBe(2);
+        expect(sessionsResponseAfterRevokeUser2.body[0].id).toEqual(session1BeforeRevokeUser2.id);
+        expect(sessionsResponseAfterRevokeUser2.body[1].id).toEqual(session2BeforeRevokeUser2.id);
+      });
 })
