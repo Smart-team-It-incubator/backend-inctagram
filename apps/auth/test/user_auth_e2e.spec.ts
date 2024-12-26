@@ -11,7 +11,7 @@ import { AppModule } from '@core_app/src/app.module';
 import { app_auth_settings } from '@auth/src/app_auth_settings';
 import { app_coreApp_settings } from '@core_app/src/infrastructure/app_coreApp_settings';
 
-describe('E2E registration user/auth flow', () => {
+describe('E2E registration SINGLE user/auth flow', () => {
   jest.setTimeout(20000);
   let appAuth: INestApplication;
   let appCoreApp: INestApplication;
