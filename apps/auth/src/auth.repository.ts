@@ -19,75 +19,75 @@ export class AuthRepository {
     ip: string
   ): Promise<void> {
     try {
-      const sessionId = randomUUID();; // Генерация уникального deviceId
-      const { userId, deviceId } = refreshTokenPayload;
-
-      await this.prisma.$transaction([
-        // Удаляем старые сессии и токены если они есть
-        this.prisma.session.deleteMany({
-          where: {
-            userId, deviceId
-          },
-        }),
-        // Создаем запись в Session
-        this.prisma.session.create({
-          data: {
-            id: sessionId,                   // Уникальный ID для сессии
-            userId: refreshTokenPayload.userId,
-            deviceId: refreshTokenPayload.deviceId,             // deviceId совпадает с id для примера
-            ip,                              // IP-адрес устройства
-            tokenHash: hashRefreshToken,     // Хэш токена
-            expiresAt: refreshTokenPayload.expirationDate,
-            createdAt: new Date(),
-            lastVisit: new Date(),
-          },
-        }),
+      const sessionId = randomUUID(); // Генерация уникального sessionId
+      const { userId, deviceId, expirationDate } = refreshTokenPayload;
   
-        // Создаем запись в RefreshToken
-         this.prisma.refreshToken.create({
+      // Транзакция для работы с базой данных
+      await this.prisma.$transaction([
+        // Удаление старых сессий и токенов для пользователя и устройства
+        this.prisma.deviceSession.deleteMany({
+          where: { userId, deviceId },
+        }),
+        // Создание новой записи RefreshToken, связанной с Session
+        this.prisma.deviceSession.create({
           data: {
-            username,
-            tokenHash: hashRefreshToken,      // Связываем сессии через tokenHash
-            userId: refreshTokenPayload.userId,
-            expiresAt: refreshTokenPayload.expirationDate,
+            tokenHash: hashRefreshToken,
+            userId,
+            deviceId,
+            expiresAt: expirationDate,
             revoked: false,
-            userAgent: useragent,             // User-Agent устройства
+            userAgent: useragent,
             createdAt: new Date(),
             updatedAt: new Date(),
+            ip: ip
           },
         }),
       ]);
-      console.log("Токен и информация о сессии сохранена в базу данных путем транзакции");
+  
+      console.log('Токен и информация о сессии успешно сохранены.');
     } catch (error) {
-      console.error('Error saving refresh token and session:', error);
-      throw new Error('Transaction failed');
+      console.error('Ошибка при сохранении токена и сессии:', error);
+      throw new Error('Ошибка транзакции при сохранении данных.');
     }
   }
+  
+  
+  
 
   // Удаление токена по хешу (параллельно удаление сессии из-за связи таблиц) 
-  async deleteRefreshTokenByHash(hashRefreshToken: string,): Promise<boolean> {
-    const result = await this.prisma.refreshToken.deleteMany({
-      where: { tokenHash: hashRefreshToken},
-    });
-
-    return result.count > 0; // Удалено хотя бы одно совпадение
+  async deleteRefreshTokenByHash(hashRefreshToken: string): Promise<boolean> {
+    try {
+      await this.prisma.deviceSession.deleteMany({
+        where: { tokenHash: hashRefreshToken },
+      });
+      return true; // Токен и связанные записи успешно удалены
+    } catch (error) {
+      console.error('Ошибка при удалении токена:', error);
+      return false;
+    }
   }
 
   // Удаляем токены по UserId и TokenHash - так как TokenHash связать с Session таблицей, соответственно удалится и сессия тоже.
   async deleteRefreshTokenByUserId(userId: string, tokenHash: string): Promise<boolean> {
-    const result = await this.prisma.refreshToken.deleteMany({
-      where: { userId: userId, tokenHash: tokenHash},
-    });
+    try {
+      const result = await this.prisma.deviceSession.deleteMany({
+        where: {userId, tokenHash },
+      });
+  
+      return true
+    } catch (error) {
+      console.error('Ошибка при удалении токена:', error);
+      return false;
+    }
 
-    return result.count > 0; // Удалено хотя бы одно совпадение
   }
 
 // Получение всех хешей токенов для пользователя с учетом deviceId сессии
   async getRefreshTokensByUserId(userId: string, deviceId: string): Promise<string[]> {
-  const tokens = await this.prisma.refreshToken.findMany({
+  const tokens = await this.prisma.deviceSession.findMany({
     where: {
       userId,
-      session: { deviceId }, // Используем связь с таблицей Session для фильтрации по deviceId
+      deviceId: deviceId , // Используем связь с таблицей Session для фильтрации по deviceId
     },
     select: {
       tokenHash: true, // Извлекаем только хеши токенов
@@ -99,7 +99,7 @@ export class AuthRepository {
 
 // Поиск одной конкретной сессии
 async findOneActiveSession(userId: string, deviceId: string): Promise<object> {
-  const sessions = await this.prisma.session.findFirst({
+  const sessions = await this.prisma.deviceSession.findFirst({
     where: {
       userId, 
       deviceId,
@@ -114,7 +114,7 @@ async findOneActiveSession(userId: string, deviceId: string): Promise<object> {
 }
 
 async findAllActiveSession(userId: string): Promise<object> {
-  const sessions = await this.prisma.session.findMany({
+  const sessions = await this.prisma.deviceSession.findMany({
     where: {
       userId, 
       expiresAt: {
@@ -130,7 +130,7 @@ async findAllActiveSession(userId: string): Promise<object> {
   async revokeSessionBySessionId(sessionId: string): Promise<boolean> {
 
     try {
-      const session = await this.prisma.session.delete({
+      const session = await this.prisma.deviceSession.delete({
         where: {
           id: sessionId,
         },
@@ -145,7 +145,7 @@ async findAllActiveSession(userId: string): Promise<object> {
 }
 async revokeAllActiveSession(userId: string, deviceId: string): Promise<boolean> {
   try {
-    const result = await this.prisma.session.deleteMany({
+    const result = await this.prisma.deviceSession.deleteMany({
       where: {
         userId, // Удаляем только сессии пользователя
         deviceId: {
@@ -180,10 +180,7 @@ async dropDb() {
   try {
     // Удаляем данные из каждой таблицы, но структура остаётся
     await this.prisma.$transaction([
-      this.prisma.refreshToken.deleteMany({}),
-      this.prisma.session.deleteMany({}),
-      this.prisma.passwordResetRequest.deleteMany({}),
-      this.prisma.revokedToken.deleteMany({}),
+      this.prisma.deviceSession.deleteMany({}),
       // Добавьте другие таблицы, из которых нужно удалить данные
     ]);
     console.log('Данные успешно удалены из таблиц Auth');

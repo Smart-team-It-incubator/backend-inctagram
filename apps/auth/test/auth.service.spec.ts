@@ -236,7 +236,7 @@ describe('E2E registration user/auth flow', () => {
         });
     });
 
-    it("Выход из системы, удаление токена, невозможность входа с тем же refreshToken", async () => {
+    it("Выход из системы, удаление токена, повторный вход (сессия должна быть 1 на устройство)", async () => {
       // Выходим из системы
       await postRequest(appAuth, RouteNames.AUTH.LOGOUT.full)
         .set('Cookie', `refreshToken=${globalRefreshToken}`)
@@ -244,7 +244,7 @@ describe('E2E registration user/auth flow', () => {
         .then((logoutResponse) => {
           expect(logoutResponse.body.message).toBe('Logout successful');
         });
-    
+
       // Попытка обновления токена после Logout (ожидаем 401 Unauthorized)
       await postRequest(appAuth, RouteNames.AUTH.REFRESH_TOKEN.full)
         .set('Cookie', `refreshToken=${globalRefreshToken}`)
@@ -252,9 +252,7 @@ describe('E2E registration user/auth flow', () => {
         .then((errorResponse) => {
           expect(errorResponse.body.message).toBe('Invalid or expired refresh token');
         });
-        
 
-      // TODO - Возвращается почему-то 409, хотя должен быть 401, из таблицы SESSION при Logout не удаляется refreshToken
       // Повторный вход с тем же refreshToken (ожидаем 401 Unauthorized)
       await postRequest(appAuth, RouteNames.AUTH.LOGIN.full)
         .set('Cookie', `refreshToken=${globalRefreshToken}`)
@@ -262,15 +260,26 @@ describe('E2E registration user/auth flow', () => {
           email: userForTest.email,
           password: userForTest.password,
         })
-        .expect(401)
-        .then((errorResponse) => {
-          expect(errorResponse.body.message).toBe('Unauthorized');
-        });
+        .expect(200);
+
+      // Получаем пользователя по email
+      const getUserByEmail = await prismaServiceCoreApp.user.findUnique({
+        where: {
+          email: userForTest.email,
+        },
+      });
+
+      // Проверяем количество записей в таблице deviceSession
+      const sessionCount = await prismaServiceAuth.deviceSession.count({
+        where: {
+          userId: getUserByEmail.id,
+        },
+      });
+
+      // Проверяем, что записей только одна
+      expect(sessionCount).toBe(1); // Если записей больше или меньше, тест упадет
+
     });
-    
-
-
   }
   )
-
 });

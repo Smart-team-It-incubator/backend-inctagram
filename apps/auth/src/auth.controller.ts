@@ -2,7 +2,6 @@ import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, 
 import { AuthService } from './auth.service';
 import { ApiBody, ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
-import { Session } from '@prisma/auth';
 
 @ApiTags('Auth')
 @Controller('auth')
