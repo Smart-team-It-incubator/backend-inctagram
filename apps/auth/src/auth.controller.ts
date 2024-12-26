@@ -2,7 +2,6 @@ import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, 
 import { AuthService } from './auth.service';
 import { ApiBody, ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
-import { Session } from '@prisma/auth';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -229,7 +228,7 @@ export class AuthController {
   @Post('/hash-password')
   async hashPassword(@Body('password') passwordByUser: string): Promise<{ hashedPassword: string }> {
     try {
-      console.log("мы попали в controller Auth hash-password", passwordByUser);
+      //console.log("мы попали в controller Auth hash-password", passwordByUser);
       const password = await this.authService._generateHash(passwordByUser);
       return password;
     } catch (error) {

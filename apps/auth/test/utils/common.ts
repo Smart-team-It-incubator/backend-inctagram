@@ -37,26 +37,35 @@ export function deleteRequest(app: INestApplication, url: string) {
  * @param errObj
  * @param fieldNames
  */
+
 export function getFieldInErrorObject(errObj: any, fieldNames: string | string[]) {
 	try {
+		// Проверяем, существует ли массив ошибок
+		if (!errObj.errors || !Array.isArray(errObj.errors)) {
+			throw new Error('Invalid error object structure');
+		}
+
+		// Обрабатываем, если передана строка
 		if (typeof fieldNames === 'string') {
-			return getFieldText(errObj, fieldNames)
+			return extractFieldErrors(errObj.errors, fieldNames);
 		} else {
+			// Если передан массив, обрабатываем все поля
 			return fieldNames.map((fieldName) => {
-				return getFieldText(errObj, fieldName)
-			})
+				return extractFieldErrors(errObj.errors, fieldName);
+			});
 		}
 	} catch (err: unknown) {
-		return null
-	}
-
-	function getFieldText(errObj: any, fieldName: string) {
-		// @ts-ignore
-		const field = errObj.wrongFields.find((field) => field.field === fieldName)
-
-		return field.message
+		console.error('Error processing error object:', err);
+		return null;
 	}
 }
+
+// Функция для извлечения ошибок по конкретному полю
+function extractFieldErrors(errorsArray: any[], fieldName: string) {
+	const fieldError = errorsArray.find((error) => error.field === fieldName);
+	return fieldError ? fieldError.errors : null;
+}
+
 
 export function checkErrorResponse(errObj: any, code: number, message: string) {
 	expect(errObj.status).toBe('error')
