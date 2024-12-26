@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './infrastructure/modules/users/user.module';
 
-import { UserController } from './infrastructure/modules/users/controllers/user.controller';
+import { UserController } from './infrastructure/modules/users/user.controller';
 import { ConfigModule } from '@nestjs/config';
 import { GlobalModule } from './infrastructure/modules/global_module/global_module';
 import { ClientsModule, Transport } from '@nestjs/microservices';

@@ -25,8 +25,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/v1', app, document); // Swagger будет доступен по /api
 
-  // await app.listen(process.env.PORT ?? 4000);
-  // console.log(`Приложение Auth запущено, ${process.env.PORT} ?? 4000`)
+  await app.listen(process.env.PORT ?? 4000);
+  console.log(`Приложение Auth запущено, ${process.env.PORT} ?? 4000`)
 
 }
 bootstrap();
