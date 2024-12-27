@@ -19,6 +19,5 @@ export async function app_auth_settings(app: INestApplication) {
     // и была возможность внедрять классы в класс проверки
     // https://medium.com/yavar/custom-validation-with-database-in-nestjs-ac008f96abe2
     useContainer(app.select(AuthModule), { fallbackOnErrors: true })
-    // await app.listen(process.env.PORT_AUTH ?? 4000);
-    // console.log(`Приложение запущено на порту ${process.env.PORT} ?? 4000`);
+    //await app.listen(process.env.PORT_AUTH ?? 4000);
 }

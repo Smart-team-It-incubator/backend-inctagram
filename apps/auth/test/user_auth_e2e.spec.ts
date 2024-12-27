@@ -59,6 +59,8 @@ describe('E2E registration SINGLE user/auth flow', () => {
     // Применяем настройки к приложениям (Порт, Префиксы, Пайпы) из функции
     await app_auth_settings(appAuth);
     await app_coreApp_settings(appCoreApp);
+    await appAuth.listen(4000);
+    await appCoreApp.listen(3000);
 
     // Создаем экземпляры сервисов нашей Prisma, чтобы их можно было использовать в тестах напрямую
     prismaServiceAuth = appAuth.get<PrismaService>(PrismaService);
