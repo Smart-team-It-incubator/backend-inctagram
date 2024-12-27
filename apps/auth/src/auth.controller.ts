@@ -174,6 +174,10 @@ export class AuthController {
 
   // Get Active Sessions
   @Get('/sessions')
+  @ApiOperation({
+    summary: 'Получения всех сессий пользователя', 
+    description: 'Получение всех сессий пользователя на основе RefreshToken'
+  })
   @ApiResponse({
     status: 200, description: 'List of active sessions.', schema: {
       example: [
@@ -194,6 +198,10 @@ export class AuthController {
 
   // Revoke specific Session
   @Delete('/sessions/revoke/:sessionId')
+  @ApiOperation({
+    summary: 'Отзыв конкретной сессии', 
+    description: 'Отзыв конкретной сессии пользователя по session ID'
+  })
   @ApiResponse({ status: 200, description: 'Session revoked successfully.' })
   @ApiBody({ schema: { example: { sessionId: 'session1' } } })
   async revokeSession(@Param('sessionId') sessionId: string): Promise<{ message: string }> {
@@ -210,6 +218,9 @@ export class AuthController {
 
   // Revoke All Sessions
   @Delete('/sessions/revoke-all')
+  @ApiOperation({
+    summary: 'Отзыв всех сессий за исключением текущей', 
+  })
   @ApiResponse({ status: 200, description: 'All sessions revoked successfully.' })
   async revokeAllSessions(@Req() req): Promise<{ message: string }> {
     try {
