@@ -7,14 +7,7 @@ import { app_auth_settings } from './app_auth_settings';
 async function bootstrap() {
   const app = await NestFactory.create(AuthModule);
   await app_auth_settings(app)
-  // app.setGlobalPrefix('api/v1');
-  // app.use(cookieParser());
-  // await app.enableCors({
-  //   origin: 'http://localhost:3000', // Разрешаем доступ из основного приложения
-  //   methods: 'GET,POST,PUT,DELETE',
-  //   allowedHeaders: 'Content-Type,Authorization',
-  // });
-  // Конфигурация Swagger для auth
+
   const config = new DocumentBuilder()
     .setTitle('Auth Service API')
     .setDescription('The Auth service API documentation')

@@ -9,15 +9,6 @@ import { app_coreApp_settings } from './infrastructure/app_coreApp_settings';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app_coreApp_settings(app)
-  // Глобальный префикс для всех эндпоинтов
-  // app.setGlobalPrefix('api/v1');
-  // app.use(cookieParser());
-
-  // // Подключение глобального пайпа для кастомизации и структурирования ошибок + проверки DTO которые приходят в контроллеры
-  // app.useGlobalPipes(
-  //   new CustomValidationPipe(),
-  // );
-
 
   try {
     // Подключение Swagger для документации
@@ -43,7 +34,7 @@ async function bootstrap() {
     console.log("Документация не поднялась т.к сервер auth не запущен");
   }
 
-
+  
   await app.listen(process.env.PORT ?? 3000);
   console.log(`Приложение запущено на порту ${process.env.PORT} ?? 3000`);
 }
