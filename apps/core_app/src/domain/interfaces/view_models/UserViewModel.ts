@@ -9,8 +9,9 @@ export class UserViewModel implements IUserInterface {
     lastName: string;
     profileImageUrl?: string;
     role: string;
-    isEmailVerified: boolean;
-    emailVerificationToken?: string;
+    isEmailConfirmed: boolean;
+    emailConfirmationCode?: string;
+    emailConfirmationCodeExpirationDate?: Date;
     createdAt: Date;
     updatedAt: Date;
     city: string;
