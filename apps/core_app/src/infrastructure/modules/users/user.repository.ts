@@ -69,6 +69,28 @@ export class UsersRepository {
       const userViewModel = new UserViewModel(user);
       return userViewModel.getPrivateProfile(); // Возвращаем внутренний профиль пользователя, т.к это для нашего ресурса
     }
+
+    async confirmEmail(confirmationCode: string): Promise<Partial<UserViewModel> | null> {
+      try {
+        // Ищем пользователя по коду подтверждения
+        const user = await this.prisma.user.findFirst({ where: { emailConfirmationCode: confirmationCode } });
+    
+        if (!user) {
+          return null; // Если пользователь не найден, возвращаем null
+        }
+    
+        // Обновляем статус пользователя на подтвержденный и удаляем код подтверждения
+        const updatedUser = await this.prisma.user.update({
+          where: { id: user.id },
+          data: { isEmailConfirmed: true, emailConfirmationCode: null },
+        });
+    
+        // Возвращаем обновлённый профиль пользователя
+        return new UserViewModel(updatedUser).getPublicProfile();
+      } catch (error) {
+        throw new Error(`Failed to confirm email: ${error.message}`);
+      }
+    }
     
 
 

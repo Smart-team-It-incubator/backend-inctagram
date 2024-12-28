@@ -1,4 +1,6 @@
-export class User {
+import { IUserInterface } from "@core_app/src/application/services/user/user-interface";
+
+export class User implements IUserInterface {
     constructor(
       public id: string,
       public email: string,

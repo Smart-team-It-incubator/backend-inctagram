@@ -8,6 +8,7 @@ import { GetUserByUsernameCommand } from '@core_app/src/application/commands/use
 import { CreateUserDto } from '@app/shared-dto';
 import { GetUserByEmailCommand } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
 import { DropDBCommand } from '@core_app/src/application/commands/users_cases/drop_user_db.use-case';
+import { ConfirmEmailCommand } from '@core_app/src/application/commands/users_cases/confirm-email.use-case';
 
 
 
@@ -101,6 +102,35 @@ export class UserController {
     }
     return user
   }
+
+  // Добавляем метод emailConfirmation
+@ApiOperation({ summary: 'Confirm user email' }) // Описание эндпоинта
+@ApiResponse({ status: 200, description: 'Email was successfully confirmed' }) // Описание ответа
+@ApiResponse({ status: 400, description: 'Invalid confirmation code' }) // Описание ошибки
+@ApiBody({
+  description: 'Код подтверждения для верификации email',
+  schema: {
+    type: 'object',
+    properties: {
+      confirmationCode: { type: 'string' },
+    },
+    required: ['confirmationCode'],
+  },
+})
+@Post('/email-confirmation')
+async emailConfirmation(@Body('confirmationCode') confirmationCode: string): Promise<{ message: string }> {
+  try {
+    const result = await this.commandBus.execute(new ConfirmEmailCommand(confirmationCode));
+
+    if (result) {
+      return { message: 'Email successfully confirmed' };
+    } else {
+      throw new HttpException('Invalid confirmation code', HttpStatus.BAD_REQUEST);
+    }
+  } catch (error) {
+    throw new HttpException(error.message || 'Confirmation failed', HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
 
 
     // For Dev
