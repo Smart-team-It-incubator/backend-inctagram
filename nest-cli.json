@@ -72,6 +72,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/global-config/tsconfig.lib.json"
       }
+    },
+    "email-service": {
+      "type": "library",
+      "root": "libs/email-service",
+      "entryFile": "index",
+      "sourceRoot": "libs/email-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/email-service/tsconfig.lib.json"
+      }
     }
   }
 }

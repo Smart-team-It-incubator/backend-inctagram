@@ -41,7 +41,7 @@
     "migrate:auth:test": "dotenv -e ./apps/auth/.test.env -- npx prisma migrate dev --schema=./apps/auth/prisma/schema.prisma",
     "generate:auth": "dotenv -e ./apps/core_app/.development.env -- npx prisma generate --schema=./apps/auth/prisma/schema.prisma",
     "generate:core_app": "dotenv -e ./apps/core_app/.development.env -- npx prisma generate --schema=./apps/core_app/prisma/schema.prisma",
-    "libs:builds": "nest build shared-dto && nest build auth-api && nest build core-app-api"
+    "libs:builds": "nest build shared-dto && nest build auth-api && nest build core-app-api && nest build email-service"
   },
   "dependencies": {
     "@libs/shared-dto": "file:./libs/shared-dto",
@@ -64,6 +64,7 @@
     "cookie-parser": "^1.4.7",
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.7",
+    "nodemailer": "^6.9.16",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.0",
@@ -122,7 +123,8 @@
       "^@prisma/auth(|/.*)$": "<rootDir>/apps/auth/prisma/schema_generate/$1",
       "^@prisma/core_app(|/.*)$": "<rootDir>/apps/core_app/prisma/schema_generate/$1",
       "@core_app(|/.*)$": "<rootDir>/apps/core_app/$1",
-      "@auth(|/.*)$": "<rootDir>/apps/auth/$1"
+      "@auth(|/.*)$": "<rootDir>/apps/auth/$1",
+      "^@app/email-service(|/.*)$": "<rootDir>/libs/email-service/src/$1"
     }
   },
   "main": "index.js",
