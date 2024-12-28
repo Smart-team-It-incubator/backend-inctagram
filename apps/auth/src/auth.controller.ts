@@ -2,11 +2,14 @@ import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, 
 import { AuthService } from './auth.service';
 import { ApiBody, ApiCookieAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
+import { EmailAdapterService } from '@app/email-service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService,
+      private readonly emailService: EmailAdapterService
+  ) { }
 
   @Post('/login')
   @ApiOperation({ summary: 'Авторизация пользователя' })
@@ -260,5 +263,11 @@ export class AuthController {
   @Get('/health') 
   async heath() {
     return {"status": "ok"}
+  }
+  
+  // Метод для ручной проверки отправки Email-Сообщений
+  @Post('/send')
+  async sendEmail(@Body() body: { to: string; subject: string; text: string }) {
+    return this.emailService.sendEmail(body.to, body.subject, body.text);
   }
 }

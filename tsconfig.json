@@ -51,6 +51,12 @@
       "@auth/*": [
         "apps/auth/*"
       ],
+      "@app/email-service": [
+        "libs/email-service/src"
+      ],
+      "@app/email-service/*": [
+        "libs/email-service/src/*"
+      ]
     }
   }
 }

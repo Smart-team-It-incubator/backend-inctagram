@@ -10,6 +10,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { FilesGatewayController } from './infrastructure/modules/files_gateway/controllers/files.controller';
 import { PrismaCoreAppService } from '../prisma/prisma.service';
 import { PrismaModule } from '../prisma/prisma.module';
+import { EmailAdapterService } from '@app/email-service';
 
 // const ENV = process.env.NODE_ENV;
 // console.log(ENV);
@@ -32,6 +33,6 @@ import { PrismaModule } from '../prisma/prisma.module';
     })
   ,],
   controllers: [AppController, UserController, FilesGatewayController],
-  providers: [AppService, PrismaCoreAppService],
+  providers: [AppService, PrismaCoreAppService, EmailAdapterService],
 })
 export class AppModule {}
