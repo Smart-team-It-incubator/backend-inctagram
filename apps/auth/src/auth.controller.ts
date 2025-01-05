@@ -273,13 +273,13 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Terms of Service' }) // Описание эндпоинта
-  @Get('/termOfService')
+  @Get('/terms')
   async termOfService() {
    return "Условия предоставления услуг"
   }
 
   @ApiOperation({ summary: 'Private Policy' }) // Описание эндпоинта
-  @Get('/PrivatePolicy')
+  @Get('/private')
   async PrivatePolicy() {
    return "Политика конфиденциальности"
   }
