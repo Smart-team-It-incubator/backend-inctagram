@@ -28,12 +28,11 @@ export class UsersRepository {
 
     async createUser(user: CreateUserDto): Promise<Partial<UserViewModel> | null> {
       // Создание переменных на основании User сущности для Prisma
-      const { username, email, password, firstName, lastName, city, country, dateOfBirthday } = user;
-      console.log(password)
+      const { username, email, password, firstName, lastName, city, country, dateOfBirthday, emailConfirmationCode, emailConfirmationCodeExpirationDate } = user;
       try {
         // Prisma получает только основные поля, остальные генерирует самостоятельно
         const createdUser: User = await this.prisma.user.create({
-          data: { username, email, password, firstName, lastName, city, country, dateOfBirthday: new Date(dateOfBirthday) },
+          data: { username, email, password, firstName, lastName, city, country, dateOfBirthday: new Date(dateOfBirthday), emailConfirmationCode, emailConfirmationCodeExpirationDate },
         });
         // Отдаем публичный профиль в заранее определенном формате
         const userViewModel = new UserViewModel(createdUser);
@@ -68,6 +67,28 @@ export class UsersRepository {
 
       const userViewModel = new UserViewModel(user);
       return userViewModel.getPrivateProfile(); // Возвращаем внутренний профиль пользователя, т.к это для нашего ресурса
+    }
+
+    async confirmEmail(confirmationCode: string): Promise<Partial<UserViewModel> | null> {
+      try {
+        // Ищем пользователя по коду подтверждения
+        const user = await this.prisma.user.findFirst({ where: { emailConfirmationCode: confirmationCode } });
+    
+        if (!user) {
+          return null; // Если пользователь не найден, возвращаем null
+        }
+    
+        // Обновляем статус пользователя на подтвержденный и удаляем код подтверждения
+        const updatedUser = await this.prisma.user.update({
+          where: { id: user.id },
+          data: { isEmailConfirmed: true, emailConfirmationCode: null },
+        });
+    
+        // Возвращаем обновлённый профиль пользователя
+        return new UserViewModel(updatedUser).getPublicProfile();
+      } catch (error) {
+        throw new Error(`Failed to confirm email: ${error.message}`);
+      }
     }
     
 

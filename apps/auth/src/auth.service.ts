@@ -35,6 +35,11 @@ export class AuthService {
       throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
     }
 
+    // Шаг 1.1: Проверка email на подтверждение
+    if (!userResponse.isEmailConfirmed) {
+      throw new HttpException('Email not confirmed', HttpStatus.UNAUTHORIZED);
+    }
+
     const { password: passwordHash } = userResponse;
 
     // Шаг 2: Проверка пароля, сравниваем hash с введенным паролем

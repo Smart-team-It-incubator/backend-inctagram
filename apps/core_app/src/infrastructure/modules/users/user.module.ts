@@ -10,11 +10,12 @@ import { HttpModule } from '@nestjs/axios';
 import { PrismaCoreAppService } from '@core_app/prisma/prisma.service';
 import { GetUserByEmailUseCase } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
 import { DropDBUseCase } from '@core_app/src/application/commands/users_cases/drop_user_db.use-case';
+import { ConfirmEmailUseCase } from '@core_app/src/application/commands/users_cases/confirm-email.use-case';
 
 
-const useCasesUsers = [GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, GetUserByEmailUseCase, DropDBUseCase]
+const useCasesUsers = [GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase]
 @Module({
-  imports: [CqrsModule,HttpModule],
+  imports: [CqrsModule,HttpModule,],
   providers: [ PrismaCoreAppService, UsersRepository, ...useCasesUsers, AuthApiService],
   controllers: [UserController]
 })

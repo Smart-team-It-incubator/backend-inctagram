@@ -4,11 +4,12 @@ export interface IUserInterface {
     password: string;
     username: string;
     role: string;
-    isEmailVerified: boolean;
+    isEmailConfirmed: boolean;
     firstName: string;
     lastName: string;
     profileImageUrl?: string;
-    emailVerificationToken?: string;
+    emailConfirmationCode?: string;
+    emailConfirmationCodeExpirationDate?: Date;
     resetPasswordToken?: string;
     resetPasswordExpires?: Date;
     lastLogin?: Date;
