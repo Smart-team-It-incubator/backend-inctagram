@@ -1,4 +1,5 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable } from '@nestjs/common/decorators/core';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
