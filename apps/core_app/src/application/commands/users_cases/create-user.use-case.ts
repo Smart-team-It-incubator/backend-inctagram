@@ -47,6 +47,9 @@ export class CreateUserUseCase {
             emailConfirmationCodeExpirationDate: new Date(Date.now() + 5 * 60 * 1000), // Установка даты истечения (5 минут от текущего времени)
         }
         const createdUserView = await this.usersRepository.createUser(user)
+        if (createdUserView === null) {
+            return null // Проверяем, если пользователь не создан, то отправлять email не нужно
+        }
         // Отправляем email, если включена отправка
         await this.emailService.sendEmailConfirmationMessage(command.email, user.emailConfirmationCode)
 
