@@ -22,16 +22,21 @@ spec:
              - containerPort: PORT_CONTAINER
 
            env:
-             - name: JWT_ACCESS_SECRET
-               valueFrom:
-                 secretKeyRef:
-                   name: smart-team-backend-auth-production-config-secret
-                   key: JWT_ACCESS_SECRET
              - name: JWT_REFRESH_SECRET
                valueFrom:
                  secretKeyRef:
                    name: smart-team-backend-auth-production-config-secret
                    key: JWT_REFRESH_SECRET
+             - name: CORE_APP_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-auth-production-config-secret
+                   key: CORE_APP_URL
+             - name: AUTH_APP_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-auth-production-config-secret
+                   key: AUTH_APP_URL
              - name: PORT_AUTH
                valueFrom:
                  secretKeyRef:
@@ -72,3 +77,8 @@ spec:
                  secretKeyRef:
                    name: smart-team-backend-auth-production-config-secret
                    key: DATABASE_URL_AUTH
+             - name: JWT_ACCESS_SECRET
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-auth-production-config-secret
+                   key: JWT_ACCESS_SECRET
