@@ -27,6 +27,7 @@ RUN npm install
 COPY --chown=node . .
 
 RUN npm run libs:builds
+RUN npm run generate:core_app
 RUN npm run build:${SERVICE}
 
 # Bind to all network interfaces so that it can be mapped to the host OS
