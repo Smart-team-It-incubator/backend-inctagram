@@ -55,4 +55,7 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   profileImageUrl?: string;
+
+  emailConfirmationCode?: string;
+  emailConfirmationCodeExpirationDate?: Date;
 }

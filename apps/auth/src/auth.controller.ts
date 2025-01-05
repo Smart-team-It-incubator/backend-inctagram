@@ -266,8 +266,21 @@ export class AuthController {
   }
   
   // Метод для ручной проверки отправки Email-Сообщений
+  @ApiOperation({ summary: 'Возможность отправить Email сообщение пользователю вручную, только для разработчиков' }) // Описание эндпоинта
   @Post('/send')
   async sendEmail(@Body() body: { to: string; subject: string; text: string }) {
     return this.emailService.sendEmail(body.to, body.subject, body.text);
+  }
+
+  @ApiOperation({ summary: 'Terms of Service' }) // Описание эндпоинта
+  @Get('/termOfService')
+  async termOfService() {
+   return "Условия предоставления услуг"
+  }
+
+  @ApiOperation({ summary: 'Private Policy' }) // Описание эндпоинта
+  @Get('/PrivatePolicy')
+  async PrivatePolicy() {
+   return "Политика конфиденциальности"
   }
 }

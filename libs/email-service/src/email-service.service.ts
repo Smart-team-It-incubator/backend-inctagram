@@ -4,6 +4,7 @@ import * as nodemailer from 'nodemailer';
 @Injectable()
 export class EmailAdapterService {
 	private transporter;
+	private isEmailEnabled = process.env.ENABLE_EMAIL_SENDING === 'true';
 
 	constructor() {
 		this.transporter = nodemailer.createTransport({
@@ -24,6 +25,7 @@ export class EmailAdapterService {
 	 * Базовый метод для отправки письма
 	 */
 	async sendEmail(to: string, subject: string, text: string, html?: string): Promise<object> {
+		if (!this.isEmailEnabled) return {} // Выключаем отправку писем глобально, возвращаем пустой объект
 		try {
 			const mailOptions = {
 				from: 'it-project@smart-reg.org.ru', // Ваш email отправителя
@@ -42,7 +44,8 @@ export class EmailAdapterService {
 	/**
 	 * Отправка письма для подтверждения email
 	 */
-	async sendEmailConfirmationMessage(userEmail: string, confirmationCode: string): Promise<void> {
+	async sendEmailConfirmationMessage(userEmail: string, confirmationCode: string): Promise<object> {
+		if (!this.isEmailEnabled) return {} // Выключаем отправку писем глобально, возвращаем пустой объект
 		const siteName = process.env.SITE_NAME || 'Inctagram'; // Имя вашего сайта
 		const domainRoot = process.env.DOMAIN_ROOT || 'smart-reg.org.ru'; // Домен вашего сайта
 
@@ -51,10 +54,10 @@ export class EmailAdapterService {
 		const htmlMessage = `
 <h1>Thanks for your registration</h1>
 <p>To finish registration please confirm your email by clicking the link below:
-  <a href="https://${domainRoot}/emailConfirmation?code=${confirmationCode}">Confirm email</a>
+  <a href="https://${domainRoot}/users/emailConfirmation?code=${confirmationCode}">Confirm email</a>
 </p>
 <p>
-  <a href="https://${domainRoot}/unsubscribe">Unsubscribe</a>
+  <a href="https://${domainRoot}/users/unsubscribe">Unsubscribe</a>
 </p>`;
 
 		await this.sendEmail(userEmail, subject, textMessage, htmlMessage);
@@ -63,7 +66,8 @@ export class EmailAdapterService {
 	/**
 	 * Отправка письма для восстановления пароля
 	 */
-	async sendPasswordRecoveryMessage(userEmail: string, recoveryCode: string): Promise<void> {
+	async sendPasswordRecoveryMessage(userEmail: string, recoveryCode: string): Promise<object> {
+		if (!this.isEmailEnabled) return {} // Выключаем отправку писем глобально, возвращаем пустой объект
 		const domainRoot = process.env.DOMAIN_ROOT || 'example.com'; // Домен вашего сайта
 
 		const subject = 'Password recovery at our web-site';
@@ -71,7 +75,7 @@ export class EmailAdapterService {
 		const htmlMessage = `
 <h1>Password recovery</h1>
 <p>To finish password recovery please follow the link below:
-  <a href="https://${domainRoot}/password-recovery?recoveryCode=${recoveryCode}">Recover password</a>
+  <a href="https://${domainRoot}/auth/password-recovery?recoveryCode=${recoveryCode}">Recover password</a>
 </p>`;
 
 		await this.sendEmail(userEmail, subject, textMessage, htmlMessage);

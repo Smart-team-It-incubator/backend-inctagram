@@ -15,7 +15,7 @@ import { ConfirmEmailUseCase } from '@core_app/src/application/commands/users_ca
 
 const useCasesUsers = [GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase]
 @Module({
-  imports: [CqrsModule,HttpModule],
+  imports: [CqrsModule,HttpModule,],
   providers: [ PrismaCoreAppService, UsersRepository, ...useCasesUsers, AuthApiService],
   controllers: [UserController]
 })

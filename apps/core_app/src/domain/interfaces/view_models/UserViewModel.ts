@@ -42,7 +42,11 @@ export class UserViewModel implements IUserInterface {
         country: this.user.country,
         dateOfBirthday: this.user.dateOfBirthday,
         password: this.user.password,
-        role: this.user.role
+        role: this.user.role,
+        emailConfirmationCode: this.user.emailConfirmationCode,
+        emailConfirmationCodeExpirationDate: this.user.emailConfirmationCodeExpirationDate,
+        isEmailConfirmed: this.user.isEmailConfirmed
+
       };
     }
   }

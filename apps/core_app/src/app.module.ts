@@ -33,6 +33,6 @@ import { EmailAdapterService } from '@app/email-service';
     })
   ,],
   controllers: [AppController, UserController, FilesGatewayController],
-  providers: [AppService, PrismaCoreAppService, EmailAdapterService],
+  providers: [AppService, PrismaCoreAppService],
 })
 export class AppModule {}

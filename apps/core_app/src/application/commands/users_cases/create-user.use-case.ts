@@ -3,7 +3,8 @@ import { UsersRepository } from "@core_app/src/infrastructure/modules/users/user
 import { UserViewModel } from "@core_app/src/domain/interfaces/view_models/UserViewModel"
 import { CreateUserDto } from "@app/shared-dto"
 import { AuthApiService } from "auth-api/auth-api";
-
+import { EmailAdapterService } from "@app/email-service";
+import { v4 as uuidv4 } from 'uuid';
 
 export class CreateUserCommand {
     constructor(
@@ -12,22 +13,23 @@ export class CreateUserCommand {
         public username: string,
         public firstName: string,
         public lastName: string,
-        public city: string, 
-        public country: string, 
+        public city: string,
+        public country: string,
         public dateOfBirthday: Date,
         public role?: string,
         public profileImageUrl?: string,
 
-        ) {
+    ) {
     }
 }
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserUseCase {
-    constructor (protected usersRepository: UsersRepository,
-        private readonly authApiService: AuthApiService
-        
-    ) {}
+    constructor(protected usersRepository: UsersRepository,
+        private readonly authApiService: AuthApiService,
+        private readonly emailService: EmailAdapterService
+
+    ) { }
 
     async execute(command: CreateUserCommand): Promise<Partial<UserViewModel>> {
         const hashedPassword = await this.authApiService.hashPassword(command.password);
@@ -40,9 +42,15 @@ export class CreateUserUseCase {
             lastName: command.lastName,
             city: command.city,
             country: command.country,
-            dateOfBirthday: command.dateOfBirthday
+            dateOfBirthday: command.dateOfBirthday,
+            emailConfirmationCode: uuidv4(), // Генерация уникального UUID кода
+            emailConfirmationCodeExpirationDate: new Date(Date.now() + 5 * 60 * 1000), // Установка даты истечения (5 минут от текущего времени)
         }
-        return await this.usersRepository.createUser(user)
+        const createdUserView = await this.usersRepository.createUser(user)
+        // Отправляем email, если включена отправка
+        await this.emailService.sendEmailConfirmationMessage(command.email, user.emailConfirmationCode)
+
+        return createdUserView
     }
 }
 

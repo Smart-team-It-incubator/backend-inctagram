@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, HttpException, HttpStatus, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpException, HttpStatus, Put, Param, Delete, Query } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { GetUsersCommand } from '@core_app/src/application/commands/users_cases/get-users.use-case';
 import { CreateUserCommand } from '@core_app/src/application/commands/users_cases/create-user.use-case';
@@ -117,20 +117,23 @@ export class UserController {
     required: ['confirmationCode'],
   },
 })
-@Post('/email-confirmation')
-async emailConfirmation(@Body('confirmationCode') confirmationCode: string): Promise<{ message: string }> {
-  try {
-    const result = await this.commandBus.execute(new ConfirmEmailCommand(confirmationCode));
+@Get('/emailConfirmation')
+async emailConfirmation(@Query('code') confirmationCode: string): Promise<{ message: string }> {
+  console.log('confirmationCode:', confirmationCode);
+  if (!confirmationCode) {
+    throw new HttpException('Confirmation code is required', HttpStatus.BAD_REQUEST);
+  }
 
-    if (result) {
-      return { message: 'Email successfully confirmed' };
-    } else {
-      throw new HttpException('Invalid confirmation code', HttpStatus.BAD_REQUEST);
-    }
-  } catch (error) {
-    throw new HttpException(error.message || 'Confirmation failed', HttpStatus.INTERNAL_SERVER_ERROR);
+  const result = await this.commandBus.execute(new ConfirmEmailCommand(confirmationCode));
+
+  if (result) {
+    return { message: 'Email successfully confirmed' };
+  } else {
+    throw new HttpException('Invalid confirmation code', HttpStatus.BAD_REQUEST);
   }
 }
+
+
 
 
     // For Dev
