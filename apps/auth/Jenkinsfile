@@ -3,7 +3,7 @@ pipeline {
     agent any
     environment {
         ENV_TYPE = "production"
-        PORT = 3709
+        PORT = 3713
         NAMESPACE = "smart-reg-org-ru"
         REGISTRY_HOSTNAME = "itlearning644"
         PROJECT = "smart-team-backend-auth"
