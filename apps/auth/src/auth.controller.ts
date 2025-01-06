@@ -241,10 +241,10 @@ export class AuthController {
     
   }
   @ApiExcludeEndpoint()
-  @Post('/hash-password')
+  @Post('/test')
   async hashPassword(@Body('password') passwordByUser: string): Promise<{ hashedPassword: string }> {
     try {
-      //console.log("мы попали в controller Auth hash-password", passwordByUser);
+      console.log("мы попали в controller Auth hash-password", passwordByUser);
       const password = await this.authService._generateHash(passwordByUser);
       return password;
     } catch (error) {
