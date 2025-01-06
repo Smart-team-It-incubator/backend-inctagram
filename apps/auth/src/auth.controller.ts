@@ -266,6 +266,7 @@ export class AuthController {
   }
   
   // Метод для ручной проверки отправки Email-Сообщений
+  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Возможность отправить Email сообщение пользователю вручную, только для разработчиков' }) // Описание эндпоинта
   @Post('/send')
   async sendEmail(@Body() body: { to: string; subject: string; text: string }) {
