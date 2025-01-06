@@ -193,7 +193,7 @@ export class AuthService {
 
   async _generateHash(password: string): Promise<string> {
     try {
-      const hash = await bcrypt.hash(password, 10);
+      const hash = await bcrypt.hash(password, 5);
       return hash
     } catch (error) {
       console.error("Error in generateHash:", error.message);
