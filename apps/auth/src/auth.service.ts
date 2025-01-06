@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { AuthRepository } from './auth.repository';
 import { JwtService } from '@nestjs/jwt';
 import { HttpService } from '@nestjs/axios';
@@ -9,6 +8,7 @@ import { CustomConfigService } from '../../../libs/shared-dto/src/config-service
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { JwtPayload } from '@app/shared-dto/dtos/jwt-payload.dto';
 import { randomUUID } from 'crypto';
+import * as bcrypt from 'bcryptjs';
 
 
 @Injectable()
@@ -193,7 +193,7 @@ export class AuthService {
 
   async _generateHash(password: string): Promise<string> {
     try {
-      const hash = "hash"
+      const hash = bcrypt.hash(password, 10);
       return hash
     } catch (error) {
       console.error("Error in generateHash:", error.message);
