@@ -11,6 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CustomConfigService } from '../../../libs/shared-dto/src/config-service';
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { EmailAdapterService } from '@app/email-service';
+import { RecaptchaAdapter } from './utils/recaptcha_adapter';
 
 
 //console.log('DATABASE_URL из process.env:', process.env.DATABASE_URL_DEV);
@@ -20,7 +21,7 @@ import { EmailAdapterService } from '@app/email-service';
     envFilePath: process.env.ENV_FILE, // Загружаем файл из переменной окружения, если нужно
   }), PrismaModule, HttpModule],
   controllers: [AuthController],
-  providers: [PrismaService, AuthService, AuthRepository, JwtService, CustomConfigService, CoreAppApiService, EmailAdapterService],
-  exports: [CustomConfigService]
+  providers: [PrismaService, AuthService, AuthRepository, JwtService, CustomConfigService, CoreAppApiService, EmailAdapterService, RecaptchaAdapter],
+  exports: [CustomConfigService, RecaptchaAdapter]
 })
 export class AuthModule {}

@@ -1,14 +1,16 @@
-import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, Req, UnauthorizedException, Delete, Query, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, Req, UnauthorizedException, Delete, Query, Param, Ip } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiCookieAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
 import { EmailAdapterService } from '@app/email-service';
+import { RecaptchaAdapter } from './utils/recaptcha_adapter';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService,
-      private readonly emailService: EmailAdapterService
+      private readonly emailService: EmailAdapterService,
+      private readonly recaptchaAdapter: RecaptchaAdapter
   ) { }
 
   @Post('/login')
@@ -157,9 +159,17 @@ export class AuthController {
   async resetPassword(
     @Body('resetToken') resetToken: string,
     @Body('newPassword') newPassword: string,
+    @Body('token') token: string, 
+    @Ip() remoteIp: string
   ): Promise<{ message: string }> {
-    // TODO: Implement logic for resetting the password
-    return { message: 'Password reset successful.' };
+    const isValid = await this.recaptchaAdapter.validateToken(token, remoteIp);
+    if (!isValid) {
+      throw new HttpException('Invalid reCAPTCHA token', HttpStatus.BAD_REQUEST);
+    }
+    else {
+      // TODO: Implement logic for resetting the password
+      return { message: 'Password reset successful.' };
+    }
   }
 
   // Change Password
