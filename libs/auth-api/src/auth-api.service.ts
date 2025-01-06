@@ -14,7 +14,7 @@ export class AuthApiService {
   // Метод для хеширования пароля
   async hashPassword(password: string): Promise<string> {
     try {
-      //console.log(`${this.authAppUrl}/hash-password`, { password }, "ПОПАДАНИЕ ТЕСТОВ В БИБЛИОТЕКУ"); 
+      console.log(`${this.authAppUrl}/hash-password`, { password }, "ПОПАДАНИЕ ТЕСТОВ В БИБЛИОТЕКУ"); 
       const response = await firstValueFrom(
         this.httpService.post(`${this.authAppUrl}/hash-password`, { password }),
       );
