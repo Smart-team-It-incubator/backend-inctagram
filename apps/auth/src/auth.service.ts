@@ -191,9 +191,15 @@ export class AuthService {
     return bcrypt.compare(token, hash);
   }
 
-  async generateHash(password: string): Promise<string> {
-    const hash = await bcrypt.hash(password, 10);
-    return hash
+  async _generateHash(password: string): Promise<string> {
+    try {
+      const hash = await bcrypt.hash(password, 10);
+      return hash
+    } catch (error) {
+      console.error("Error in generateHash:", error.message);
+      throw new Error("Hashing failed");
+    }
+
   }
 
   // Метод для извлечения payload из токена
