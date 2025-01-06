@@ -251,7 +251,7 @@ export class AuthController {
     //   return error.message
     // }
     console.log("мы попали в controller Auth hash-password", passwordByUser);
-       const password = await this.authService._generateHash(passwordByUser);
+       const password = await this.authService.generateHash(passwordByUser);
        return { password };
   }
 

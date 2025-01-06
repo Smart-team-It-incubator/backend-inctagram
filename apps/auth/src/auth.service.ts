@@ -191,7 +191,7 @@ export class AuthService {
     return bcrypt.compare(token, hash);
   }
 
-  async _generateHash(password: string): Promise<string> {
+  async generateHash(password: string): Promise<string> {
     const hash = await bcrypt.hash(password, 10);
     return hash
   }
