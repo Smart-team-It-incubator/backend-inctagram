@@ -240,7 +240,7 @@ export class AuthController {
     }
     
   }
-  @ApiExcludeEndpoint()
+  //@ApiExcludeEndpoint()
   @Post('/hash-password')
   async hashPassword(@Body('password') passwordByUser: string): Promise<object> {
     try {
