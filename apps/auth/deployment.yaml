@@ -82,3 +82,8 @@ spec:
                  secretKeyRef:
                    name: smart-team-backend-auth-production-config-secret
                    key: JWT_ACCESS_SECRET
+                                - name: RECAPTCHA_SECRET_KEY
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-auth-production-config-secret
+                   key: RECAPTCHA_SECRET_KEY
