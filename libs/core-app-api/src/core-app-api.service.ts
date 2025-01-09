@@ -26,7 +26,7 @@ export class CoreAppApiService {
         }
     }
 
-        // Получение данных пользователя по username
+        // Получение данных пользователя по Email
         async getUserByEmail(email: string): Promise<any> {
             try {
                 const response = await firstValueFrom(

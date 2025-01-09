@@ -10,6 +10,7 @@ import { UserModule } from '@core_app/src/infrastructure/modules/users/user.modu
 import { AppModule } from '@core_app/src/app.module';
 import { app_auth_settings } from '@auth/src/app_auth_settings';
 import { app_coreApp_settings } from '@core_app/src/infrastructure/app_coreApp_settings';
+import { isEmail } from 'class-validator';
 
 describe('E2E registration SINGLE user/auth flow', () => {
   jest.setTimeout(20000);
@@ -182,9 +183,22 @@ describe('E2E registration SINGLE user/auth flow', () => {
         password: expect.any(String),
         role: "user",
         dateOfBirthday: expect.any(String), // Дата
+        emailConfirmationCode: expect.any(String),
+        emailConfirmationCodeExpirationDate: expect.any(String),
+        isEmailConfirmed: false
       });
     })
 
+    it('Осуществляем активацию пользователя, верифицируем email', async () => {
+      // Получение пользователя после регистрации
+      const userAfterRegistration = await getRequest(appCoreApp, RouteNames.USERS.GET_USER_BY_EMAIL.full + `/${userForTest.email}`)
+
+      // Проверка подтверждения email для первого пользователя
+      const pathWithQuery = `${RouteNames.USERS.EMAIL_CONFIRMATION.full}?code=${userAfterRegistration.body.emailConfirmationCode}`;    
+      const emailConfirmation1 = await getRequest(appCoreApp, pathWithQuery);
+      expect(emailConfirmation1.status).toBe(200); // Проверка статуса ответа
+      expect(emailConfirmation1.body).toHaveProperty('message', 'Email successfully confirmed'); // Проверка сообщения
+  });
     it("Производим вход в систему, получаем токены", async () => {
       // Успешный вход
       const loginResponse = await postRequest(appAuth, RouteNames.AUTH.LOGIN.full)

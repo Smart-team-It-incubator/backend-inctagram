@@ -59,7 +59,7 @@ export class UsersRepository {
 
     async getUserByEmail(email: string): Promise<Partial<UserViewModel> | null> {
       const user = await this.prisma.user.findUnique({
-        where: { email },
+        where: { email: email },
       });
       if (!user) {
         return null;
