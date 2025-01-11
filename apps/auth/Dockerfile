@@ -27,11 +27,11 @@ RUN npm install
 COPY --chown=node . .
 
 RUN npm run libs:builds
-RUN npm run generate:core_app
+RUN npm run generate:auth
 RUN npm run build:${SERVICE}
 
 # Bind to all network interfaces so that it can be mapped to the host OS
 
 EXPOSE ${PORT}
 
-CMD npm run 'start:core_app'
+CMD npm run 'start:auth'

@@ -1,14 +1,16 @@
-import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, Req, UnauthorizedException, Delete, Query, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, Req, UnauthorizedException, Delete, Query, Param, Ip } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiCookieAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
 import { EmailAdapterService } from '@app/email-service';
+import { RecaptchaAdapter } from './utils/recaptcha_adapter';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService,
-      private readonly emailService: EmailAdapterService
+      private readonly emailService: EmailAdapterService,
+      private readonly recaptchaAdapter: RecaptchaAdapter
   ) { }
 
   @Post('/login')
@@ -45,10 +47,13 @@ export class AuthController {
       const useragent = req.headers['user-agent'];
       const refreshTokenExist = req.cookies?.refreshToken; // Получаем токен из Cookie
       const result = await this.authService.login(loginDto, useragent, ip, refreshTokenExist);
+      console.log(result.refreshToken)
       res
         .cookie("refreshToken", result.refreshToken, {
-          httpOnly: true,
-          secure: true
+          httpOnly: process.env.HTTP_ONLY,
+          secure: process.env.NODE_ENV === 'production', // Обязательно для production
+          maxAge: 24 * 60 * 60 * 1000, // Время жизни
+          sameSite: 'Strict', // Или 'Lax' в зависимости от вашего случая
         })
         .status(200)
         .send({ accessToken: result.accessToken });
@@ -157,9 +162,17 @@ export class AuthController {
   async resetPassword(
     @Body('resetToken') resetToken: string,
     @Body('newPassword') newPassword: string,
+    @Body('token') token: string, 
+    @Ip() remoteIp: string
   ): Promise<{ message: string }> {
-    // TODO: Implement logic for resetting the password
-    return { message: 'Password reset successful.' };
+    const isValid = await this.recaptchaAdapter.validateToken(token, remoteIp);
+    if (!isValid) {
+      throw new HttpException('Invalid reCAPTCHA token', HttpStatus.BAD_REQUEST);
+    }
+    else {
+      // TODO: Implement logic for resetting the password
+      return { message: 'Password reset successful.' };
+    }
   }
 
   // Change Password
@@ -240,11 +253,11 @@ export class AuthController {
     }
     
   }
-  @ApiExcludeEndpoint()
+  //@ApiExcludeEndpoint()
   @Post('/hash-password')
-  async hashPassword(@Body('password') passwordByUser: string): Promise<{ hashedPassword: string }> {
+  async hashPassword(@Body('password') passwordByUser: string): Promise<string> {
     try {
-      //console.log("мы попали в controller Auth hash-password", passwordByUser);
+      console.log("мы попали в controller Auth hash-password", passwordByUser);
       const password = await this.authService._generateHash(passwordByUser);
       return password;
     } catch (error) {
@@ -266,6 +279,7 @@ export class AuthController {
   }
   
   // Метод для ручной проверки отправки Email-Сообщений
+  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Возможность отправить Email сообщение пользователю вручную, только для разработчиков' }) // Описание эндпоинта
   @Post('/send')
   async sendEmail(@Body() body: { to: string; subject: string; text: string }) {

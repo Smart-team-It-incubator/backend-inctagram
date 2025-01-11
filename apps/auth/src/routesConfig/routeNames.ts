@@ -43,7 +43,7 @@ export const RouteNames = {
 	},
 	USERS: {
 		value: 'users',
-		REGISTRATION: {
+		REGISTRATION: { // POST
 			value: 'registration',
 			full: 'api/v1/users/registration',
 		},
@@ -51,5 +51,9 @@ export const RouteNames = {
 			value: 'getByEmail',
 			full: 'api/v1/users/getByEmail',
 		},
+		EMAIL_CONFIRMATION: { // GET 
+			value: 'email-confirmation',
+			full: 'api/v1/users/emailConfirmation',
+		}
 	}
 }

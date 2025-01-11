@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { AuthRepository } from './auth.repository';
 import { JwtService } from '@nestjs/jwt';
 import { HttpService } from '@nestjs/axios';
@@ -9,6 +8,7 @@ import { CustomConfigService } from '../../../libs/shared-dto/src/config-service
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { JwtPayload } from '@app/shared-dto/dtos/jwt-payload.dto';
 import { randomUUID } from 'crypto';
+import * as bcrypt from 'bcryptjs';
 
 
 @Injectable()
@@ -36,7 +36,7 @@ export class AuthService {
     }
 
     // Шаг 1.1: Проверка email на подтверждение
-    if (!userResponse.isEmailConfirmed) {
+    if (!userResponse.isEmailConfirmed && !userResponse.githubProviders) {
       throw new HttpException('Email not confirmed', HttpStatus.UNAUTHORIZED);
     }
 
@@ -44,7 +44,7 @@ export class AuthService {
 
     // Шаг 2: Проверка пароля, сравниваем hash с введенным паролем
     const isPasswordValid = await bcrypt.compare(password, passwordHash);
-    if (!isPasswordValid) {
+    if (!isPasswordValid && !userResponse.githubProviders) {
       throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
     }
 
@@ -191,9 +191,15 @@ export class AuthService {
     return bcrypt.compare(token, hash);
   }
 
-  async _generateHash(password: string) {
-    const hash = await bcrypt.hash(password, 10);
-    return hash
+  async _generateHash(password: string): Promise<string> {
+    try {
+      const hash = bcrypt.hash(password, 10);
+      return hash
+    } catch (error) {
+      console.error("Error in generateHash:", error.message);
+      throw new Error("Hashing failed");
+    }
+
   }
 
   // Метод для извлечения payload из токена

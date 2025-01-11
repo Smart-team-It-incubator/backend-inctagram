@@ -11,6 +11,11 @@ import { JwtService } from '@nestjs/jwt';
 import { CustomConfigService } from '../../../libs/shared-dto/src/config-service';
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { EmailAdapterService } from '@app/email-service';
+import { RecaptchaAdapter } from './utils/recaptcha_adapter';
+import { GithubAuthController } from './github/github.controller';
+import { GithubStrategy } from './github/github.adapter';
+import { PassportModule } from '@nestjs/passport';
+import { AuthApiService } from 'auth-api/auth-api';
 
 
 //console.log('DATABASE_URL из process.env:', process.env.DATABASE_URL_DEV);
@@ -18,9 +23,9 @@ import { EmailAdapterService } from '@app/email-service';
   imports: [ConfigModule.forRoot({
     isGlobal: true,
     envFilePath: process.env.ENV_FILE, // Загружаем файл из переменной окружения, если нужно
-  }), PrismaModule, HttpModule],
-  controllers: [AuthController],
-  providers: [PrismaService, AuthService, AuthRepository, JwtService, CustomConfigService, CoreAppApiService, EmailAdapterService],
-  exports: [CustomConfigService]
+  }), PrismaModule, HttpModule, PassportModule],
+  controllers: [AuthController, GithubAuthController],
+  providers: [PrismaService, AuthService, AuthRepository, JwtService, CustomConfigService, CoreAppApiService, AuthApiService, EmailAdapterService, RecaptchaAdapter, GithubStrategy],
+  exports: [CustomConfigService, RecaptchaAdapter]
 })
 export class AuthModule {}

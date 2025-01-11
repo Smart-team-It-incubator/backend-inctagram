@@ -16,18 +16,19 @@ model User {
   createdAt              DateTime  @default(now())
   emailConfirmationCode  String?
   emailConfirmationCodeExpirationDate DateTime?
-  firstName              String
+  firstName              String?
   isEmailConfirmed       Boolean   @default(false)
   lastLogin              DateTime?
-  lastName               String
+  lastName               String?
   profileImageUrl        String?
   resetPasswordExpires   DateTime?
   resetPasswordToken     String?
   role                   String    @default("user")
   updatedAt              DateTime? @updatedAt
-  password               String
+  password               String?
   username               String    @unique
-  city                   String
-  country                String
-  dateOfBirthday         DateTime
+  city                   String?
+  country                String?
+  dateOfBirthday         DateTime?
+  githubId        String?   @unique                         // Github ID
 }

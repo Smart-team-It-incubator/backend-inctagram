@@ -8,12 +8,14 @@ import { GetUserByUsernameUseCase } from '@core_app/src/application/commands/use
 import { AuthApiService } from 'auth-api/auth-api';
 import { HttpModule } from '@nestjs/axios';
 import { PrismaCoreAppService } from '@core_app/prisma/prisma.service';
-import { GetUserByEmailUseCase } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
 import { DropDBUseCase } from '@core_app/src/application/commands/users_cases/drop_user_db.use-case';
 import { ConfirmEmailUseCase } from '@core_app/src/application/commands/users_cases/confirm-email.use-case';
+import { GetUserByEmailUseCase } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
+import { GetUserByGithubIdUseCase } from '@core_app/src/application/commands/users_cases/get-user-by-github.use-case';
+import { UpdateUserUseCase } from '@core_app/src/application/commands/users_cases/update-user.user-case';
 
 
-const useCasesUsers = [GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase]
+const useCasesUsers = [GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase, GetUserByGithubIdUseCase, UpdateUserUseCase]
 @Module({
   imports: [CqrsModule,HttpModule,],
   providers: [ PrismaCoreAppService, UsersRepository, ...useCasesUsers, AuthApiService],

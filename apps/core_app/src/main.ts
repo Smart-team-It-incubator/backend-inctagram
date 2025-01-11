@@ -19,7 +19,8 @@ async function bootstrap() {
       .build();
     const coreDoc = SwaggerModule.createDocument(app, config);
     // Получение документации для auth микросервиса
-    const authDoc = await axios.get('http://localhost:4000/api/v1-json'); // Путь к Swagger документации для auth, в настоящем пути "-json" нет, но это необходимо указать для того чтобы склеить документацию.
+    //const authDoc = await axios.get(`https://auth.smart-reg.org.ru/api/v1-json`); // Путь к Swagger документации для auth, в настоящем пути "-json" нет, но это необходимо указать для того чтобы склеить документацию.
+    const authDoc = await axios.get(`http://localhost:4000/api/v1-json`); // Путь к Swagger документации для auth, в настоящем пути "-json" нет, но это необходимо указать для того чтобы склеить документацию.
     //console.log(authDoc.data)
     const combinedDoc = {
       ...coreDoc,
@@ -28,9 +29,10 @@ async function bootstrap() {
         ...authDoc.data.paths
       }
     };
-
+    //console.log(...authDoc.data.paths)
     SwaggerModule.setup('api/v1/swagger', app, combinedDoc); // Укажи путь к документации
   } catch (error) {
+    console.log(error)
     console.log("Документация не поднялась т.к сервер auth не запущен");
   }
 

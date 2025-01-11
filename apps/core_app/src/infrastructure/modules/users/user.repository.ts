@@ -3,6 +3,7 @@ import { CreateUserDto } from "@app/shared-dto";
 import { Injectable } from "@nestjs/common/decorators/core";
 import { User } from "@core_app/src/domain/entities/user-entities";
 import { PrismaCoreAppService } from "@core_app/prisma/prisma.service";
+import { UpdateUserDto } from "@app/shared-dto/dtos/update-user.dto";
 
 
 
@@ -29,11 +30,24 @@ export class UsersRepository {
     async createUser(user: CreateUserDto): Promise<Partial<UserViewModel> | null> {
       // Создание переменных на основании User сущности для Prisma
       const { username, email, password, firstName, lastName, city, country, dateOfBirthday, emailConfirmationCode, emailConfirmationCodeExpirationDate } = user;
+      
       try {
         // Prisma получает только основные поля, остальные генерирует самостоятельно
         const createdUser: User = await this.prisma.user.create({
-          data: { username, email, password, firstName, lastName, city, country, dateOfBirthday: new Date(dateOfBirthday), emailConfirmationCode, emailConfirmationCodeExpirationDate },
+          data: {
+            username,
+            email,
+            password,
+            firstName,
+            lastName,
+            city,
+            country,
+            dateOfBirthday: dateOfBirthday ? new Date(dateOfBirthday) : null, // Проверка на null
+            emailConfirmationCode,
+            emailConfirmationCodeExpirationDate,
+          },
         });
+    
         // Отдаем публичный профиль в заранее определенном формате
         const userViewModel = new UserViewModel(createdUser);
         return userViewModel.getPublicProfile();
@@ -43,6 +57,7 @@ export class UsersRepository {
         return null; // Возвращаем null в случае ошибки
       }
     }
+    
 
 
     async getUserByUsername(username: string): Promise<Partial<UserViewModel> | null> {
@@ -59,7 +74,19 @@ export class UsersRepository {
 
     async getUserByEmail(email: string): Promise<Partial<UserViewModel> | null> {
       const user = await this.prisma.user.findUnique({
-        where: { email },
+        where: { email: email },
+      });
+      if (!user) {
+        return null;
+      }
+
+      const userViewModel = new UserViewModel(user);
+      return userViewModel.getPrivateProfile(); // Возвращаем внутренний профиль пользователя, т.к это для нашего ресурса
+    }
+
+    async getUserByGithubId(githubId: string): Promise<Partial<UserViewModel> | null> {
+      const user = await this.prisma.user.findUnique({
+        where: { githubId: githubId },
       });
       if (!user) {
         return null;
@@ -90,9 +117,25 @@ export class UsersRepository {
         throw new Error(`Failed to confirm email: ${error.message}`);
       }
     }
+
+    async updateUser(userId: string, fieldsToUpdate: object): Promise<any> {
+      try {
+        const updatedUser = await this.prisma.user.update({
+          where: { id: userId },
+          data: fieldsToUpdate,
+        });
     
-
-
+        if (!updatedUser) {
+          throw new Error('User update failed');
+        }
+    
+        return { message: 'User was successfully updated', user: updatedUser };
+      } catch (error) {
+        throw new Error(`Failed to update user: ${error.message}`);
+      }
+    }
+    
+    
     
 async dropDb() {
   try {

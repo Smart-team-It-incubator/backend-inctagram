@@ -17,5 +17,6 @@ export interface IUserInterface {
     updatedAt: Date;
     city: string;
     country: string;
-    dateOfBirthday: Date
+    dateOfBirthday: Date;
+    githubId?: string;
   }
