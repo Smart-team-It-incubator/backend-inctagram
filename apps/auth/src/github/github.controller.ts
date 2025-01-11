@@ -4,7 +4,6 @@ import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { User } from '@prisma/core_app';
 import { AuthApiService } from "auth-api/auth-api";
 
 @ApiTags('Github')
