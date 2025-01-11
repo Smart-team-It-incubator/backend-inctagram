@@ -17,7 +17,7 @@ export class UserViewModel implements IUserInterface {
     city: string;
     country: string;
     dateOfBirthday: Date
-    githubPrividers: string
+    githubId: string
     constructor(private user: IUserInterface) {}
   
     getPublicProfile() {
@@ -47,7 +47,7 @@ export class UserViewModel implements IUserInterface {
         emailConfirmationCode: this.user.emailConfirmationCode,
         emailConfirmationCodeExpirationDate: this.user.emailConfirmationCodeExpirationDate,
         isEmailConfirmed: this.user.isEmailConfirmed,
-        githubPrividers: this.githubPrividers
+        githubId: this.githubId
 
       };
     }

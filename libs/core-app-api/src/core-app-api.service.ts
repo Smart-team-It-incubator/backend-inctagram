@@ -1,6 +1,8 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { UpdateUserDto } from '@app/shared-dto/dtos/update-user.dto';
+import { CreateUserDto } from '@app/shared-dto';
 
 @Injectable()
 export class CoreAppApiService {
@@ -19,10 +21,8 @@ export class CoreAppApiService {
             );
             return response.data;
         } catch (error) {
-            throw new HttpException(
-                'User not found or Core_app unavailable',
-                HttpStatus.NOT_FOUND,
-            );
+            console.error("Ошибка в GetUserByUsername либо Core_app недоступен",error.status, error.config.data); // Логирование ошибки
+            return null; // или undefined
         }
     }
 
@@ -34,10 +34,46 @@ export class CoreAppApiService {
                 );
                 return response.data;
             } catch (error) {
-                throw new HttpException(
-                    'User not found or Core_app unavailable',
-                    HttpStatus.NOT_FOUND,
+                console.error("Ошибка в GetUserByEmail либо Core_app недоступен",error.status, error.config.data); // Логирование ошибки
+                return null; // или undefined
+            }
+        }
+
+        async getUserByGithubId(githubId: string): Promise<any> {
+            try {
+                const response = await firstValueFrom(
+                    this.httpService.get(`${this.coreAppUrl}/users/getByGithubId/${githubId}`),
                 );
+                return response.data;
+            } catch (error) {
+                console.error("Ошибка в GetUserByGithubId либо Core_app недоступен",error.status, error.config.data); // Логирование ошибки
+                return null; // или undefined
+            }
+        }
+
+        async updateUser(userId: string, UpdateUserDto: UpdateUserDto): Promise<any> {
+            try {
+                const response = await firstValueFrom(
+                    this.httpService.put(`${this.coreAppUrl}/users/update/${userId}`,
+                        UpdateUserDto // Передаем данные в тело запроса
+                    ),
+                );
+                return response.data;
+            } catch (error) {
+                console.error("Ошибка в UpdateUser либо Core_app недоступен",error.status, error.config.data); // Логирование ошибки
+                return null; // или undefined
+            }
+        }
+
+        async registerUserByGithub(githubUser: CreateUserDto): Promise<any> {
+            try {
+                const response = await firstValueFrom(
+                    this.httpService.post(`${this.coreAppUrl}/users/registration`, githubUser),
+                );
+                return response.data;
+            } catch (error) {
+                console.error("Ошибка в RegisterUser либо Core_app недоступен",error.status, error.config.data); // Логирование ошибки
+                return null; // или undefined
             }
         }
 }

@@ -29,6 +29,6 @@ model User {
   username               String    @unique
   city                   String?
   country                String?
-  dateOfBirthday         DateTime
-  githubPrividers        String?                             // Github ID
+  dateOfBirthday         DateTime?
+  githubId        String?   @unique                         // Github ID
 }

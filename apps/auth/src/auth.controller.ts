@@ -47,10 +47,13 @@ export class AuthController {
       const useragent = req.headers['user-agent'];
       const refreshTokenExist = req.cookies?.refreshToken; // Получаем токен из Cookie
       const result = await this.authService.login(loginDto, useragent, ip, refreshTokenExist);
+      console.log(result.refreshToken)
       res
         .cookie("refreshToken", result.refreshToken, {
-          httpOnly: true,
-          secure: true
+          httpOnly: process.env.HTTP_ONLY,
+          secure: process.env.NODE_ENV === 'production', // Обязательно для production
+          maxAge: 24 * 60 * 60 * 1000, // Время жизни
+          sameSite: 'Strict', // Или 'Lax' в зависимости от вашего случая
         })
         .status(200)
         .send({ accessToken: result.accessToken });

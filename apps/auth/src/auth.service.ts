@@ -36,7 +36,7 @@ export class AuthService {
     }
 
     // Шаг 1.1: Проверка email на подтверждение
-    if (!userResponse.isEmailConfirmed) {
+    if (!userResponse.isEmailConfirmed && !userResponse.githubProviders) {
       throw new HttpException('Email not confirmed', HttpStatus.UNAUTHORIZED);
     }
 
@@ -44,7 +44,7 @@ export class AuthService {
 
     // Шаг 2: Проверка пароля, сравниваем hash с введенным паролем
     const isPasswordValid = await bcrypt.compare(password, passwordHash);
-    if (!isPasswordValid) {
+    if (!isPasswordValid && !userResponse.githubProviders) {
       throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
     }
 

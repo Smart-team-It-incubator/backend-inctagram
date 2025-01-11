@@ -9,6 +9,7 @@ export async function app_auth_settings(app: INestApplication) {
     app.enableCors({
         origin: '*',
         methods: 'GET,POST,PUT,DELETE',
+        credentials: true, // Разрешение на использование куков
     })
     app.setGlobalPrefix('api/v1');
     app.use(cookieParser());

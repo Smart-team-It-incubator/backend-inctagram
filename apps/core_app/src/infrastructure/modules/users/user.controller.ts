@@ -6,9 +6,12 @@ import { ApiBody, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from 
 import { UserViewModel } from '@core_app/src/domain/interfaces/view_models/UserViewModel';
 import { GetUserByUsernameCommand } from '@core_app/src/application/commands/users_cases/get-user-by-username.use-case';
 import { CreateUserDto } from '@app/shared-dto';
-import { GetUserByEmailCommand } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
+import { GetUserByGithubIdCommand } from '@core_app/src/application/commands/users_cases/get-user-by-github.use-case';
 import { DropDBCommand } from '@core_app/src/application/commands/users_cases/drop_user_db.use-case';
 import { ConfirmEmailCommand } from '@core_app/src/application/commands/users_cases/confirm-email.use-case';
+import { GetUserByEmailCommand } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
+import { UpdateUserDto } from '@app/shared-dto/dtos/update-user.dto';
+import { UpdateUserCommand } from '@core_app/src/application/commands/users_cases/update-user.user-case';
 
 
 
@@ -55,12 +58,13 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'User was successfully updated' }) // Описание ответа
   @ApiBody({
     description: 'Данные для обновления пользователя',
-    type: CreateUserDto, // Это может быть другая DTO для обновления, которая может содержать только те поля, которые можно обновить.
+    type: UpdateUserDto, // Это может быть другая DTO для обновления, которая может содержать только те поля, которые можно обновить.
   })
   @Put("update/:userId") // Используем PUT для обновления
-  async updateUser(@Param('userId') userId: string): Promise<string> {
-    // Пока логика обновления не реализована, возвращаем описание того, что будет реализовано.
-    return `Метод updateUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;
+  async updateUser(@Param('userId') userId: string, @Body() updateUserDto: UpdateUserDto): Promise<string> {
+    console.log(updateUserDto)
+    const updateUser = await this.commandBus.execute(new UpdateUserCommand(userId, updateUserDto));
+    return updateUser
   }
 
   // // Метод для удаления пользователя
@@ -93,10 +97,22 @@ export class UserController {
     //TODO - сделать метод закрытым, это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
   // Метод для получения пользователя по Email
   @ApiOperation({ summary: 'Get User by email' }) // Описание эндпоинта
-  @ApiResponse({ status: 200, description: 'respone with required user' }) // Описание ответа
+  @ApiResponse({ status: 200, description: 'response with required user' }) // Описание ответа
   @Get("/getByEmail/:email") // Регистр email ВАЖЕН при поиске
   async findUserByEmail(@Param('email') email: string): Promise<string> {
     const user = await this.commandBus.execute(new GetUserByEmailCommand(email));
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
+    return user
+  }
+
+  @ApiOperation({ summary: 'Get User by githubID' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'response with required user' }) // Описание ответа
+  @Get("/getByGithubId/:githubId")
+  async findUserByGithubId(@Param('githubId') githubId: string): Promise<string> {
+    console.log("попадаение в GetGitHubUser")
+    const user = await this.commandBus.execute(new GetUserByGithubIdCommand(githubId));
     if (!user) {
       throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     }
