@@ -16,12 +16,24 @@ export class GithubAuthController {
   ) { }
 
 
+
+  @Get()
+  @ApiOperation({ summary: 'Login через Github' })
+  @UseGuards(AuthGuard('github'))
+  async githubLogin() {
+    console.log("Попадание в Github Login")
+    // Redirect to GitHub login page
+  }
+
+
+
   @Get('callback')
   @UseGuards(AuthGuard('github'))
   @ApiOperation({ summary: 'Github callback' })
   async githubCallback(@Req() req, @Res() res) {
     const githubUser = req.user; // Данные пользователя из GitHub
     const { githubId, email, username } = githubUser;
+    const isGithubRequest = true
     console.log("Попали в GitHub callback", githubUser);
 
     // 1. Ищем пользователя по githubId
@@ -34,7 +46,7 @@ export class GithubAuthController {
 
     // 3. Пользователь найден по githubId, выполняем вход
     if (userByGithubId) {
-      const loginResult = await this.AuthApiService.login({ email, password: 'emptyPassword', githubId });
+      const loginResult = await this.AuthApiService.login({ email, password: 'emptyPassword', githubId, isGithubRequest }, );
 
       // Отправляем accessToken и refreshToken в cookies
       res.cookie('accessToken', loginResult.accessToken, {
@@ -56,7 +68,7 @@ export class GithubAuthController {
     if (userByEmail && !userByEmail.githubProviders) {
       const userUpdateDto: UpdateUserDto = { githubId: githubId };
       await this.CoreAppApiService.updateUser(userByEmail.id, userUpdateDto);
-      const loginResult = await this.AuthApiService.login({ email, password: 'emptyPassword', githubId });
+      const loginResult = await this.AuthApiService.login({ email, password: 'emptyPassword', githubId, isGithubRequest }, );
       // Отправляем accessToken и refreshToken в cookies
       res.cookie('accessToken', loginResult.accessToken, {
         httpOnly: process.env.HTTP_ONLY,
@@ -79,18 +91,20 @@ export class GithubAuthController {
         email,
         username,
         githubId: githubId,
-        password: 'emptyPassword', // Генерация временного пароля
+        password: 'githubEmptyPassword', // Генерация временного пароля
       };
 
       // Регистрируем пользователя
       const newUser = await this.CoreAppApiService.registerUserByGithub(createUserDto);
+
+      // console.log("new user",newUser)
 
       // Верифицируем Email т.к он подтвержден Github
       const userUpdateDto: UpdateUserDto = { isEmailConfirmed: true };
       await this.CoreAppApiService.updateUser(newUser.id, userUpdateDto);
 
       // После регистрации, выполняем вход
-      const loginResult = await this.AuthApiService.login({ email, password: 'emptyPassword', githubId });
+      const loginResult = await this.AuthApiService.login({ email, password: 'githubEmptyPassword', githubId, isGithubRequest }, );
 
       // Отправляем accessToken и refreshToken в cookies
       res.cookie('accessToken', loginResult.accessToken, {

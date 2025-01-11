@@ -27,24 +27,25 @@ export class AuthService {
 
 
 
-  async login(loginDto: AuthForm, useragent: string, ip: string, refreshTokenExist?: string): Promise<{ accessToken: string; refreshToken: string }> {
+  async login(loginDto: AuthForm, useragent: string, ip: string, refreshTokenExist?: string,): Promise<{ accessToken: string; refreshToken: string }> {
     const { email, password } = loginDto;
+    console.log("Тесты LOGIN DTO", loginDto)
     // Шаг 1: Получение данных пользователя из Core_app
     const userResponse = await this.coreAppApiService.getUserByEmail(email);
     if (!userResponse) {
       throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
     }
 
-    // Шаг 1.1: Проверка email на подтверждение
-    if (!userResponse.isEmailConfirmed && !userResponse.githubProviders) {
+    // Шаг 1.1: Проверка email на подтверждение, в случае если это Github запрос то Email автоматически подтверждается
+    if (!userResponse.isEmailConfirmed && !loginDto.isGithubRequest) {
       throw new HttpException('Email not confirmed', HttpStatus.UNAUTHORIZED);
     }
 
     const { password: passwordHash } = userResponse;
 
-    // Шаг 2: Проверка пароля, сравниваем hash с введенным паролем
+    // Шаг 2: Проверка пароля, сравниваем hash с введенным паролем, но только если он не через Гитхаб
     const isPasswordValid = await bcrypt.compare(password, passwordHash);
-    if (!isPasswordValid && !userResponse.githubProviders) {
+    if (!isPasswordValid && !loginDto.isGithubRequest) {
       throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
     }
 

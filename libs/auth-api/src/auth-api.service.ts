@@ -29,6 +29,8 @@ export class AuthApiService {
       );
     }
   }
+
+  // Логин пока используется под Github OAuth
   async login (loginDto: AuthForm) {
     try {
       console.log(`${this.authAppUrl}/login`, loginDto, "Запрос попал в библиотеку метод Login"); 
