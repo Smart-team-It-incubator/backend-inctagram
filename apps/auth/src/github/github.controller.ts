@@ -33,15 +33,15 @@ export class GithubAuthController {
     const githubUser = req.user; // Данные пользователя из GitHub
     const { githubId, email, username } = githubUser;
     const isGithubRequest = true
-    console.log("Попали в GitHub callback", githubUser);
+    //console.log("Попали в GitHub callback", githubUser);
 
     // 1. Ищем пользователя по githubId
     let userByGithubId = await this.CoreAppApiService.getUserByGithubId(githubId);
-    console.log("userByGithubId", userByGithubId);
+    //console.log("userByGithubId", userByGithubId);
 
     // 2. Ищем пользователя по Email
     let userByEmail = await this.CoreAppApiService.getUserByEmail(email);
-    console.log("userByEmail", userByEmail);
+    //console.log("userByEmail", userByEmail);
 
     // 3. Пользователь найден по githubId, выполняем вход
     if (userByGithubId) {

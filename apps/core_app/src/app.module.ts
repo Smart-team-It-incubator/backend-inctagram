@@ -11,6 +11,8 @@ import { FilesGatewayController } from './infrastructure/modules/files_gateway/c
 import { PrismaCoreAppService } from '../prisma/prisma.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { EmailAdapterService } from '@app/email-service';
+import { PostModule } from './infrastructure/modules/posts/post.module';
+import { PostController } from './infrastructure/modules/posts/post.controller';
 
 // const ENV = process.env.NODE_ENV;
 // console.log(ENV);
@@ -25,14 +27,14 @@ import { EmailAdapterService } from '@app/email-service';
       port: Number(process.env.FILES_SERVICE_PORT) || 3695,
     },
   }]),
-    PrismaModule, UserModule, GlobalModule,
+    PrismaModule, UserModule, GlobalModule, PostModule,
     
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: process.env.ENV_FILE, // Загружаем файл из переменной окружения, если нужно
     })
   ,],
-  controllers: [AppController, UserController, FilesGatewayController],
+  controllers: [AppController, UserController, FilesGatewayController, PostController],
   providers: [AppService, PrismaCoreAppService],
 })
 export class AppModule {}
