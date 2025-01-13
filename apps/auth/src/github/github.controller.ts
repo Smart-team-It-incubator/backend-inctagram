@@ -5,6 +5,7 @@ import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthApiService } from "auth-api/auth-api";
+import { generateUsernameFromEmail, getUniqueUsername } from './github_utils';
 
 @ApiTags('Github')
 @Controller('auth/github')
@@ -35,6 +36,12 @@ export class GithubAuthController {
     const isGithubRequest = true
     //console.log("Попали в GitHub callback", githubUser);
 
+    // Генерация username, если он не пришел от GitHub
+    let validUsername = username || generateUsernameFromEmail(email);
+    // Проверка уникальности username
+    validUsername = await getUniqueUsername(validUsername, this.CoreAppApiService);
+    console.log("validUsername при регистрации через Github:", validUsername);
+
     // 1. Ищем пользователя по githubId
     let userByGithubId = await this.CoreAppApiService.getUserByGithubId(githubId);
     //console.log("userByGithubId", userByGithubId);
@@ -45,7 +52,7 @@ export class GithubAuthController {
 
     // 3. Пользователь найден по githubId, выполняем вход
     if (userByGithubId) {
-      const loginResult = await this.AuthApiService.login({ email, password: 'emptyPassword', githubId, isGithubRequest }, );
+      const loginResult = await this.AuthApiService.login({ email, password: 'emptyPassword', githubId, isGithubRequest },);
 
       // Отправляем accessToken и refreshToken в cookies
       res.cookie('accessToken', loginResult.accessToken, {
@@ -67,7 +74,7 @@ export class GithubAuthController {
     if (userByEmail && !userByEmail.githubProviders) {
       const userUpdateDto: UpdateUserDto = { githubId: githubId };
       await this.CoreAppApiService.updateUser(userByEmail.id, userUpdateDto);
-      const loginResult = await this.AuthApiService.login({ email, password: 'emptyPassword', githubId, isGithubRequest }, );
+      const loginResult = await this.AuthApiService.login({ email, password: 'emptyPassword', githubId, isGithubRequest },);
       // Отправляем accessToken и refreshToken в cookies
       res.cookie('accessToken', loginResult.accessToken, {
         httpOnly: process.env.HTTP_ONLY,
@@ -88,7 +95,7 @@ export class GithubAuthController {
     if (!userByGithubId && !userByEmail) {
       const createUserDto: CreateUserDto = {
         email,
-        username,
+        username: validUsername,
         githubId: githubId,
         password: 'githubEmptyPassword', // Генерация временного пароля
       };
@@ -103,7 +110,7 @@ export class GithubAuthController {
       await this.CoreAppApiService.updateUser(newUser.id, userUpdateDto);
 
       // После регистрации, выполняем вход
-      const loginResult = await this.AuthApiService.login({ email, password: 'githubEmptyPassword', githubId, isGithubRequest }, );
+      const loginResult = await this.AuthApiService.login({ email, password: 'githubEmptyPassword', githubId, isGithubRequest },);
 
       // Отправляем accessToken и refreshToken в cookies
       res.cookie('accessToken', loginResult.accessToken, {

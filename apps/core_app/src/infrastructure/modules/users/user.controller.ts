@@ -87,12 +87,15 @@ export class UserController {
   // Метод для получения пользователя по Username
   @ApiOperation({ summary: 'Get User by username' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'respone with required user' }) // Описание ответа
+  @ApiResponse({ status: 404, description: 'User not found' })
   @Get("/getByUsername/:username") // Регистр username ВАЖЕН при поиске
   async findUserByUsername(@Param('username') username: string): Promise<string> {
     const user = await this.commandBus.execute(new GetUserByUsernameCommand(username));
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+
+    if (!user || !user.username) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND); 
     }
+    
     return user
   }
 

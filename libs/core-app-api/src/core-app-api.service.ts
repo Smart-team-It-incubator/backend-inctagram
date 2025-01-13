@@ -21,7 +21,7 @@ export class CoreAppApiService {
             );
             return response.data;
         } catch (error) {
-            console.error("Ошибка в GetUserByUsername либо Core_app недоступен",error.status, error.config.data); // Логирование ошибки
+            console.error("Ошибка в GetUserByUsername либо Core_app недоступен", error.status, error.config.data);
             return null; // или undefined
         }
     }
