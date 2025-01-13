@@ -13,9 +13,10 @@ import { ConfirmEmailUseCase } from '@core_app/src/application/commands/users_ca
 import { GetUserByEmailUseCase } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
 import { GetUserByGithubIdUseCase } from '@core_app/src/application/commands/users_cases/get-user-by-github.use-case';
 import { UpdateUserUseCase } from '@core_app/src/application/commands/users_cases/update-user.user-case';
+import { ResendConfirmationCodeUseCase } from '@core_app/src/application/commands/email_cases/email-confirmation-resend.use-case';
 
 
-const useCasesUsers = [GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase, GetUserByGithubIdUseCase, UpdateUserUseCase]
+const useCasesUsers = [GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase, GetUserByGithubIdUseCase, UpdateUserUseCase, ResendConfirmationCodeUseCase]
 @Module({
   imports: [CqrsModule,HttpModule,],
   providers: [ PrismaCoreAppService, UsersRepository, ...useCasesUsers, AuthApiService],

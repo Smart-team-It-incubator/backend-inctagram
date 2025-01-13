@@ -12,6 +12,8 @@ import { ConfirmEmailCommand } from '@core_app/src/application/commands/users_ca
 import { GetUserByEmailCommand } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
 import { UpdateUserDto } from '@app/shared-dto/dtos/update-user.dto';
 import { UpdateUserCommand } from '@core_app/src/application/commands/users_cases/update-user.user-case';
+import { ResendConfirmationCodeDto } from '@app/shared-dto/dtos/email/resend-email.dto';
+import { ResendConfirmationCodeCommand } from '@core_app/src/application/commands/email_cases/email-confirmation-resend.use-case';
 
 
 
@@ -122,7 +124,7 @@ export class UserController {
   // Добавляем метод emailConfirmation
 @ApiOperation({ summary: 'Confirm user email' }) // Описание эндпоинта
 @ApiResponse({ status: 200, description: 'Email was successfully confirmed' }) // Описание ответа
-@ApiResponse({ status: 400, description: 'Invalid confirmation code' }) // Описание ошибки
+@ApiResponse({ status: 400, description: 'Invalid confirmation code or code expired (5 min)' }) // Описание ошибки
 @ApiBody({
   description: 'Код подтверждения для верификации email',
   schema: {
@@ -149,6 +151,33 @@ async emailConfirmation(@Query('code') confirmationCode: string): Promise<{ mess
   }
 }
 
+
+@ApiOperation({ summary: 'Resend confirmation code' }) // Описание эндпоинта
+@ApiResponse({
+  status: 200,
+  description: 'Confirmation code was successfully resent.',
+  schema: { example: { message: 'Confirmation code was successfully resent' } },
+})
+@ApiResponse({
+  status: 400,
+  description: 'User not found or User already activated.',
+  schema: { example: { statusCode: 400, message: 'User not found or User already activated', error: 'Bad Request' } },
+})
+@ApiBody({
+  description: 'Email of the user requesting the confirmation code.',
+  type: ResendConfirmationCodeDto,
+}) // Описание ожидаемого тела запроса
+@Post('/resendConfirmationCode')
+async resendConfirmationCode(@Body() resendConfirmationCodeDto: ResendConfirmationCodeDto): Promise<{ message: string }> {
+  const { email } = resendConfirmationCodeDto;
+  const result = await this.commandBus.execute(new ResendConfirmationCodeCommand(email));
+
+  if (result) {
+    return { message: 'Confirmation code was successfully resent' };
+  } else {
+    throw new HttpException('User not found or User already activated', HttpStatus.BAD_REQUEST);
+  }
+}
 
 
 
