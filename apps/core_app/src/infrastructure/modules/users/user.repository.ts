@@ -72,6 +72,18 @@ export class UsersRepository {
       return userViewModel.getPrivateProfile(); // Возвращаем внутренний профиль пользователя, т.к это для нашего ресурса
     }
 
+    async getUserByResetPasswordToken(recoveryToken: string): Promise<Partial<UserViewModel> | null> {
+      const user = await this.prisma.user.findFirst({
+        where: { resetPasswordToken: recoveryToken },
+      });
+      if (!user) {
+        return null;
+      }
+
+      const userViewModel = new UserViewModel(user);
+      return userViewModel.getPrivateProfile(); // Возвращаем внутренний профиль пользователя, т.к это для нашего ресурса
+    }
+
     async getUserByEmail(email: string): Promise<Partial<UserViewModel> | null> {
       const user = await this.prisma.user.findUnique({
         where: { email: email },

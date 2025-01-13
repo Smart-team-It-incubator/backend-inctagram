@@ -53,6 +53,7 @@ export class CoreAppApiService {
 
         async updateUser(userId: string, UpdateUserDto: UpdateUserDto): Promise<any> {
             try {
+                console.log("Мы попали в библиотеку, метод UpdateUser", userId, UpdateUserDto);
                 const response = await firstValueFrom(
                     this.httpService.put(`${this.coreAppUrl}/users/update/${userId}`,
                         UpdateUserDto // Передаем данные в тело запроса
@@ -73,6 +74,18 @@ export class CoreAppApiService {
                 return response.data;
             } catch (error) {
                 console.error("Ошибка в RegisterUser либо Core_app недоступен",error.status, error.config.data); // Логирование ошибки
+                return null; // или undefined
+            }
+        }
+
+        async getUserByResetPasswordToken (recoveryCode: string): Promise<any> {
+            try {
+                const response = await firstValueFrom(
+                    this.httpService.get(`${this.coreAppUrl}/users/getByResetPasswordToken/${recoveryCode}`),
+                );
+                return response.data;
+            } catch (error) {
+                console.error("Ошибка в GetUserByResetPasswordToken либо Core_app недоступен",error.status, error.config.data); // Логирование ошибки
                 return null; // или undefined
             }
         }

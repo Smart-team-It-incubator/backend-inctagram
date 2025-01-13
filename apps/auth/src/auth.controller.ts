@@ -145,34 +145,64 @@ export class AuthController {
     }
   }
 
-  @ApiExcludeEndpoint()
+
+  // Метод для запроса сброса пароля, не делает каких-либо изменений, просто отправляем письмо для восстановления
   @Post('/password-reset/request')
+  @ApiOperation({ summary: 'Request password reset', description: 'Sends a password reset email to the specified user email address.' })
   @ApiResponse({ status: 200, description: 'Password reset request submitted successfully.' })
-  @ApiBody({ schema: { example: { email: 'user@example.com' } } })
+  @ApiResponse({ status: 404, description: 'User with the provided email not found.' })
+  @ApiBody({
+    schema: {
+      example: { email: 'user@example.com' },
+      type: 'object',
+      properties: {
+        email: { type: 'string', format: 'email', example: 'user@example.com' },
+      },
+    },
+  })
   async requestPasswordReset(@Body('email') email: string): Promise<{ message: string }> {
     // TODO: Implement logic for sending password reset email
+    const result = await this.authService.sendPasswordRecoveryMessage(email)
     return { message: `Password reset link sent to ${email}` };
   }
 
-  // Reset Password
-  @ApiExcludeEndpoint()
+  // Метод для взаимодействия с сбросом пароля из почтовой ссылки
   @Post('/password-reset/confirm')
-  @ApiResponse({ status: 200, description: 'Password reset successfully.' })
-  @ApiBody({ schema: { example: { resetToken: 'token123', newPassword: 'newStrongPassword' } } })
+  @ApiOperation({ summary: 'Reset password', description: 'Confirms password reset using a recovery code and sets a new password.' })
+  @ApiResponse({ status: 200, description: 'Password reset successful.' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired recovery code.' })
+  @ApiBody({
+    schema: {
+      example: {
+        recoveryCode: 'token123',
+        newPassword: 'newStrongPassword',
+      },
+      type: 'object',
+      properties: {
+        recoveryCode: { type: 'string', example: 'token123' },
+        newPassword: { type: 'string', example: 'newStrongPassword', minLength: 8 },
+      },
+    },
+  })
   async resetPassword(
-    @Body('resetToken') resetToken: string,
+    @Query('recoveryCode') recoveryCode: string,
     @Body('newPassword') newPassword: string,
-    @Body('token') token: string, 
-    @Ip() remoteIp: string
+    //@Body('token') tokenRecaptcha: string, 
+    //@Ip() remoteIp: string
   ): Promise<{ message: string }> {
-    const isValid = await this.recaptchaAdapter.validateToken(token, remoteIp);
-    if (!isValid) {
-      throw new HttpException('Invalid reCAPTCHA token', HttpStatus.BAD_REQUEST);
+    //const isValid = await this.recaptchaAdapter.validateToken(tokenRecaptcha, remoteIp);
+    // if (!isValid) {
+    //   throw new HttpException('Invalid reCAPTCHA token', HttpStatus.BAD_REQUEST);
+    // }
+    console.log("recoveryCode:",recoveryCode, "newPassword:",newPassword)
+    const result = await this.authService.resetPassword(recoveryCode, newPassword)
+    if (!result) {
+      // Если результат отсутствует, токен может быть недействительным или истёкшим
+      throw new HttpException('Invalid or expired recovery code.', HttpStatus.BAD_REQUEST);
     }
-    else {
-      // TODO: Implement logic for resetting the password
-      return { message: 'Password reset successful.' };
-    }
+  
+    // Возвращаем успешное сообщение
+    return { message: 'Password reset successful.' };
   }
 
   // Change Password

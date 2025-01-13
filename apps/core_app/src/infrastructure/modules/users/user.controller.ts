@@ -14,6 +14,7 @@ import { UpdateUserDto } from '@app/shared-dto/dtos/update-user.dto';
 import { UpdateUserCommand } from '@core_app/src/application/commands/users_cases/update-user.user-case';
 import { ResendConfirmationCodeDto } from '@app/shared-dto/dtos/email/resend-email.dto';
 import { ResendConfirmationCodeCommand } from '@core_app/src/application/commands/email_cases/email-confirmation-resend.use-case';
+import { GetUserByResetPasswordTokenCommand } from '@core_app/src/application/commands/users_cases/get-user-by-resetToken.use-case';
 
 
 
@@ -64,7 +65,7 @@ export class UserController {
   })
   @Put("update/:userId") // Используем PUT для обновления
   async updateUser(@Param('userId') userId: string, @Body() updateUserDto: UpdateUserDto): Promise<string> {
-    console.log(updateUserDto)
+    console.log('мы попали в update User',updateUserDto)
     const updateUser = await this.commandBus.execute(new UpdateUserCommand(userId, updateUserDto));
     return updateUser
   }
@@ -116,8 +117,20 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'response with required user' }) // Описание ответа
   @Get("/getByGithubId/:githubId")
   async findUserByGithubId(@Param('githubId') githubId: string): Promise<string> {
-    console.log("попадаение в GetGitHubUser")
+    console.log("попадание в GetGitHubUser")
     const user = await this.commandBus.execute(new GetUserByGithubIdCommand(githubId));
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
+    return user
+  }
+
+  @ApiOperation({ summary: 'Get User by resetPasswordToken' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'response with required user' }) // Описание ответа
+  @Get("/getByResetPasswordToken/:resetPasswordToken")
+  async findUserByResetPasswordToken(@Param('resetPasswordToken') resetPasswordToken: string): Promise<string> {
+    console.log("попадание в resetPasswordToken Get User")
+    const user = await this.commandBus.execute(new GetUserByResetPasswordTokenCommand(resetPasswordToken));
     if (!user) {
       throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     }

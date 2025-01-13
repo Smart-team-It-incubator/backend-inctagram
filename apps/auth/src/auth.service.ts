@@ -9,6 +9,8 @@ import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { JwtPayload } from '@app/shared-dto/dtos/jwt-payload.dto';
 import { randomUUID } from 'crypto';
 import * as bcrypt from 'bcryptjs';
+import { EmailAdapterService } from '@app/email-service';
+const { v4: uuidv4 } = require('uuid');
 
 
 @Injectable()
@@ -19,7 +21,8 @@ export class AuthService {
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
     private readonly configService: CustomConfigService,
-    private readonly coreAppApiService: CoreAppApiService
+    private readonly coreAppApiService: CoreAppApiService,
+    private readonly emailAdapterService: EmailAdapterService
   ) {
     this.jwtAccessSecret = this.configService.getJwtAccessSecret();
     this.jwtRefreshSecret = this.configService.getJwtRefreshSecret();
@@ -239,4 +242,38 @@ export class AuthService {
     const result = await this.authRepository.revokeAllActiveSession(refreshTokenPayload.userId, refreshTokenPayload.deviceId);
     return result
   }
+
+  async sendPasswordRecoveryMessage (userEmail: string) {
+    // Ищем пользователя, существует ли он вообще
+    const userByEmail = await this.coreAppApiService.getUserByEmail(userEmail);
+    if (userByEmail) {
+      try {
+        const recoveryCode = uuidv4();
+      // Создаем для юзера код восстановления + срок по которому можем определить актуальность этого запроса
+      const userUpdate = await this.coreAppApiService.updateUser(userByEmail.id, {resetPasswordToken: recoveryCode, resetPasswordExpires: new Date(Date.now() + 300000)}); // 5 минут
+      // Отправляем письмо
+      return this.emailAdapterService.sendPasswordRecoveryMessage(userEmail, recoveryCode)
+      } catch (error) {
+        console.log("Что-то произошло при отправке письма для восстановления пароля", error)
+      }
+    }
+    else {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    
+  }
+
+  async resetPassword (recoveryCode: string, newPassword: string) {
+    // Ищем пользователя по коду восстановления
+    const userByResetPasswordToken = await this.coreAppApiService.getUserByResetPasswordToken(recoveryCode);
+    console.log(userByResetPasswordToken)
+    if (userByResetPasswordToken) {
+      const hashedPassword = await this._generateHash(newPassword);
+      const userUpdate = await this.coreAppApiService.updateUser(userByResetPasswordToken.id, {password: hashedPassword, resetPasswordToken: null, resetPasswordExpires: null});
+      return userUpdate
+    }
+    else {
+      throw new HttpException('User not found or recovery code invalid', HttpStatus.NOT_FOUND);
+    }
+}
 }
