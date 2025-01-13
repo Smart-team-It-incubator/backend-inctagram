@@ -275,5 +275,18 @@ export class AuthService {
     else {
       throw new HttpException('User not found or recovery code invalid', HttpStatus.NOT_FOUND);
     }
-}
+  }
+  async changePassword (oldPassword: string, newPassword: string, username: string) {
+    const user = await this.coreAppApiService.getUserByUsername(username);
+    if (!user) {
+      throw new HttpException('User not found by username (token is invalid)', HttpStatus.NOT_FOUND);
+    }
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isPasswordValid) {
+      throw new HttpException('Old password is incorrect', HttpStatus.UNAUTHORIZED);
+    }
+    const hashedPassword = await this._generateHash(newPassword);
+    const userUpdate = await this.coreAppApiService.updateUser(user.id, {password: hashedPassword});
+    return userUpdate
+  }
 }

@@ -190,6 +190,7 @@ export class AuthController {
     //@Body('token') tokenRecaptcha: string, 
     //@Ip() remoteIp: string
   ): Promise<{ message: string }> {
+    // Это метод для Recaptcha
     //const isValid = await this.recaptchaAdapter.validateToken(tokenRecaptcha, remoteIp);
     // if (!isValid) {
     //   throw new HttpException('Invalid reCAPTCHA token', HttpStatus.BAD_REQUEST);
@@ -207,16 +208,39 @@ export class AuthController {
 
   // Change Password
   @Post('/password/change')
-  //@ApiResponse({ status: 200, description: 'Password changed successfully.' })
-  //@ApiBody({ schema: { example: { currentPassword: 'oldPassword123', newPassword: 'newStrongPassword' } } })
-  @ApiExcludeEndpoint()
+  @ApiResponse({ status: 200, description: 'Password changed successfully.' })
+  @ApiResponse({ status: 400, description: 'Invalid current password or other error.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized, user not authenticated.' })
+  @ApiBody({
+    schema: {
+      example: {
+        currentPassword: 'oldPassword123',
+        newPassword: 'newStrongPassword',
+      },
+    },
+  })
   async changePassword(
     @Body('currentPassword') currentPassword: string,
     @Body('newPassword') newPassword: string,
+    @Req() req,
   ): Promise<{ message: string }> {
-    // TODO: Implement logic for changing the password
+    // Проверяем, что пользователь аутентифицирован
+    if (!req.user || !req.user.username) {
+      throw new HttpException('Unauthorized: User is not authenticated.', HttpStatus.UNAUTHORIZED);
+    }
+  
+    const username = req.user.username;
+  
+    // Изменение пароля
+    const result = await this.authService.changePassword(currentPassword, newPassword, username);
+  
+    if (!result) {
+      throw new HttpException('Invalid current password or unable to change password.', HttpStatus.BAD_REQUEST);
+    }
+  
     return { message: 'Password changed successfully.' };
   }
+  
 
   // Get Active Sessions
   @Get('/sessions')
