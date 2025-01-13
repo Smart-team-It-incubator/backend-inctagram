@@ -33,12 +33,12 @@ export class AuthService {
     // Шаг 1: Получение данных пользователя из Core_app
     const userResponse = await this.coreAppApiService.getUserByEmail(email);
     if (!userResponse) {
-      throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('User with this email not found', HttpStatus.UNAUTHORIZED);
     }
 
     // Шаг 1.1: Проверка email на подтверждение, в случае если это Github запрос то Email автоматически подтверждается
     if (!userResponse.isEmailConfirmed && !loginDto.isGithubRequest) {
-      throw new HttpException('Email not confirmed', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Email not confirmed, check your email or use resending method', HttpStatus.UNAUTHORIZED);
     }
 
     const { password: passwordHash } = userResponse;
@@ -46,7 +46,7 @@ export class AuthService {
     // Шаг 2: Проверка пароля, сравниваем hash с введенным паролем, но только если он не через Гитхаб
     const isPasswordValid = await bcrypt.compare(password, passwordHash);
     if (!isPasswordValid && !loginDto.isGithubRequest) {
-      throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('The email or password are incorrect try again please', HttpStatus.UNAUTHORIZED);
     }
 
 
@@ -56,7 +56,7 @@ export class AuthService {
       const existingSession = await this.authRepository.findOneActiveSession(userResponse.userId, existRefreshTokenPayload?.deviceId);
       //console.log("existingSession:", existingSession);
       if (existingSession) {
-        throw new Error('Active session exists');
+        throw new Error('Active session exists, if you want to update, please use refresh-token');
       }
     }
 

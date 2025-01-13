@@ -153,6 +153,15 @@ async dropDb() {
     console.error('Ошибка при удалении данных:', error);
   }
 }
+
+
+// Проверка поля на занятость перед регистрацией юзера
+async isFieldTaken(field: 'username' | 'email', value: string): Promise<boolean> {
+  const user = await this.prisma.user.findFirst({
+    where: { [field]: value },
+  });
+  return !!user;
+}
     
     
     
