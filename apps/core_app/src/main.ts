@@ -11,7 +11,7 @@ async function bootstrap() {
   try {
     // Подключение Swagger для документации
     const config = new DocumentBuilder()
-      .setTitle('Core_app API') // Укажи название API
+      .setTitle('API Inctagram app') // Укажи название API
       .setDescription('В API представлены методы для таких модулей как: Users, Posts, Auth, Files. К методам Auth и Github раздела ОБЯЗАТЕЛЬНО добавлять субдомен auth. (например https://auth.smart-reg.org.ru/api/v1/auth/github/)') // Добавь описание
       .setVersion('1.0') // Укажи версию
       .build();
