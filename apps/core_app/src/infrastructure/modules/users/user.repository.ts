@@ -100,11 +100,14 @@ export class UsersRepository {
       try {
         // Ищем пользователя по коду подтверждения
         const user = await this.prisma.user.findFirst({ where: { emailConfirmationCode: confirmationCode } });
-    
+        
         if (!user) {
           return null; // Если пользователь не найден, возвращаем null
         }
-    
+        // Проверяем, что код подтверждения не просрочен
+        if (user.emailConfirmationCodeExpirationDate < new Date()) {
+          return null; // Если код просрочен, возвращаем null
+        }
         // Обновляем статус пользователя на подтвержденный и удаляем код подтверждения
         const updatedUser = await this.prisma.user.update({
           where: { id: user.id },
@@ -142,6 +145,7 @@ async dropDb() {
     // Удаляем данные из каждой таблицы, но структура остаётся
     await this.prisma.$transaction([
       this.prisma.user.deleteMany({}),
+      this.prisma.post.deleteMany({}),
       // Добавьте другие таблицы, из которых нужно удалить данные
     ]);
     console.log('Данные успешно удалены из таблиц User');

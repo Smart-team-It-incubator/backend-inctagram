@@ -145,7 +145,7 @@ async emailConfirmation(@Query('code') confirmationCode: string): Promise<{ mess
   if (result) {
     return { message: 'Email successfully confirmed' };
   } else {
-    throw new HttpException('Invalid confirmation code', HttpStatus.BAD_REQUEST);
+    throw new HttpException('Invalid confirmation code or code expired', HttpStatus.BAD_REQUEST);
   }
 }
 

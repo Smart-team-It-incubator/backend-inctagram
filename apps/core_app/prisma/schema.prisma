@@ -31,7 +31,7 @@ model User {
   country                String?
   dateOfBirthday         DateTime?
   githubId        String?   @unique                         // Github ID
-  Post	Post[]
+  Post	Post[] 
 }
 
 model Post {
@@ -39,6 +39,6 @@ model Post {
 	text	String?
 	location	String?
 	createdAt	DateTime	@default(now())
-	user User @relation(fields: [userId], references: [id])
+	user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 	userId String
 }
