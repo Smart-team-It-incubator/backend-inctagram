@@ -7,7 +7,7 @@ import { AuthModule } from "./auth.module";
 
 export async function app_auth_settings(app: INestApplication) {
     app.enableCors({
-        origin: '*',
+        origin: ['http://localhost:3000', '*'],
         methods: 'GET,POST,PUT,DELETE',
         credentials: true, // Разрешение на использование куков
     })
