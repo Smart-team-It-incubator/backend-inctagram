@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, HttpException, HttpStatus, Put, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpException, HttpStatus, Put, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { GetUsersCommand } from '@core_app/src/application/commands/users_cases/get-users.use-case';
 import { CreateUserCommand } from '@core_app/src/application/commands/users_cases/create-user.use-case';
-import { ApiBody, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCookieAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserViewModel } from '@core_app/src/domain/interfaces/view_models/UserViewModel';
 import { GetUserByUsernameCommand } from '@core_app/src/application/commands/users_cases/get-user-by-username.use-case';
 import { CreateUserDto } from '@app/shared-dto';
@@ -15,6 +15,7 @@ import { UpdateUserCommand } from '@core_app/src/application/commands/users_case
 import { ResendConfirmationCodeDto } from '@app/shared-dto/dtos/email/resend-email.dto';
 import { ResendConfirmationCodeCommand } from '@core_app/src/application/commands/email_cases/email-confirmation-resend.use-case';
 import { GetUserByResetPasswordTokenCommand } from '@core_app/src/application/commands/users_cases/get-user-by-resetToken.use-case';
+import { JwtAuthGuard } from '@app/guards';
 
 
 
@@ -57,6 +58,8 @@ export class UserController {
   } 
 
   // Метод для обновления пользователя
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update user' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'User was successfully updated' }) // Описание ответа
   @ApiBody({
@@ -86,6 +89,7 @@ export class UserController {
 
   //TODO - сделать метод закрытым, это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
   // Метод для получения пользователя по Username
+  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Get User by username' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'respone with required user' }) // Описание ответа
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -102,6 +106,7 @@ export class UserController {
 
     //TODO - сделать метод закрытым, это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
   // Метод для получения пользователя по Email
+  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Get User by email' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'response with required user' }) // Описание ответа
   @Get("/getByEmail/:email") // Регистр email ВАЖЕН при поиске
@@ -113,6 +118,7 @@ export class UserController {
     return user
   }
 
+  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Get User by githubID' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'response with required user' }) // Описание ответа
   @Get("/getByGithubId/:githubId")
@@ -125,6 +131,7 @@ export class UserController {
     return user
   }
 
+  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Get User by resetPasswordToken' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'response with required user' }) // Описание ответа
   @Get("/getByResetPasswordToken/:resetPasswordToken")

@@ -13,6 +13,9 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { EmailAdapterService } from '@app/email-service';
 import { PostModule } from './infrastructure/modules/posts/post.module';
 import { PostController } from './infrastructure/modules/posts/post.controller';
+import { JwtService } from '@nestjs/jwt';
+import { CoreAppApiService } from '@core-app-api/core-app-api';
+import { HttpModule } from '@nestjs/axios';
 
 // const ENV = process.env.NODE_ENV;
 // console.log(ENV);
@@ -27,7 +30,7 @@ import { PostController } from './infrastructure/modules/posts/post.controller';
       port: Number(process.env.FILES_SERVICE_PORT) || 3695,
     },
   }]),
-    PrismaModule, UserModule, GlobalModule, PostModule,
+    PrismaModule, UserModule, GlobalModule, PostModule, HttpModule,
     
     ConfigModule.forRoot({
       isGlobal: true,
@@ -35,6 +38,6 @@ import { PostController } from './infrastructure/modules/posts/post.controller';
     })
   ,],
   controllers: [AppController, UserController, FilesGatewayController, PostController],
-  providers: [AppService, PrismaCoreAppService],
+  providers: [AppService, PrismaCoreAppService, JwtService, CoreAppApiService],
 })
 export class AppModule {}

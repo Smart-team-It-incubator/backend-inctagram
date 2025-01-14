@@ -14,6 +14,14 @@ async function bootstrap() {
       .setTitle('API Inctagram app') // Укажи название API
       .setDescription('В API представлены методы для таких модулей как: Users, Posts, Auth, Files. К методам Auth и Github раздела ОБЯЗАТЕЛЬНО добавлять субдомен auth. (например https://auth.smart-reg.org.ru/api/v1/auth/github/)') // Добавь описание
       .setVersion('1.0') // Укажи версию
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT', // Опционально: Указывает, что используется JWT
+        },
+        'access-token', // Название схемы авторизации
+      )
       .build();
     const coreDoc = SwaggerModule.createDocument(app, config);
     // Получение документации для auth микросервиса

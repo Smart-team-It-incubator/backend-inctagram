@@ -219,6 +219,7 @@ describe('E2e Multidevice Flow', () => {
         it('Получение всех сессий для User1', async () => {
             // Запрос для получения всех сессий
             const sessionsResponse = await getRequest(appAuth, RouteNames.AUTH.GET_ALL_SESSION.full)
+                .set('Authorization', `Bearer ${accessTokenUser1}`)
                 .set('Cookie', `refreshToken=${refreshTokenUser1}`) // Передаем refreshToken в Cookie
                 .expect(200);
 
@@ -243,6 +244,7 @@ describe('E2e Multidevice Flow', () => {
         it('Получение всех сессий для User2', async () => {
             // Запрос для получения всех сессий
             const sessionsResponse = await getRequest(appAuth, RouteNames.AUTH.GET_ALL_SESSION.full)
+                .set('Authorization', `Bearer ${accessTokenUser2}`)
                 .set('Cookie', `refreshToken=${refreshTokenUser2}`) // Передаем refreshToken в Cookie
                 .expect(200);
 
@@ -255,6 +257,7 @@ describe('E2e Multidevice Flow', () => {
     it('Отзыв одной сессии для User1 и проверка сессий для User2', async () => {
         // Запрос для получения всех сессий User1 до отзыва
         const sessionsResponseBeforeRevokeUser1 = await getRequest(appAuth, RouteNames.AUTH.GET_ALL_SESSION.full)
+            .set('Authorization', `Bearer ${accessTokenUser1}`)
             .set('Cookie', `refreshToken=${refreshTokenUser1}`)
             .expect(200);
 
@@ -264,6 +267,7 @@ describe('E2e Multidevice Flow', () => {
 
         // Отзываем первую сессию User1
         const revokeSessionResponse = await deleteRequest(appAuth, RouteNames.AUTH.DEL_SPECIFIC_SESSION.full.replace(':sessionId', session1BeforeRevokeUser1.id))
+            .set('Authorization', `Bearer ${accessTokenUser1}`)
             .expect(200);
 
         // Проверяем, что сессия была успешно отозвана
@@ -271,6 +275,7 @@ describe('E2e Multidevice Flow', () => {
 
         // Запрос для получения всех сессий User1 после отзыва
         const sessionsResponseAfterRevokeUser1 = await getRequest(appAuth, RouteNames.AUTH.GET_ALL_SESSION.full)
+            .set('Authorization', `Bearer ${accessTokenUser1}`)
             .set('Cookie', `refreshToken=${refreshTokenUser1}`)
             .expect(200);
 
@@ -283,6 +288,7 @@ describe('E2e Multidevice Flow', () => {
 
         // Запрос для получения всех сессий User2 до отзыва сессии у User1
         const sessionsResponseBeforeRevokeUser2 = await getRequest(appAuth, RouteNames.AUTH.GET_ALL_SESSION.full)
+            .set('Authorization', `Bearer ${accessTokenUser2}`)
             .set('Cookie', `refreshToken=${refreshTokenUser2}`)
             .expect(200);
 
@@ -292,6 +298,7 @@ describe('E2e Multidevice Flow', () => {
 
         // Проверяем, что сессии User2 остались на месте
         const sessionsResponseAfterRevokeUser2 = await getRequest(appAuth, RouteNames.AUTH.GET_ALL_SESSION.full)
+            .set('Authorization', `Bearer ${accessTokenUser2}`)
             .set('Cookie', `refreshToken=${refreshTokenUser2}`)
             .expect(200);
 

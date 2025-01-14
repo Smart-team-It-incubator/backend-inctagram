@@ -1,9 +1,10 @@
-import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, Req, UnauthorizedException, Delete, Query, Param, Ip } from '@nestjs/common';
+import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, Req, UnauthorizedException, Delete, Query, Param, Ip, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBody, ApiCookieAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCookieAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
 import { EmailAdapterService } from '@app/email-service';
 import { RecaptchaAdapter } from './utils/recaptcha_adapter';
+import { JwtAuthGuard } from '@app/guards';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -12,6 +13,7 @@ export class AuthController {
       private readonly emailService: EmailAdapterService,
       private readonly recaptchaAdapter: RecaptchaAdapter
   ) { }
+
 
   @Post('/login')
   @ApiOperation({ summary: 'Авторизация пользователя' })
@@ -40,7 +42,6 @@ export class AuthController {
     status: 409,
     description: 'Сессия уже существует для этого устройства.',
   })
-  @ApiCookieAuth() // Добавляем информацию о cookie для refreshToken
   async login(@Body() loginDto: AuthForm, @Res() res, @Req() req) {
     try {
       const ip = req.ip
@@ -58,7 +59,7 @@ export class AuthController {
         .status(200)
         .send({ accessToken: result.accessToken });
     } catch (error) {
-      if (error.message === 'Active session exists') {
+      if (error.message === 'Active session exists, if you want to update, please use refresh-token') {
         throw new HttpException('Уже существует активная сессия для устройства с этим Refresh Token, если нужно обновить, обратись на refresh-token.', HttpStatus.CONFLICT);
       }
       throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
@@ -67,6 +68,8 @@ export class AuthController {
 
   @ApiTags('Auth') // Группировка методов по тегу 'Auth'
   @Post('/logout')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Logout user', 
     description: 'Handles logout by invalidating the refresh token and logging the user out.'
@@ -121,6 +124,7 @@ export class AuthController {
     }
   })
   @Post('/refresh-token')
+  @ApiCookieAuth('refreshToken')
   async updateRefreshToken(@Req() req, @Res() res) {
     try {
       const ip = req.ip
@@ -208,6 +212,8 @@ export class AuthController {
 
   // Change Password
   @Post('/password/change')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Password changed successfully.' })
   @ApiResponse({ status: 400, description: 'Invalid current password or other error.' })
   @ApiResponse({ status: 401, description: 'Unauthorized, user not authenticated.' })
@@ -222,7 +228,7 @@ export class AuthController {
   async changePassword(
     @Body('currentPassword') currentPassword: string,
     @Body('newPassword') newPassword: string,
-    @Req() req,
+    @Req() req, // В Req приходят данные о пользователе благодаря Guard
   ): Promise<{ message: string }> {
     // Проверяем, что пользователь аутентифицирован
     if (!req.user || !req.user.username) {
@@ -244,6 +250,9 @@ export class AuthController {
 
   // Get Active Sessions
   @Get('/sessions')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiCookieAuth()
   @ApiOperation({
     summary: 'Получения всех сессий пользователя', 
     description: 'Получение всех сессий пользователя на основе RefreshToken'
@@ -268,6 +277,9 @@ export class AuthController {
 
   // Revoke specific Session
   @Delete('/sessions/revoke/:sessionId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiCookieAuth()
   @ApiOperation({
     summary: 'Отзыв конкретной сессии', 
     description: 'Отзыв конкретной сессии пользователя по session ID'
@@ -288,6 +300,9 @@ export class AuthController {
 
   // Revoke All Sessions
   @Delete('/sessions/revoke-all')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiCookieAuth()
   @ApiOperation({
     summary: 'Отзыв всех сессий за исключением текущей', 
   })
@@ -307,7 +322,7 @@ export class AuthController {
     }
     
   }
-  //@ApiExcludeEndpoint()
+  @ApiExcludeEndpoint()
   @Post('/hash-password')
   async hashPassword(@Body('password') passwordByUser: string): Promise<string> {
     try {

@@ -248,13 +248,14 @@ describe('E2E registration SINGLE user/auth flow', () => {
         })
         .expect(401)
         .then((errorResponse) => {
-          expect(errorResponse.body.message).toBe('Invalid password'); // Сообщение об ошибке
+          expect(errorResponse.body.message).toBe('The email or password are incorrect try again please'); // Сообщение об ошибке
         });
     });
 
     it("Выход из системы, удаление токена, повторный вход (сессия должна быть 1 на устройство)", async () => {
       // Выходим из системы
       await postRequest(appAuth, RouteNames.AUTH.LOGOUT.full)
+        .set('Authorization', `Bearer ${globalAccessToken}`)
         .set('Cookie', `refreshToken=${globalRefreshToken}`)
         .expect(200)
         .then((logoutResponse) => {
