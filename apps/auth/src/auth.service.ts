@@ -266,6 +266,9 @@ export class AuthService {
   async resetPassword (recoveryCode: string, newPassword: string) {
     // Ищем пользователя по коду восстановления
     const userByResetPasswordToken = await this.coreAppApiService.getUserByResetPasswordToken(recoveryCode);
+    if (userByResetPasswordToken.resetPasswordExpires < new Date()) {
+      throw new HttpException('Recovery code expired', HttpStatus.BAD_REQUEST);
+    }
     console.log(userByResetPasswordToken)
     if (userByResetPasswordToken) {
       const hashedPassword = await this._generateHash(newPassword);
