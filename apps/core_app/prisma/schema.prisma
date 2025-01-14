@@ -31,4 +31,14 @@ model User {
   country                String?
   dateOfBirthday         DateTime?
   githubId        String?   @unique                         // Github ID
+  Post	Post[] 
+}
+
+model Post {
+	id	Int	@id	@default(autoincrement())
+	text	String?
+	location	String?
+	createdAt	DateTime	@default(now())
+	user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+	userId String
 }

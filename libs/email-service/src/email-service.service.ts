@@ -76,7 +76,7 @@ export class EmailAdapterService {
 		const htmlMessage = `
 <h1>Password recovery</h1>
 <p>To finish password recovery please follow the link below:
-  <a href="https://${domainRoot}/auth/password-recovery?recoveryCode=${recoveryCode}">Recover password</a>
+  <a href="https://${domainRoot}/auth/password-reset/confirm?recoveryCode=${recoveryCode}">Recover password</a>
 </p>`;
 
 		await this.sendEmail(userEmail, subject, textMessage, htmlMessage);

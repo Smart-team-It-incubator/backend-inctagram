@@ -17,7 +17,7 @@ export class AuthApiService {
     try {
       console.log(`${this.authAppUrl}/hash-password`, { password }, "Запрос попал в библиотеку метод hash-password"); 
       const response = await firstValueFrom(
-        this.httpService.post(`${this.authAppUrl}/hash-password`, { password }),
+        this.httpService.post(`${this.authAppUrl}/auth/hash-password`, { password }),
       );
       //console.log("response", response.data)
       return response.data; // Возвращается строка password сразу в виде хэша
@@ -29,11 +29,13 @@ export class AuthApiService {
       );
     }
   }
+
+  // Логин пока используется под Github OAuth
   async login (loginDto: AuthForm) {
     try {
       console.log(`${this.authAppUrl}/login`, loginDto, "Запрос попал в библиотеку метод Login"); 
       const response = await firstValueFrom(
-        this.httpService.post(`${this.authAppUrl}/login`, loginDto, {
+        this.httpService.post(`${this.authAppUrl}/auth/login`, loginDto, {
           withCredentials: true, // Это обеспечит передачу кук с запросом
         }),
       );

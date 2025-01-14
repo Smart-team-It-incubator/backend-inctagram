@@ -13,12 +13,17 @@ import { ConfirmEmailUseCase } from '@core_app/src/application/commands/users_ca
 import { GetUserByEmailUseCase } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
 import { GetUserByGithubIdUseCase } from '@core_app/src/application/commands/users_cases/get-user-by-github.use-case';
 import { UpdateUserUseCase } from '@core_app/src/application/commands/users_cases/update-user.user-case';
+import { ResendConfirmationCodeUseCase } from '@core_app/src/application/commands/email_cases/email-confirmation-resend.use-case';
+import { GetUserByResetPasswordTokenUseCase } from '@core_app/src/application/commands/users_cases/get-user-by-resetToken.use-case';
+import { CoreAppApiService } from '@core-app-api/core-app-api';
+import { JwtService } from '@nestjs/jwt';
 
 
-const useCasesUsers = [GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase, GetUserByGithubIdUseCase, UpdateUserUseCase]
+const useCasesUsers = [GetUserByResetPasswordTokenUseCase,
+  GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase, GetUserByGithubIdUseCase, UpdateUserUseCase, ResendConfirmationCodeUseCase]
 @Module({
   imports: [CqrsModule,HttpModule,],
-  providers: [ PrismaCoreAppService, UsersRepository, ...useCasesUsers, AuthApiService],
+  providers: [ PrismaCoreAppService, UsersRepository, ...useCasesUsers, AuthApiService, JwtService, CoreAppApiService],
   controllers: [UserController]
 })
 export class UserModule {}

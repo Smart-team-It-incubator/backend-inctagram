@@ -82,6 +82,26 @@ spec:
                  secretKeyRef:
                    name: smart-team-backend-auth-production-config-secret
                    key: RECAPTCHA_SECRET_KEY
+             - name: GITHUB_CLIENT_ID
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-auth-production-config-secret
+                   key: GITHUB_CLIENT_ID
+             - name: GITHUB_CLIENT_SECRET
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-auth-production-config-secret
+                   key: GITHUB_CLIENT_SECRET
+             - name: GITHUB_CALLBACK_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-auth-production-config-secret
+                   key: GITHUB_CALLBACK_URL
+             - name: HTTP_ONLY
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-auth-production-config-secret
+                   key: HTTP_ONLY
              - name: JWT_ACCESS_SECRET
                valueFrom:
                  secretKeyRef:

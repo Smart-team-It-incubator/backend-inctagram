@@ -9,6 +9,8 @@ import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { JwtPayload } from '@app/shared-dto/dtos/jwt-payload.dto';
 import { randomUUID } from 'crypto';
 import * as bcrypt from 'bcryptjs';
+import { EmailAdapterService } from '@app/email-service';
+const { v4: uuidv4 } = require('uuid');
 
 
 @Injectable()
@@ -19,7 +21,8 @@ export class AuthService {
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
     private readonly configService: CustomConfigService,
-    private readonly coreAppApiService: CoreAppApiService
+    private readonly coreAppApiService: CoreAppApiService,
+    private readonly emailAdapterService: EmailAdapterService
   ) {
     this.jwtAccessSecret = this.configService.getJwtAccessSecret();
     this.jwtRefreshSecret = this.configService.getJwtRefreshSecret();
@@ -27,25 +30,26 @@ export class AuthService {
 
 
 
-  async login(loginDto: AuthForm, useragent: string, ip: string, refreshTokenExist?: string): Promise<{ accessToken: string; refreshToken: string }> {
+  async login(loginDto: AuthForm, useragent: string, ip: string, refreshTokenExist?: string,): Promise<{ accessToken: string; refreshToken: string }> {
     const { email, password } = loginDto;
+    console.log("Тесты LOGIN DTO", loginDto)
     // Шаг 1: Получение данных пользователя из Core_app
     const userResponse = await this.coreAppApiService.getUserByEmail(email);
     if (!userResponse) {
-      throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('User with this email not found', HttpStatus.UNAUTHORIZED);
     }
 
-    // Шаг 1.1: Проверка email на подтверждение
-    if (!userResponse.isEmailConfirmed && !userResponse.githubProviders) {
-      throw new HttpException('Email not confirmed', HttpStatus.UNAUTHORIZED);
+    // Шаг 1.1: Проверка email на подтверждение, в случае если это Github запрос то Email автоматически подтверждается
+    if (!userResponse.isEmailConfirmed && !loginDto.isGithubRequest) {
+      throw new HttpException('Email not confirmed, check your email or use resending method', HttpStatus.UNAUTHORIZED);
     }
 
     const { password: passwordHash } = userResponse;
 
-    // Шаг 2: Проверка пароля, сравниваем hash с введенным паролем
+    // Шаг 2: Проверка пароля, сравниваем hash с введенным паролем, но только если он не через Гитхаб
     const isPasswordValid = await bcrypt.compare(password, passwordHash);
-    if (!isPasswordValid && !userResponse.githubProviders) {
-      throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
+    if (!isPasswordValid && !loginDto.isGithubRequest) {
+      throw new HttpException('The email or password are incorrect try again please', HttpStatus.UNAUTHORIZED);
     }
 
 
@@ -55,7 +59,7 @@ export class AuthService {
       const existingSession = await this.authRepository.findOneActiveSession(userResponse.userId, existRefreshTokenPayload?.deviceId);
       //console.log("existingSession:", existingSession);
       if (existingSession) {
-        throw new Error('Active session exists');
+        throw new Error('Active session exists, if you want to update, please use refresh-token');
       }
     }
 
@@ -237,5 +241,55 @@ export class AuthService {
     const refreshTokenPayload = await this.extractPayloadFromToken(refreshToken, false);
     const result = await this.authRepository.revokeAllActiveSession(refreshTokenPayload.userId, refreshTokenPayload.deviceId);
     return result
+  }
+
+  async sendPasswordRecoveryMessage (userEmail: string) {
+    // Ищем пользователя, существует ли он вообще
+    const userByEmail = await this.coreAppApiService.getUserByEmail(userEmail);
+    if (userByEmail) {
+      try {
+        const recoveryCode = uuidv4();
+      // Создаем для юзера код восстановления + срок по которому можем определить актуальность этого запроса
+      const userUpdate = await this.coreAppApiService.updateUser(userByEmail.id, {resetPasswordToken: recoveryCode, resetPasswordExpires: new Date(Date.now() + 300000)}); // 5 минут
+      // Отправляем письмо
+      return this.emailAdapterService.sendPasswordRecoveryMessage(userEmail, recoveryCode)
+      } catch (error) {
+        console.log("Что-то произошло при отправке письма для восстановления пароля", error)
+      }
+    }
+    else {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    
+  }
+
+  async resetPassword (recoveryCode: string, newPassword: string) {
+    // Ищем пользователя по коду восстановления
+    const userByResetPasswordToken = await this.coreAppApiService.getUserByResetPasswordToken(recoveryCode);
+    if (userByResetPasswordToken.resetPasswordExpires < new Date()) {
+      throw new HttpException('Recovery code expired', HttpStatus.BAD_REQUEST);
+    }
+    console.log(userByResetPasswordToken)
+    if (userByResetPasswordToken) {
+      const hashedPassword = await this._generateHash(newPassword);
+      const userUpdate = await this.coreAppApiService.updateUser(userByResetPasswordToken.id, {password: hashedPassword, resetPasswordToken: null, resetPasswordExpires: null});
+      return userUpdate
+    }
+    else {
+      throw new HttpException('User not found or recovery code invalid', HttpStatus.NOT_FOUND);
+    }
+  }
+  async changePassword (oldPassword: string, newPassword: string, username: string) {
+    const user = await this.coreAppApiService.getUserByUsername(username);
+    if (!user) {
+      throw new HttpException('User not found by username (token is invalid)', HttpStatus.NOT_FOUND);
+    }
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isPasswordValid) {
+      throw new HttpException('Old password is incorrect', HttpStatus.UNAUTHORIZED);
+    }
+    const hashedPassword = await this._generateHash(newPassword);
+    const userUpdate = await this.coreAppApiService.updateUser(user.id, {password: hashedPassword});
+    return userUpdate
   }
 }

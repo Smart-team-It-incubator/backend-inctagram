@@ -18,4 +18,5 @@ export class AuthForm {
     password: string;
 
     githubId?: string
+    isGithubRequest?: boolean = false
 }

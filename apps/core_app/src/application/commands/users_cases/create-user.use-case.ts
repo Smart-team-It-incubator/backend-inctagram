@@ -5,6 +5,7 @@ import { CreateUserDto } from "@app/shared-dto"
 import { AuthApiService } from "auth-api/auth-api";
 import { EmailAdapterService } from "@app/email-service";
 import { v4 as uuidv4 } from 'uuid';
+import { HttpException, HttpStatus } from "@nestjs/common";
 
 export class CreateUserCommand {
     constructor(
@@ -46,12 +47,23 @@ export class CreateUserUseCase {
             emailConfirmationCode: uuidv4(), // Генерация уникального UUID кода
             emailConfirmationCodeExpirationDate: new Date(Date.now() + 5 * 60 * 1000), // Установка даты истечения (5 минут от текущего времени)
         }
+
+        // Проверяем, занят ли username
+        if (await this.usersRepository.isFieldTaken('username', command.username)) {
+            throw new HttpException('User with this username is already registered', HttpStatus.CONFLICT);
+        }
+        // Проверяем, занят ли email
+        if (await this.usersRepository.isFieldTaken('email', command.email)) {
+            throw new HttpException('User with this email is already registered', HttpStatus.CONFLICT);
+        }
         const createdUserView = await this.usersRepository.createUser(user)
         if (createdUserView === null) {
             return null // Проверяем, если пользователь не создан, то отправлять email не нужно
         }
-        // Отправляем email, если включена отправка
-        await this.emailService.sendEmailConfirmationMessage(command.email, user.emailConfirmationCode)
+        // Запуск отправки Email в фоне, т.к возможно из-за VPN проблемы связи с email-server, для повторной отправки сделаем Email-Resending
+        this.emailService.sendEmailConfirmationMessage(command.email, user.emailConfirmationCode).catch((error) => {
+            console.error('Failed to send email:', error);
+        });
 
         return createdUserView
     }

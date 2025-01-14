@@ -72,6 +72,18 @@ export class UsersRepository {
       return userViewModel.getPrivateProfile(); // Возвращаем внутренний профиль пользователя, т.к это для нашего ресурса
     }
 
+    async getUserByResetPasswordToken(recoveryToken: string): Promise<Partial<UserViewModel> | null> {
+      const user = await this.prisma.user.findFirst({
+        where: { resetPasswordToken: recoveryToken },
+      });
+      if (!user) {
+        return null;
+      }
+
+      const userViewModel = new UserViewModel(user);
+      return userViewModel.getPrivateProfile(); // Возвращаем внутренний профиль пользователя, т.к это для нашего ресурса
+    }
+
     async getUserByEmail(email: string): Promise<Partial<UserViewModel> | null> {
       const user = await this.prisma.user.findUnique({
         where: { email: email },
@@ -100,11 +112,14 @@ export class UsersRepository {
       try {
         // Ищем пользователя по коду подтверждения
         const user = await this.prisma.user.findFirst({ where: { emailConfirmationCode: confirmationCode } });
-    
+        
         if (!user) {
           return null; // Если пользователь не найден, возвращаем null
         }
-    
+        // Проверяем, что код подтверждения не просрочен
+        if (user.emailConfirmationCodeExpirationDate < new Date()) {
+          return null; // Если код просрочен, возвращаем null
+        }
         // Обновляем статус пользователя на подтвержденный и удаляем код подтверждения
         const updatedUser = await this.prisma.user.update({
           where: { id: user.id },
@@ -142,12 +157,22 @@ async dropDb() {
     // Удаляем данные из каждой таблицы, но структура остаётся
     await this.prisma.$transaction([
       this.prisma.user.deleteMany({}),
+      this.prisma.post.deleteMany({}),
       // Добавьте другие таблицы, из которых нужно удалить данные
     ]);
     console.log('Данные успешно удалены из таблиц User');
   } catch (error) {
     console.error('Ошибка при удалении данных:', error);
   }
+}
+
+
+// Проверка поля на занятость перед регистрацией юзера
+async isFieldTaken(field: 'username' | 'email', value: string): Promise<boolean> {
+  const user = await this.prisma.user.findFirst({
+    where: { [field]: value },
+  });
+  return !!user;
 }
     
     

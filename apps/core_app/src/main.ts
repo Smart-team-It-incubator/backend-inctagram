@@ -1,9 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { CustomValidationPipe } from './domain/exceptions/Pipe/Custom_global_validation_pipe';
 import axios from 'axios';
-import cookieParser from 'cookie-parser';
 import { app_coreApp_settings } from './infrastructure/app_coreApp_settings';
 
 async function bootstrap() {
@@ -13,21 +11,39 @@ async function bootstrap() {
   try {
     // Подключение Swagger для документации
     const config = new DocumentBuilder()
-      .setTitle('Core_app API') // Укажи название API
-      .setDescription('В API представлены методы для таких модулей как: Users, Posts, Auth, Files') // Добавь описание
+      .setTitle('API Inctagram app') // Укажи название API
+      .setDescription('В API представлены методы для таких модулей как: Users, Posts, Auth, Files. К методам Auth и Github раздела ОБЯЗАТЕЛЬНО добавлять субдомен auth. (например https://auth.smart-reg.org.ru/api/v1/auth/github/)') // Добавь описание
       .setVersion('1.0') // Укажи версию
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT', // Опционально: Указывает, что используется JWT
+        },
+        'access-token', // Название схемы авторизации
+      )
       .build();
     const coreDoc = SwaggerModule.createDocument(app, config);
     // Получение документации для auth микросервиса
-    //const authDoc = await axios.get(`https://auth.smart-reg.org.ru/api/v1-json`); // Путь к Swagger документации для auth, в настоящем пути "-json" нет, но это необходимо указать для того чтобы склеить документацию.
-    const authDoc = await axios.get(`http://localhost:4000/api/v1-json`); // Путь к Swagger документации для auth, в настоящем пути "-json" нет, но это необходимо указать для того чтобы склеить документацию.
-    //console.log(authDoc.data)
+    const authDoc = await axios.get(`${process.env.AUTH_APP_URL}-json`); // Путь к Swagger документации для auth, в настоящем пути "-json" нет, но это необходимо указать для того чтобы склеить документацию.
     const combinedDoc = {
       ...coreDoc,
+      // Подтягивает пути документации
       paths: {
         ...coreDoc.paths,
         ...authDoc.data.paths
-      }
+      },
+      // Подтягивает схемы документации
+      components: {
+        schemas: {
+          ...coreDoc.components?.schemas,
+          ...authDoc.data.components?.schemas,
+        },
+        securitySchemes: {
+          ...coreDoc.components?.securitySchemes,
+          ...authDoc.data.components?.securitySchemes,
+        },
+      },
     };
     //console.log(...authDoc.data.paths)
     SwaggerModule.setup('api/v1/swagger', app, combinedDoc); // Укажи путь к документации
