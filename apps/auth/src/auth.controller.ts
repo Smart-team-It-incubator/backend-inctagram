@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, HttpStatus, HttpException, Res, HttpCode, Req, UnauthorizedException, Delete, Query, Param, Ip, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiBody, ApiCookieAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
+import { AuthForm } from '@app/shared-dto/dtos/auth/auth-form.dto';
 import { EmailAdapterService } from '@app/email-service';
 import { RecaptchaAdapter } from './utils/recaptcha_adapter';
 import { JwtAuthGuard } from '@app/guards';
@@ -104,7 +104,6 @@ export class AuthController {
 
   
   // Обновляем Access Token на основании Refresh token
-  @ApiTags('Auth') // Группировка методов по тегу 'Auth'
   @ApiOperation({
     summary: 'Update AccessToken using RefreshToken', 
     description: 'This endpoint updates the AccessToken by using the RefreshToken from the cookie and returns a new AccessToken along with a new RefreshToken in the cookie.'
@@ -265,6 +264,7 @@ export class AuthController {
       ]
     }
   })
+  @ApiResponse({ status: 401, description: 'Unauthorized, user not authenticated.' })
   async getActiveSessions(@Req() req): Promise<object> {
     try {
       const refreshToken = req.cookies?.refreshToken; // Получаем токен из Cookie
@@ -285,6 +285,7 @@ export class AuthController {
     description: 'Отзыв конкретной сессии пользователя по session ID'
   })
   @ApiResponse({ status: 200, description: 'Session revoked successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized, user not authenticated.' })
   @ApiBody({ schema: { example: { sessionId: 'session1' } } })
   async revokeSession(@Param('sessionId') sessionId: string): Promise<{ message: string }> {
     try {
@@ -307,6 +308,7 @@ export class AuthController {
     summary: 'Отзыв всех сессий за исключением текущей', 
   })
   @ApiResponse({ status: 200, description: 'All sessions revoked successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized, user not authenticated.' })
   async revokeAllSessions(@Req() req): Promise<{ message: string }> {
     try {
       const refreshToken = req.cookies?.refreshToken; // Получаем токен из Cookie
@@ -342,9 +344,10 @@ export class AuthController {
     return this.authService.dropDb();
   }
   @ApiOperation({ summary: 'Проверка модуля Auth на работоспособность' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'status: ok, app is available' }) 
   @Get('/health') 
   async heath() {
-    return {"status": "ok"}
+    return {"status": "ok, app is available"}
   }
   
   // Метод для ручной проверки отправки Email-Сообщений

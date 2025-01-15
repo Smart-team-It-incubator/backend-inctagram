@@ -1,7 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
+import { AuthForm } from '@app/shared-dto/dtos/auth/auth-form.dto';
 
 @Injectable()
 export class AuthApiService {

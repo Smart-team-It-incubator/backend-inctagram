@@ -3,7 +3,7 @@ import { CreateUserDto } from "@app/shared-dto";
 import { Injectable } from "@nestjs/common/decorators/core";
 import { User } from "@core_app/src/domain/entities/user-entities";
 import { PrismaCoreAppService } from "@core_app/prisma/prisma.service";
-import { UpdateUserDto } from "@app/shared-dto/dtos/update-user.dto";
+import { UpdateUserDto } from "@app/shared-dto/dtos/user/update-user.dto";
 
 
 
@@ -133,19 +133,20 @@ export class UsersRepository {
       }
     }
 
-    async updateUser(userId: string, fieldsToUpdate: object): Promise<any> {
+    async updateUser(userId: string, fieldsToUpdate: object): Promise<Partial<UserViewModel>> {
       try {
         const updatedUser = await this.prisma.user.update({
           where: { id: userId },
           data: fieldsToUpdate,
         });
-    
+        //console.log("updatedUser",updatedUser)
         if (!updatedUser) {
-          throw new Error('User update failed');
+          return null
         }
     
-        return { message: 'User was successfully updated', user: updatedUser };
+        return updatedUser ;
       } catch (error) {
+        console.log(error.message)
         throw new Error(`Failed to update user: ${error.message}`);
       }
     }

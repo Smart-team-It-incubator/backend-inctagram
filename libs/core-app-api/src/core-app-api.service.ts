@@ -1,7 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { UpdateUserDto } from '@app/shared-dto/dtos/update-user.dto';
+import { UpdateUserDto } from '@app/shared-dto/dtos/user/update-user.dto';
 import { CreateUserDto } from '@app/shared-dto';
 
 @Injectable()

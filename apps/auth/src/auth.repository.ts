@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { JwtPayload } from '@app/shared-dto/dtos/jwt-payload.dto';
+import { JwtPayload } from '@app/shared-dto/dtos/auth/jwt-payload.dto';
 import { randomUUID } from 'crypto';
 
 @Injectable()

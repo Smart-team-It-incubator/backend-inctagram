@@ -1,5 +1,5 @@
 import { CreateUserDto } from '@app/shared-dto';
-import { UpdateUserDto } from '@app/shared-dto/dtos/update-user.dto';
+import { UpdateUserDto } from '@app/shared-dto/dtos/user/update-user.dto';
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';

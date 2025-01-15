@@ -86,32 +86,16 @@ export class CreateUserDto {
   @IsDateString()
   dateOfBirthday?: Date;
 
-  @ApiPropertyOptional({
-    description: 'URL изображения профиля пользователя.',
-    example: 'https://example.com/profile-image.jpg',
-  })
   @IsString()
   @IsOptional()
   profileImageUrl?: string;
 
-  @ApiPropertyOptional({
-    description: 'Код подтверждения email.',
-    example: '123456',
-  })
   @IsOptional()
   emailConfirmationCode?: string;
 
-  @ApiPropertyOptional({
-    description: 'Дата истечения срока действия кода подтверждения email.',
-    example: '2025-01-01T00:00:00.000Z',
-  })
   @IsOptional()
   emailConfirmationCodeExpirationDate?: Date;
 
-  @ApiPropertyOptional({
-    description: 'ID пользователя в GitHub.',
-    example: '1234567890',
-  })
   @IsOptional()  // Не обязательно для GitHub авторизации
   githubId?: string;
 }
