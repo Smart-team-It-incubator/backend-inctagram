@@ -166,6 +166,7 @@ export class AuthController {
   @Post('/password/change')
   //@ApiResponse({ status: 200, description: 'Password changed successfully.' })
   //@ApiBody({ schema: { example: { currentPassword: 'oldPassword123', newPassword: 'newStrongPassword' } } })
+  //test
   @ApiExcludeEndpoint()
   async changePassword(
     @Body('currentPassword') currentPassword: string,
