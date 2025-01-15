@@ -48,7 +48,6 @@ export class UserViewModel implements IUserInterface {
         emailConfirmationCodeExpirationDate: this.user.emailConfirmationCodeExpirationDate,
         isEmailConfirmed: this.user.isEmailConfirmed,
         githubId: this.githubId
-
       };
     }
   }

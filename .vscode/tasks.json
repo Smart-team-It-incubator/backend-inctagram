@@ -1,0 +1,36 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Start Files Service (Dev Mode)",
+        "type": "shell",
+        "command": "yarn start:dev:files",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Start Auth Service (Test Mode)",
+        "type": "shell",
+        "command": "yarn start:test:auth",
+        "group": {
+          "kind": "build",
+          "isDefault": false
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Start Core App (Test Mode)",
+        "type": "shell",
+        "command": "yarn start:test:core_app",
+        "group": {
+          "kind": "build",
+          "isDefault": false
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+  

@@ -35,10 +35,18 @@ model User {
 }
 
 model Post {
-	id	Int	@id	@default(autoincrement())
-	text	String?
-	location	String?
-	createdAt	DateTime	@default(now())
-	user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-	userId String
+  id         Int       @id @default(autoincrement())
+  text       String?
+  location   String?
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  photos     Photo[]   // Связь с фотографиями
+}
+
+model Photo {
+  id       Int      @id @default(autoincrement())
+  url      String   // Ссылка на файл в S3
+  post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId   Int
 }
