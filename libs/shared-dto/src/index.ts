@@ -1,4 +1,4 @@
 export * from './shared-dto.module';
 export * from './shared-dto.service';
-export * from './dtos/create-user.dto';
+export * from './dtos/user/create-user.dto';
 

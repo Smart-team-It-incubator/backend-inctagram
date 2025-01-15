@@ -10,37 +10,42 @@ import { GetUserByGithubIdCommand } from '@core_app/src/application/commands/use
 import { DropDBCommand } from '@core_app/src/application/commands/users_cases/drop_user_db.use-case';
 import { ConfirmEmailCommand } from '@core_app/src/application/commands/users_cases/confirm-email.use-case';
 import { GetUserByEmailCommand } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
-import { UpdateUserDto } from '@app/shared-dto/dtos/update-user.dto';
+import { UpdateUserDto } from '@app/shared-dto/dtos/user/update-user.dto';
 import { UpdateUserCommand } from '@core_app/src/application/commands/users_cases/update-user.user-case';
 import { ResendConfirmationCodeDto } from '@app/shared-dto/dtos/email/resend-email.dto';
 import { ResendConfirmationCodeCommand } from '@core_app/src/application/commands/email_cases/email-confirmation-resend.use-case';
 import { GetUserByResetPasswordTokenCommand } from '@core_app/src/application/commands/users_cases/get-user-by-resetToken.use-case';
 import { JwtAuthGuard } from '@app/guards';
+import { PublicUserProfileDto } from '@app/shared-dto/dtos/user/public-profile-user.dto';
+import { mapToPublicUserProfileDto } from '../../utils/user-mapper';
 
 
 
 @ApiTags('Users API') // Группировка в Swagger
 @Controller('users')
 export class UserController {
-  constructor(private commandBus: CommandBus) {}
+  constructor(private commandBus: CommandBus) { }
 
 
   @ApiOperation({ summary: 'Get all users' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'User list successfully received' }) // Описание ответа
+  @ApiResponse({
+    description: "Тело ответа",
+    type: [PublicUserProfileDto],
+  })
   @Get()
-  async getUsers(): Promise<Partial<UserViewModel>[] | null> {
-    const users: Partial<UserViewModel>[] | null = await this.commandBus.execute(new GetUsersCommand()); 
-    if (!users) {
+  async getUsers(): Promise<PublicUserProfileDto[] | null> {
+    const users: Partial<UserViewModel>[] | null = await this.commandBus.execute(new GetUsersCommand());
+    if (!users || users.length === 0) {
       throw new HttpException('Users not found', HttpStatus.BAD_REQUEST);
-      
     }
-    else if (users) {
-      return users
-    }
+    // Обязательно мапим под нужный DTO, чтобы вернуть только необходимые поля + сгенерировать swagger
+    return users.map(mapToPublicUserProfileDto);
   }
 
   @ApiOperation({ summary: 'Create user / registration' }) // Описание эндпоинта
-  @ApiResponse({ status: 200, description: 'User was created' }) // Описание ответа
+  @ApiResponse({ status: 200, description: 'User was created', type: PublicUserProfileDto }) // Описание ответа
+  @ApiResponse({ status: 400, description: 'User not created' })
   @ApiBody({
     description: 'Данные для создания пользователя',
     type: CreateUserDto,
@@ -50,27 +55,35 @@ export class UserController {
     const createUser: Partial<UserViewModel> | null = await this.commandBus.execute(new CreateUserCommand(body.email, body.password, body.username, body.firstName, body.lastName, body.city, body.country, body.dateOfBirthday));
     if (!createUser) {
       throw new HttpException('User not created', HttpStatus.BAD_REQUEST);
-      
+
     }
     else if (createUser) {
-      return createUser
+      return mapToPublicUserProfileDto(createUser)
     }
-  } 
+  }
 
   // Метод для обновления пользователя
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update user' }) // Описание эндпоинта
-  @ApiResponse({ status: 200, description: 'User was successfully updated' }) // Описание ответа
+  // Описание ответов
+  @ApiResponse({ status: 200, description: 'User was successfully updated' })
+  @ApiResponse({ status: 400, description: 'User not updated' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBody({
     description: 'Данные для обновления пользователя',
     type: UpdateUserDto, // Это может быть другая DTO для обновления, которая может содержать только те поля, которые можно обновить.
   })
+  @UseGuards(JwtAuthGuard)
   @Put("update/:userId") // Используем PUT для обновления
-  async updateUser(@Param('userId') userId: string, @Body() updateUserDto: UpdateUserDto): Promise<string> {
-    console.log('мы попали в update User',updateUserDto)
-    const updateUser = await this.commandBus.execute(new UpdateUserCommand(userId, updateUserDto));
-    return updateUser
+  async updateUser(@Param('userId') userId: string, @Body() updateUserDto: UpdateUserDto): Promise<Partial<UserViewModel> | null> {
+    try {
+      const updateUser = await this.commandBus.execute(new UpdateUserCommand(userId, updateUserDto));
+      return mapToPublicUserProfileDto(updateUser)
+    } catch (error) {
+      console.log("ошибка при обновлении пользователя в контроллере", error.message);
+      throw new HttpException('User not updated, maybe user not found', HttpStatus.BAD_REQUEST);
+    }
+
   }
 
   // // Метод для удаления пользователя
@@ -87,7 +100,7 @@ export class UserController {
   // }
 
 
-  //TODO - сделать метод закрытым, это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
+  // Это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
   // Метод для получения пользователя по Username
   @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Get User by username' }) // Описание эндпоинта
@@ -98,13 +111,13 @@ export class UserController {
     const user = await this.commandBus.execute(new GetUserByUsernameCommand(username));
 
     if (!user || !user.username) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND); 
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-    
+
     return user
   }
 
-    //TODO - сделать метод закрытым, это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
+  // Это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
   // Метод для получения пользователя по Email
   @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Get User by email' }) // Описание эндпоинта
@@ -118,6 +131,7 @@ export class UserController {
     return user
   }
 
+  // Это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
   @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Get User by githubID' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'response with required user' }) // Описание ответа
@@ -131,6 +145,7 @@ export class UserController {
     return user
   }
 
+  // Это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
   @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Get User by resetPasswordToken' }) // Описание эндпоинта
   @ApiResponse({ status: 200, description: 'response with required user' }) // Описание ответа
@@ -145,80 +160,76 @@ export class UserController {
   }
 
   // Добавляем метод emailConfirmation
-@ApiOperation({ summary: 'Confirm user email' }) // Описание эндпоинта
-@ApiResponse({ status: 200, description: 'Email was successfully confirmed' }) // Описание ответа
-@ApiResponse({ status: 400, description: 'Invalid confirmation code or code expired (5 min)' }) // Описание ошибки
-@ApiBody({
-  description: 'Код подтверждения для верификации email',
-  schema: {
-    type: 'object',
-    properties: {
-      confirmationCode: { type: 'string' },
+  @ApiOperation({ summary: 'Confirm user email' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'Email was successfully confirmed' }) // Описание ответа
+  @ApiResponse({ status: 400, description: 'Invalid confirmation code or code expired (5 min)' }) // Описание ошибки
+  @ApiBody({
+    description: 'Код подтверждения для верификации email',
+    schema: {
+      type: 'object',
+      properties: {
+        confirmationCode: { type: 'string' },
+      },
+      required: ['confirmationCode'],
     },
-    required: ['confirmationCode'],
-  },
-})
-@Get('/emailConfirmation')
-async emailConfirmation(@Query('code') confirmationCode: string): Promise<{ message: string }> {
-  console.log('confirmationCode:', confirmationCode);
-  if (!confirmationCode) {
-    throw new HttpException('Confirmation code is required', HttpStatus.BAD_REQUEST);
-  }
-
-  const result = await this.commandBus.execute(new ConfirmEmailCommand(confirmationCode));
-
-  if (result) {
-    return { message: 'Email successfully confirmed' };
-  } else {
-    throw new HttpException('Invalid confirmation code or code expired', HttpStatus.BAD_REQUEST);
-  }
-}
-
-
-@ApiOperation({ summary: 'Resend confirmation code' }) // Описание эндпоинта
-@ApiResponse({
-  status: 200,
-  description: 'Confirmation code was successfully resent.',
-  schema: { example: { message: 'Confirmation code was successfully resent' } },
-})
-@ApiResponse({
-  status: 400,
-  description: 'User not found or User already activated.',
-  schema: { example: { statusCode: 400, message: 'User not found or User already activated', error: 'Bad Request' } },
-})
-@ApiBody({
-  description: 'Email of the user requesting the confirmation code.',
-  type: ResendConfirmationCodeDto,
-}) // Описание ожидаемого тела запроса
-@Post('/resendConfirmationCode')
-async resendConfirmationCode(@Body() resendConfirmationCodeDto: ResendConfirmationCodeDto): Promise<{ message: string }> {
-  const { email } = resendConfirmationCodeDto;
-  const result = await this.commandBus.execute(new ResendConfirmationCodeCommand(email));
-
-  if (result) {
-    return { message: 'Confirmation code was successfully resent' };
-  } else {
-    throw new HttpException('User not found or User already activated', HttpStatus.BAD_REQUEST);
-  }
-}
-
-
-
-    // For Dev
-    @ApiExcludeEndpoint()
-    @Delete('/drop-db')
-    async dropDb() {
-      return this.commandBus.execute(new DropDBCommand())
-    }
-    @ApiOperation({ summary: 'Проверка модуля Users на работоспособность' }) // Описание эндпоинта
-    @Get('/health') 
-    async heath() {
-      return {"status": "ok"}
+  })
+  @Get('/emailConfirmation')
+  async emailConfirmation(@Query('code') confirmationCode: string): Promise<{ message: string }> {
+    console.log('confirmationCode:', confirmationCode);
+    if (!confirmationCode) {
+      throw new HttpException('Confirmation code is required', HttpStatus.BAD_REQUEST);
     }
 
-  
+    const result = await this.commandBus.execute(new ConfirmEmailCommand(confirmationCode));
+
+    if (result) {
+      return { message: 'Email successfully confirmed' };
+    } else {
+      throw new HttpException('Invalid confirmation code or code expired', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+
+  @ApiOperation({ summary: 'Resend confirmation code' }) // Описание эндпоинта
+  @ApiResponse({
+    status: 200,
+    description: 'Confirmation code was successfully resent.',
+    schema: { example: { message: 'Confirmation code was successfully resent' } },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'User not found or User already activated.',
+    schema: { example: { statusCode: 400, message: 'User not found or User already activated', error: 'Bad Request' } },
+  })
+  @ApiBody({
+    description: 'Email of the user requesting the confirmation code.',
+    type: ResendConfirmationCodeDto,
+  }) // Описание ожидаемого тела запроса
+  @Post('/resendConfirmationCode')
+  async resendConfirmationCode(@Body() resendConfirmationCodeDto: ResendConfirmationCodeDto): Promise<{ message: string }> {
+    const { email } = resendConfirmationCodeDto;
+    const result = await this.commandBus.execute(new ResendConfirmationCodeCommand(email));
+
+    if (result) {
+      return { message: 'Confirmation code was successfully resent' };
+    } else {
+      throw new HttpException('User not found or User already activated', HttpStatus.BAD_REQUEST);
+    }
+  }
 
 
 
+  // For Dev
+  @ApiExcludeEndpoint()
+  @Delete('/drop-db')
+  async dropDb() {
+    return this.commandBus.execute(new DropDBCommand())
+  }
+  @ApiOperation({ summary: 'Проверка модуля Users на работоспособность' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'status: ok, app is available' }) 
+  @Get('/health')
+  async heath() {
+    return { "status": "ok, app is available" }
+  }
 
 }

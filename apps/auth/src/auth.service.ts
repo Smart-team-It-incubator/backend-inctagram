@@ -3,10 +3,10 @@ import { AuthRepository } from './auth.repository';
 import { JwtService } from '@nestjs/jwt';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs'; // Импортируем firstValueFrom из RxJS
-import { AuthForm } from '@app/shared-dto/dtos/auth-form.dto';
+import { AuthForm } from '@app/shared-dto/dtos/auth/auth-form.dto';
 import { CustomConfigService } from '../../../libs/shared-dto/src/config-service';
 import { CoreAppApiService } from '@core-app-api/core-app-api';
-import { JwtPayload } from '@app/shared-dto/dtos/jwt-payload.dto';
+import { JwtPayload } from '@app/shared-dto/dtos/auth/jwt-payload.dto';
 import { randomUUID } from 'crypto';
 import * as bcrypt from 'bcryptjs';
 import { EmailAdapterService } from '@app/email-service';

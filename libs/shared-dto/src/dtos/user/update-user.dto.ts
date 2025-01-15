@@ -5,7 +5,6 @@ import { IsOptional, IsString, IsEmail, IsBoolean, IsDateString, Matches, MaxLen
 const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]).{6,}$/;
 
 export class UpdateUserDto {
-  @ApiProperty({ description: 'GitHub Provider ID', required: false, type: String })
   @IsOptional()
   @IsString()
   githubId?: string;
@@ -30,7 +29,6 @@ export class UpdateUserDto {
   @IsString()
   resetPasswordToken?: string;
 
-  @ApiProperty({ description: 'Password reset token expiry date', required: false, type: String, format: 'date-time' })
   @IsOptional()
   @IsDateString()
   resetPasswordExpires?: Date;

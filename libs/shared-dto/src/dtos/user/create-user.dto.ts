@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEmail, Matches, IsString, MinLength, MaxLength, IsOptional, IsDateString, ValidateIf } from "class-validator";
 
 const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]).{6,}$/;
@@ -9,6 +9,10 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
+  @ApiProperty({
+    description: 'Пароль пользователя. Должен содержать хотя бы одну заглавную букву, одну строчную букву, одну цифру и один специальный символ.',
+    example: 'P@ssw0rd!',
+  })
   @ValidateIf((o) => !o.githubId)  // Валидация пароля только если githubId отсутствует
   @Matches(passwordRegExp, {
     message:
@@ -19,6 +23,10 @@ export class CreateUserDto {
   @MaxLength(20, { message: 'Password must be at most 20 characters long' })
   password?: string;
 
+  @ApiProperty({
+    description: 'Имя пользователя. Может содержать только буквы, цифры, подчеркивания (_) и дефисы (-).',
+    example: 'user_name123',
+  })
   @ValidateIf((o) => !o.githubId)  // Валидация username только если githubId отсутствует
   @Matches(usernameRegExp, {
     message:
@@ -29,32 +37,54 @@ export class CreateUserDto {
   @MaxLength(30, { message: 'Username must be at most 30 characters long' })
   username?: string;
 
+  @ApiPropertyOptional({
+    description: 'Имя пользователя.',
+    example: 'John',
+  })
   @ValidateIf((o) => !o.githubId)  // Валидация FirstName только если githubId отсутствует
+  @IsOptional()
   @IsString()
   @MinLength(3, { message: 'FirstName must be at least 3 characters long' })
   @MaxLength(30, { message: 'FirstName must be at most 30 characters long' })
   firstName?: string;
 
+  @ApiPropertyOptional({
+    description: 'Фамилия пользователя.',
+    example: 'Doe',
+  })
   @ValidateIf((o) => !o.githubId)  // Валидация LastName только если githubId отсутствует
+  @IsOptional()
   @IsString()
   @MinLength(3, { message: 'LastName must be at least 3 characters long' })
   @MaxLength(30, { message: 'LastName must be at most 30 characters long' })
   lastName?: string;
-  
+
+  @ApiPropertyOptional({
+    description: 'Страна пользователя.',
+    example: 'USA',
+  })
   @ValidateIf((o) => !o.githubId)  // Валидация country только если githubId отсутствует
-  @ApiProperty({ description: 'Страна пользователя', example: 'USA' })
+  @IsOptional()
   @IsString()
   country?: string;
 
+  @ApiPropertyOptional({
+    description: 'Город пользователя.',
+    example: 'New York',
+  })
   @ValidateIf((o) => !o.githubId)  // Валидация city только если githubId отсутствует
-  @ApiProperty({ description: 'Город пользователя', example: 'New York' })
+  @IsOptional()
   @IsString()
   city?: string;
 
+  @ApiPropertyOptional({
+    description: 'Дата рождения пользователя в формате ISO.',
+    example: '2000-01-01',
+  })
   @ValidateIf((o) => !o.githubId)  // Валидация dateOfBirthday только если githubId отсутствует
-  @ApiProperty({ description: 'Дата рождения пользователя', example: '2000-01-01' })
+  @IsOptional()
   @IsDateString()
-  dateOfBirthday?: Date; // ISO string, e.g., '2000-01-01'
+  dateOfBirthday?: Date;
 
   @IsString()
   @IsOptional()

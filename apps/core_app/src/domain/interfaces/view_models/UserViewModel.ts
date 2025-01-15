@@ -1,6 +1,8 @@
 import { IUserInterface } from "@core_app/src/application/services/user/user-interface";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class UserViewModel implements IUserInterface {
+    @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
     id: string;
     email: string;
     password: string;
@@ -48,7 +50,6 @@ export class UserViewModel implements IUserInterface {
         emailConfirmationCodeExpirationDate: this.user.emailConfirmationCodeExpirationDate,
         isEmailConfirmed: this.user.isEmailConfirmed,
         githubId: this.githubId
-
       };
     }
   }
