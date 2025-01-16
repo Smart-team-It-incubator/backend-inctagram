@@ -5,7 +5,10 @@ import { PostsRepository } from '@core_app/src/infrastructure/modules/posts/post
 import { PostViewModel, IPostInterface } from '../../services/post/post-interface';
 
 export class CreatePostCommand {
-  constructor(public readonly postDto: CreatePostDto) {}
+  constructor(
+    public readonly postDto: CreatePostDto,
+    public readonly userId: string
+  ) {}
 }
 
 @Injectable()
@@ -18,7 +21,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
 
     try {
       // Вызов метода создания поста в репозитории
-      const createdPost = await this.postsRepository.createPost(postDto);
+      const createdPost = await this.postsRepository.createPost(postDto, command.userId);
 
       if (!createdPost) {
         throw new HttpException('Failed to create post', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -31,6 +34,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         location: createdPost.location!,
         createdAt: new Date(createdPost.createdAt), // Преобразуем строку в Date
         userId: createdPost.userId!,
+        photos: createdPost.photos!,
       };
 
       // Возвращаем ViewModel поста

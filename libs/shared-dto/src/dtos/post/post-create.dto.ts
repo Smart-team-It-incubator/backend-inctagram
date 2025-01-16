@@ -17,10 +17,10 @@ export class CreatePostDto {
   @IsOptional()
   location?: string;
 
-  @ApiProperty({
-    description: 'ID of the user creating the post',
-    example: '123e4567-e89b-12d3-a456-426614174000', // Пример UUID
-  })
-  @IsString()
-  userId: string;
+  // @ApiProperty({
+  //   description: 'ID of the user creating the post',
+  //   example: '123e4567-e89b-12d3-a456-426614174000', // Пример UUID
+  // })
+  // @IsString()
+  // userId: string;
 }
