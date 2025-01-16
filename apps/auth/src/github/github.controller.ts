@@ -3,7 +3,7 @@ import { UpdateUserDto } from '@app/shared-dto/dtos/user/update-user.dto';
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthApiService } from "auth-api/auth-api";
 import { generateUsernameFromEmail, getUniqueUsername } from './github_utils';
 
@@ -26,7 +26,7 @@ export class GithubAuthController {
   }
 
 
-
+  @ApiExcludeEndpoint()
   @Get('callback')
   @UseGuards(AuthGuard('github'))
   @ApiOperation({ summary: 'Github callback' })
