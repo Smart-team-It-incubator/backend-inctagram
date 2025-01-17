@@ -33,7 +33,7 @@ export class PostsRepository {
 
   async createPost(createPostDto: CreatePostDto, userId: string): Promise<Partial<PostViewModel>> {
     try {
-      const { text, location } = createPostDto;
+      const { text, location, photos} = createPostDto;
 
       // Создание нового поста в базе данных
       const createdPost = await this.prisma.post.create({
@@ -42,13 +42,9 @@ export class PostsRepository {
           location,
           userId,
           photos: {
-            // Создание нескольких фотографий для поста
-            create: [
-              { url: "https://s3.bucket/photo1.jpg", photoDescription: "Photo 1" },
-              { url: "https://s3.bucket/photo2.jpg" },
-              { url: "https://s3.bucket/photo3.jpg" },
-            ],
-          },
+            // Создание нескольких фотографий для поста из данных из createPostDto.photos
+            create: photos.map(photo => ({ url: photo.photoUrl, photoDescription: photo.description })),
+        },
         },
         include: {
           photos: true, // Включаем фотографии в результат
@@ -60,8 +56,8 @@ export class PostsRepository {
     } catch (error) {
       console.log("Ошибка в репозитории при создании поста:", error.message);
     }
-
   }
+
   async updatePost(updatePostDto: UpdatePostDto, userId: string, postId: string): Promise<Partial<PostViewModel>> {
     try {
       const updatedPost = await this.prisma.post.update({

@@ -1,5 +1,7 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional, MaxLength, IsArray, ValidateNested } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { PhotoDto } from './photo.dto';
 
 export class CreatePostDto {
   @ApiProperty({
@@ -17,6 +19,12 @@ export class CreatePostDto {
   @IsOptional()
   location?: string;
 
+  @ApiProperty({ description: 'Array of photos with descriptions', type: [PhotoDto] })
+  //@IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PhotoDto)
+  photos: PhotoDto[];
+
   // @ApiProperty({
   //   description: 'ID of the user creating the post',
   //   example: '123e4567-e89b-12d3-a456-426614174000', // Пример UUID
@@ -24,3 +32,4 @@ export class CreatePostDto {
   // @IsString()
   // userId: string;
 }
+
