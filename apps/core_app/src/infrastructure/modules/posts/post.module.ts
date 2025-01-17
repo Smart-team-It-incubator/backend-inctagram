@@ -7,12 +7,16 @@ import { PostsRepository } from './post.repository';
 import { GetPostsUseCase } from '@core_app/src/application/commands/posts_cases/get-posts.use-case';
 import { CreatePostUseCase } from '@core_app/src/application/commands/posts_cases/create-post.use-case';
 import { FilesClientService } from '../../config/files-client-proxy';
+import { JwtService } from '@nestjs/jwt';
+import { CoreAppApiService } from '@core-app-api/core-app-api';
+import { UpdatePostUseCase } from '@core_app/src/application/commands/posts_cases/update-post.use-case';
+import { DeletePostUseCase } from '@core_app/src/application/commands/posts_cases/delete-post.use-case';
 
 
-const useCasesPosts = [GetPostsUseCase, CreatePostUseCase]
+const useCasesPosts = [GetPostsUseCase, CreatePostUseCase, UpdatePostUseCase, DeletePostUseCase]
 @Module({
   imports: [CqrsModule,HttpModule,],
-  providers: [PrismaCoreAppService, PostsRepository, ...useCasesPosts, FilesClientService],
+  providers: [PrismaCoreAppService, PostsRepository, ...useCasesPosts, FilesClientService, JwtService, CoreAppApiService],
   controllers: [PostController],
   exports: []
 })

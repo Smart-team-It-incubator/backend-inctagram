@@ -224,6 +224,7 @@ export class AuthController {
       },
     },
   })
+  @ApiOperation({ summary: 'Reset password for authenticated user', description: 'Сброс пароля для авторизованного пользователя' })
   async changePassword(
     @Body('currentPassword') currentPassword: string,
     @Body('newPassword') newPassword: string,

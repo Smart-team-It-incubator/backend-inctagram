@@ -1,8 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
-import { ApiBody, ApiOperation, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiExcludeController, ApiOperation, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Files API') // Группировка в Swagger
+@ApiExcludeController()
 @Controller('files')
 export class FilesGatewayController {
   private client: ClientProxy;
@@ -16,9 +16,7 @@ export class FilesGatewayController {
        }, // Параметры микросервиса Files
     });
   }
-
-  @ApiOperation({ summary: 'Get files' }) // Описание эндпоинта
-  @ApiResponse({ status: 200, description: 'Files received' }) // Описание ответа
+  
   @Get()
   async getFiles() {
     return this.client.send({ cmd: 'get_files' }, { userId: 1 })
