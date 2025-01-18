@@ -1,13 +1,16 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators/core';
 import * as nodemailer from 'nodemailer';
+import { TelegramService } from './telegram-service';
 
 @Injectable()
 export class EmailAdapterService {
 	private transporter;
 	private isEmailEnabled = process.env.ENABLE_EMAIL_SENDING === 'true';
 
-	constructor() {
+	constructor(
+		private readonly telegramService: TelegramService
+	) {
 		this.transporter = nodemailer.createTransport({
 			host: 'mail.hosting.reg.ru', // Хост вашего почтового сервиса
 			port: 587, // Порт (обычно 587 для TLS)
@@ -36,6 +39,10 @@ export class EmailAdapterService {
 				html,
 			};
 
+			// Дублирование сообщения в Telegram
+			const telegramMessage = `📧 Email отправлен:\nTo: ${to}\nSubject: ${subject}\nBody: ${text}`;
+			await this.telegramService.sendMessage('490130518', telegramMessage);
+
 			return this.transporter.sendMail(mailOptions);
 		} catch (error) {
 			throw new HttpException(`Ошибка отправки письма: ${error.message}`, HttpStatus.BAD_REQUEST);
@@ -60,7 +67,9 @@ export class EmailAdapterService {
 <p>
   <a href="https://${domainRoot}/users/unsubscribe">Unsubscribe</a>
 </p>`;
-
+		// Дублирование сообщения в Telegram
+		const telegramMessage = `📧 Email отправлен:\nTo: ${userEmail}\nBody: ${htmlMessage}`;
+		await this.telegramService.sendMessage('490130518', telegramMessage);
 		await this.sendEmail(userEmail, subject, textMessage, htmlMessage);
 	}
 
@@ -79,6 +88,9 @@ export class EmailAdapterService {
   <a href="https://${domainRoot}/auth/password-reset/confirm?recoveryCode=${recoveryCode}">Recover password</a>
 </p>`;
 
+		// Дублирование сообщения в Telegram
+		const telegramMessage = `📧 Email отправлен:\nTo: ${userEmail}\nBody: ${htmlMessage}`;
+		await this.telegramService.sendMessage('490130518', telegramMessage);
 		await this.sendEmail(userEmail, subject, textMessage, htmlMessage);
 	}
 }
