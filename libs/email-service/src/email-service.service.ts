@@ -68,8 +68,8 @@ export class EmailAdapterService {
   <a href="https://${domainRoot}/users/unsubscribe">Unsubscribe</a>
 </p>`;
 		// Дублирование сообщения в Telegram
-		const telegramMessage = `📧 Email отправлен:\nTo: ${userEmail}\nBody: ${htmlMessage}`;
-		await this.telegramService.sendMessage('490130518', telegramMessage);
+		// const telegramMessage = `📧 Email отправлен:\nTo: ${userEmail}\nBody: ${htmlMessage}`;
+		// await this.telegramService.sendMessage('490130518', telegramMessage);
 		await this.sendEmail(userEmail, subject, textMessage, htmlMessage);
 	}
 
@@ -89,8 +89,8 @@ export class EmailAdapterService {
 </p>`;
 
 		// Дублирование сообщения в Telegram
-		const telegramMessage = `📧 Email отправлен:\nTo: ${userEmail}\nBody: ${htmlMessage}`;
-		await this.telegramService.sendMessage('490130518', telegramMessage);
+		// const telegramMessage = `📧 Email отправлен:\nTo: ${userEmail}\nBody: ${htmlMessage}`;
+		// await this.telegramService.sendMessage('490130518', telegramMessage);
 		await this.sendEmail(userEmail, subject, textMessage, htmlMessage);
 	}
 }
