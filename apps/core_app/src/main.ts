@@ -22,6 +22,8 @@ async function bootstrap() {
         },
         'access-token', // Название схемы авторизации
       )
+      .addServer('https://smart-reg.org.ru', 'Main server') // Добавление основного сервера
+      .addServer('https://auth.smart-reg.org.ru', 'Auth server') // Добавление сервера auth
       .build();
     const coreDoc = SwaggerModule.createDocument(app, config);
     // Получение документации для auth микросервиса
@@ -46,7 +48,13 @@ async function bootstrap() {
       },
     };
     //console.log(...authDoc.data.paths)
-    SwaggerModule.setup('api/v1/swagger', app, combinedDoc); // Укажи путь к документации
+    SwaggerModule.setup('api/v1/swagger', app, combinedDoc, 
+      {
+        swaggerOptions:{
+          servers: [{ url: 'https://smart-reg.org.ru/api/v1' }, { url: 'https://auth.smart-reg.org.ru/api/v1' },]
+        }
+      }
+    ); // Укажи путь к документации
   } catch (error) {
     console.log(error)
     console.log("Документация не поднялась т.к сервер auth не запущен");
