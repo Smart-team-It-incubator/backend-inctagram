@@ -107,3 +107,8 @@ spec:
                  secretKeyRef:
                    name: smart-team-backend-auth-production-config-secret
                    key: JWT_ACCESS_SECRET
+              - name: BOT_TOKEN
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-auth-production-config-secret
+                   key: BOT_TOKEN    

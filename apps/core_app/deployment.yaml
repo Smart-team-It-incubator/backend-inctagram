@@ -92,3 +92,8 @@ spec:
                  secretKeyRef:
                    name: smart-team-backend-coreapp-production-config-secret
                    key: AUTH_APP_URL
+              - name: BOT_TOKEN
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-coreapp-production-config-secret
+                   key: BOT_TOKEN     
