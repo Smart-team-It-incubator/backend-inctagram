@@ -7,11 +7,16 @@ export class JwtAuthGuard implements CanActivate {
     constructor(
         protected jwtServiceClass: JwtService,
         protected coreAppServiceApi: CoreAppApiService
-    ) {}
+    ) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         try {
             const req = context.switchToHttp().getRequest();
+
+            // Проверяем, является ли запрос внутренним
+            if (req.headers['x-internal-request'] === 'true') {
+                return true; // Пропускаем запрос
+            }
 
             // Проверяем наличие и формат заголовка Authorization
             const authHeader = req.headers.authorization;

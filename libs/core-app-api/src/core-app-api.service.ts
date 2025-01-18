@@ -7,7 +7,7 @@ import { CreateUserDto } from '@app/shared-dto';
 @Injectable()
 export class CoreAppApiService {
     private readonly coreAppUrl: string;
-
+    private readonly responseInside: boolean = true;
     constructor(private readonly httpService: HttpService) {
         // Здесь мы предполагаем, что URL Core_app задается через переменную окружения
         this.coreAppUrl = process.env.CORE_APP_URL || 'http://127.0.0.1:3000';
@@ -53,10 +53,15 @@ export class CoreAppApiService {
 
         async updateUser(userId: string, UpdateUserDto: UpdateUserDto): Promise<any> {
             try {
-                console.log("Мы попали в библиотеку, метод UpdateUser", userId, UpdateUserDto);
+                console.log("Мы попали в библиотеку, метод UpdateUser", userId, UpdateUserDto, );
                 const response = await firstValueFrom(
                     this.httpService.put(`${this.coreAppUrl}/users/update/${userId}`,
-                        UpdateUserDto // Передаем данные в тело запроса
+                        UpdateUserDto, // Передаем данные в тело запроса
+                        {
+                            headers: {
+                                'X-Internal-Request': 'true',
+                            },
+                        }
                     ),
                 );
                 return response.data;

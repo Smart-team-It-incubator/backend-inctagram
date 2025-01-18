@@ -18,6 +18,7 @@ import { GetUserByResetPasswordTokenCommand } from '@core_app/src/application/co
 import { JwtAuthGuard } from '@app/guards';
 import { PublicUserProfileDto } from '@app/shared-dto/dtos/user/public-profile-user.dto';
 import { mapToPublicUserProfileDto } from '../../utils/user-mapper';
+import { DeleteUserCommand } from '@core_app/src/application/commands/users_cases/delete-user.user-case';
 
 
 
@@ -86,18 +87,24 @@ export class UserController {
 
   }
 
-  // // Метод для удаления пользователя
-  // @ApiOperation({ summary: 'Delete user' }) // Описание эндпоинта
-  // @ApiResponse({ status: 200, description: 'User was successfully deleted' }) // Описание ответа
-  // @ApiBody({
-  //   description: 'Данные для удаления пользователя',
-  //   type: CreateUserDto, // Можно использовать другой DTO, который содержит только идентификатор пользователя для удаления.
-  // })
-  // @Delete("/:userId") // Используем DELETE для удаления
-  // async deleteUser(@Param('userId') userId: string): Promise<string> {
-  //   // Пока логика удаления не реализована, возвращаем описание того, что будет реализовано.
-  //   return `Метод deleteUser для пользователя с ID ${userId} еще не реализован, ожидается ТЗ`;
-  // }
+  // Метод для удаления пользователя
+  @ApiExcludeEndpoint()
+  @ApiOperation({ summary: 'Delete user' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'User was successfully deleted' }) // Описание ответа
+  @ApiBody({
+    description: 'Данные для удаления пользователя',
+    type: CreateUserDto, // Можно использовать другой DTO, который содержит только идентификатор пользователя для удаления.
+  })
+  @Delete("/:userId") // Используем DELETE для удаления
+  async deleteUser(@Param('userId') userId: string): Promise<string> {
+    try {
+      const deletedUser = await this.commandBus.execute(new DeleteUserCommand(userId));
+      return deletedUser
+    } catch (error) {
+      console.log("ошибка при удалении пользователя в контроллере", error.message);
+      throw new HttpException('User not deleted, maybe user not found', HttpStatus.BAD_REQUEST);
+    }
+  }
 
 
   // Это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
@@ -151,7 +158,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'response with required user' }) // Описание ответа
   @Get("/getByResetPasswordToken/:resetPasswordToken")
   async findUserByResetPasswordToken(@Param('resetPasswordToken') resetPasswordToken: string): Promise<string> {
-    console.log("попадание в resetPasswordToken Get User")
+    console.log("попадание в resetPasswordToken Get User, resetPasswordToken:", resetPasswordToken)
     const user = await this.commandBus.execute(new GetUserByResetPasswordTokenCommand(resetPasswordToken));
     if (!user) {
       throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
