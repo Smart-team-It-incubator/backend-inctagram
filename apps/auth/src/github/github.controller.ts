@@ -68,18 +68,7 @@ export class GithubAuthController {
 
       // Редирект на нужную страницу
       //return res.redirect('http://localhost:3000/'); // Редирект на страницу после отправки токенов
-      return res
-      .cookie('accessToken', loginResult.accessToken, {
-        httpOnly: process.env.HTTP_ONLY === 'true', // Преобразуем строку в boolean
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000, // 1 день
-      })
-      .cookie('refreshToken', loginResult.refreshToken, {
-        httpOnly: process.env.HTTP_ONLY === 'true', // Преобразуем строку в boolean
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000, // 1 день
-      })
-      .redirect('http://smart-reg.org.ru/'); // Редирект на страницу после отправки токенов
+      return res.redirect('http://smart-reg.org.ru/'); // Редирект на страницу после отправки токенов
     }
 
     // 4. Если пользователь есть, но GitHub не привязан, привязываем
@@ -101,18 +90,7 @@ export class GithubAuthController {
 
       // Редирект на нужную страницу
       //return res.redirect('http://localhost:3000/'); // Редирект на страницу после отправки токенов
-      return res
-      .cookie('accessToken', loginResult.accessToken, {
-        httpOnly: process.env.HTTP_ONLY === 'true', // Преобразуем строку в boolean
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000, // 1 день
-      })
-      .cookie('refreshToken', loginResult.refreshToken, {
-        httpOnly: process.env.HTTP_ONLY === 'true', // Преобразуем строку в boolean
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000, // 1 день
-      })
-      .redirect('http://smart-reg.org.ru/'); // Редирект на страницу после отправки токенов
+      return res.redirect('http://smart-reg.org.ru/'); // Редирект на страницу после отправки токенов
     }
 
     // 5. Если пользователь не найден, регистрируем нового
@@ -151,18 +129,7 @@ export class GithubAuthController {
       // Редирект на нужную страницу после регистрации
       //return res.redirect('http://localhost:3000/'); // Редирект на страницу после отправки токенов
 
-      return res
-      .cookie('accessToken', loginResult.accessToken, {
-        httpOnly: process.env.HTTP_ONLY === 'true', // Преобразуем строку в boolean
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000, // 1 день
-      })
-      .cookie('refreshToken', loginResult.refreshToken, {
-        httpOnly: process.env.HTTP_ONLY === 'true', // Преобразуем строку в boolean
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000, // 1 день
-      })
-      .redirect('http://smart-reg.org.ru/'); // Редирект на страницу после отправки токенов
+      return res.redirect('http://smart-reg.org.ru/'); // Редирект на страницу после отправки токенов
     }
 
     // На случай, если все варианты не сработают
