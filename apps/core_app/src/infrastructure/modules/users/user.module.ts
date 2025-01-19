@@ -17,10 +17,11 @@ import { ResendConfirmationCodeUseCase } from '@core_app/src/application/command
 import { GetUserByResetPasswordTokenUseCase } from '@core_app/src/application/commands/users_cases/get-user-by-resetToken.use-case';
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { JwtService } from '@nestjs/jwt';
+import { DeleteUserUseCase } from '@core_app/src/application/commands/users_cases/delete-user.user-case';
 
 
 const useCasesUsers = [GetUserByResetPasswordTokenUseCase,
-  GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase, GetUserByGithubIdUseCase, UpdateUserUseCase, ResendConfirmationCodeUseCase]
+  GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, DeleteUserUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase, GetUserByGithubIdUseCase, UpdateUserUseCase, ResendConfirmationCodeUseCase]
 @Module({
   imports: [CqrsModule,HttpModule,],
   providers: [ PrismaCoreAppService, UsersRepository, ...useCasesUsers, AuthApiService, JwtService, CoreAppApiService],

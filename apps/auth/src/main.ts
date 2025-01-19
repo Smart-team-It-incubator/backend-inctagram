@@ -13,10 +13,17 @@ async function bootstrap() {
     .setDescription('The Auth service API documentation')
     .setVersion('1.0')
     .addTag('auth')
+    .addServer('https://auth.smart-reg.org.ru', 'Auth server') // Добавление сервера auth
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/v1', app, document); // Swagger будет доступен по /api
+  SwaggerModule.setup('api/v1', app, document,
+    {
+      swaggerOptions:{
+        servers: [{ url: 'https://auth.smart-reg.org.ru/api/v1' }]
+      }
+    }
+  ); // Swagger будет доступен по /api
 
   await app.listen(process.env.PORT ?? 4000);
   console.log(`Приложение Auth запущено, ${process.env.PORT} ?? 4000`)

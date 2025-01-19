@@ -16,6 +16,7 @@ import { GithubAuthController } from './github/github.controller';
 import { GithubStrategy } from './github/github.adapter';
 import { PassportModule } from '@nestjs/passport';
 import { AuthApiService } from 'auth-api/auth-api';
+import { TelegramService } from '@app/email-service/telegram-service';
 
 
 //console.log('DATABASE_URL из process.env:', process.env.DATABASE_URL_DEV);
@@ -25,7 +26,7 @@ import { AuthApiService } from 'auth-api/auth-api';
     envFilePath: process.env.ENV_FILE, // Загружаем файл из переменной окружения, если нужно
   }), PrismaModule, HttpModule, PassportModule],
   controllers: [AuthController, GithubAuthController],
-  providers: [PrismaService, AuthService, AuthRepository, JwtService, CustomConfigService, CoreAppApiService, AuthApiService, EmailAdapterService, RecaptchaAdapter, GithubStrategy],
+  providers: [PrismaService, AuthService, AuthRepository, JwtService, CustomConfigService, CoreAppApiService, AuthApiService, EmailAdapterService, RecaptchaAdapter, GithubStrategy, TelegramService],
   exports: [CustomConfigService, RecaptchaAdapter]
 })
 export class AuthModule {}

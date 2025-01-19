@@ -150,6 +150,23 @@ export class UsersRepository {
         throw new Error(`Failed to update user: ${error.message}`);
       }
     }
+
+    async deleteUser(userId: string): Promise<Partial<UserViewModel>> {
+      try {
+        const deletedUser = await this.prisma.user.delete({
+          where: { id: userId },
+        });
+        //console.log("updatedUser",updatedUser)
+        if (!deletedUser) {
+          return null
+        }
+    
+        return deletedUser ;
+      } catch (error) {
+        console.log(error.message)
+        throw new Error(`Failed to delete user: ${error.message}`);
+      }
+    }
     
     
     
