@@ -67,8 +67,8 @@ export class GithubAuthController {
       });
 
       // Редирект на нужную страницу
-      return res.redirect('http://localhost:3000/'); // Редирект на страницу после отправки токенов
-      //return res.redirect('http://smart-reg.org.ru/'); // Редирект на страницу после отправки токенов
+      //return res.redirect('http://localhost:3000/'); // Редирект на страницу после отправки токенов
+      return res.redirect('http://smart-reg.org.ru/'); // Редирект на страницу после отправки токенов
     }
 
     // 4. Если пользователь есть, но GitHub не привязан, привязываем
@@ -89,8 +89,8 @@ export class GithubAuthController {
       });
 
       // Редирект на нужную страницу
-      return res.redirect('http://localhost:3000/'); // Редирект на страницу после отправки токенов
-      //return res.redirect('http://smart-reg.org.ru/'); // Редирект на страницу после отправки токенов
+      //return res.redirect('http://localhost:3000/'); // Редирект на страницу после отправки токенов
+      return res.redirect('http://smart-reg.org.ru/'); // Редирект на страницу после отправки токенов
     }
 
     // 5. Если пользователь не найден, регистрируем нового
@@ -127,8 +127,8 @@ export class GithubAuthController {
       });
 
       // Редирект на нужную страницу после регистрации
-      return res.redirect('http://localhost:3000/'); // Редирект на страницу после отправки токенов
-      //return res.redirect('http://smart-reg.org.ru/'); // Редирект на страницу после отправки токенов
+      //return res.redirect('http://localhost:3000/'); // Редирект на страницу после отправки токенов
+      return res.redirect('http://smart-reg.org.ru/'); // Редирект на страницу после отправки токенов
     }
 
     // На случай, если все варианты не сработают
