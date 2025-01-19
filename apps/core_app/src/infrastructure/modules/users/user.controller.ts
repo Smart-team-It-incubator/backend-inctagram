@@ -95,7 +95,7 @@ export class UserController {
     description: 'Данные для удаления пользователя',
     type: CreateUserDto, // Можно использовать другой DTO, который содержит только идентификатор пользователя для удаления.
   })
-  @Delete("/:userId") // Используем DELETE для удаления
+  @Delete("deluser/:userId") // Используем DELETE для удаления
   async deleteUser(@Param('userId') userId: string): Promise<string> {
     try {
       const deletedUser = await this.commandBus.execute(new DeleteUserCommand(userId));
