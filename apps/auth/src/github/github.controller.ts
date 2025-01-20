@@ -55,17 +55,16 @@ export class GithubAuthController {
       const loginResult = await this.AuthApiService.login({ email, password: 'emptyPassword', githubId, isGithubRequest },);
 
       // Отправляем accessToken и refreshToken в cookies
-      // res.cookie('accessToken', loginResult.accessToken, {
-      //   httpOnly: false, //process.env.HTTP_ONLY,
-      //   secure: false, //process.env.NODE_ENV === 'production',
-      //   maxAge: 24 * 60 * 60 * 1000, // 1 день
-      // });
+      res.cookie('accessToken', loginResult.accessToken, {
+        httpOnly: false, //process.env.HTTP_ONLY,
+        secure: false, //process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000, // 1 день
+      });
       res.cookie('refreshToken', loginResult.refreshToken, {
         httpOnly: false, //process.env.HTTP_ONLY,
         secure: false, //process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
-      res.send({ accessToken: loginResult.accessToken });
 
       // Редирект на нужную страницу
       //return res.redirect('http://localhost:3000/'); // Редирект на страницу после отправки токенов
@@ -78,17 +77,16 @@ export class GithubAuthController {
       await this.CoreAppApiService.updateUser(userByEmail.id, userUpdateDto);
       const loginResult = await this.AuthApiService.login({ email, password: 'emptyPassword', githubId, isGithubRequest },);
       // Отправляем accessToken и refreshToken в cookies
-      // res.cookie('accessToken', loginResult.accessToken, {
-      //   httpOnly: false, //process.env.HTTP_ONLY,
-      //   secure: false, //process.env.NODE_ENV === 'production',
-      //   maxAge: 24 * 60 * 60 * 1000, // 1 день
-      // });
+      res.cookie('accessToken', loginResult.accessToken, {
+        httpOnly: false, //process.env.HTTP_ONLY,
+        secure: false, //process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000, // 1 день
+      });
       res.cookie('refreshToken', loginResult.refreshToken, {
         httpOnly: false, //process.env.HTTP_ONLY,
         secure: false, //process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
-      res.send({ accessToken: loginResult.accessToken });
 
       // Редирект на нужную страницу
       //return res.redirect('http://localhost:3000/'); // Редирект на страницу после отправки токенов
@@ -117,17 +115,16 @@ export class GithubAuthController {
       const loginResult = await this.AuthApiService.login({ email, password: 'githubEmptyPassword', githubId, isGithubRequest },);
 
       // Отправляем accessToken и refreshToken в cookies
-      // res.cookie('accessToken', loginResult.accessToken, {
-      //   httpOnly: false, //process.env.HTTP_ONLY,
-      //   secure: false, //process.env.NODE_ENV === 'production',
-      //   maxAge: 24 * 60 * 60 * 1000, // 1 день
-      // });
+      res.cookie('accessToken', loginResult.accessToken, {
+        httpOnly: false, //process.env.HTTP_ONLY,
+        secure: false, //process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000, // 1 день
+      });
       res.cookie('refreshToken', loginResult.refreshToken, {
         httpOnly: false, //process.env.HTTP_ONLY,
         secure: false, //process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
-      res.send({ accessToken: loginResult.accessToken });
 
       // Редирект на нужную страницу после регистрации
       //return res.redirect('http://localhost:3000/'); // Редирект на страницу после отправки токенов
