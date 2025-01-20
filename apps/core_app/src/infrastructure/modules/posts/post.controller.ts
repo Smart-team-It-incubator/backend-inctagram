@@ -22,18 +22,34 @@ export class PostController {
     private filesClientService: FilesClientService
   ) { }
 
-  @ApiOperation({ summary: 'Get all posts by userId' }) // Описание эндпоинта
-  @ApiResponse({ status: 200, description: 'Posts successfully received', type: [PublicPostDto] }) // Описание ответа
-  @ApiResponse({ status: 400, description: 'Posts not found by userId' }) // Описание ошибки
-  @Get(':userId') // Указываем параметр пути
+  @ApiOperation({ summary: 'Get all posts by userId' })  // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'Posts successfully received', type: [PublicPostDto] })  // Описание успешного ответа
+  @ApiResponse({ status: 400, description: 'Posts not found by userId' })  // Описание ошибки
+  @ApiResponse({ status: 500, description: 'Internal server error' })  // Описание ошибки сервера
+  @Get(':userId')  // Указываем параметр пути
   async getAllPostsByUserId(
-    @Param('userId') userId: string, // Извлекаем параметр пути
+    @Param('userId') userId: string,  // Извлекаем параметр пути
+    @Query('offset') offset = 0,
+    @Query('limit') limit = 8,
   ): Promise<Partial<PostViewModel>[] | null> {
-    const posts: Partial<PostViewModel>[] | null = await this.commandBus.execute(new GetPostsCommand(userId));
-    if (!posts) {
-      throw new HttpException('Posts not found', HttpStatus.BAD_REQUEST);
+
+
+    try {
+      // Выполняем команду, передавая userId, offset и limit
+      const posts = await this.commandBus.execute(new GetPostsCommand(userId, offset, limit));
+
+      // Если постов нет, выбрасываем ошибку
+      if (!posts || posts.length === 0) {
+        throw new HttpException('Posts not found', HttpStatus.BAD_REQUEST);
+      }
+
+      // Возвращаем посты
+      return posts;
+    } catch (error) {
+      // Обработка ошибок
+      console.error('Error fetching posts:', error.message);
+      throw new HttpException('Failed to fetch posts', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return posts;
   }
 
 

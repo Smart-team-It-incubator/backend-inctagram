@@ -8,26 +8,40 @@ import { UpdatePostDto } from "@app/shared-dto/dtos/post/post-update.dto";
 export class PostsRepository {
   constructor(private readonly prisma: PrismaCoreAppService) { }
 
-  async getAllPostsByUserId(userId: string): Promise<Partial<PostViewModel>[]> {
+  async getAllPostsByUserId(
+    userId: string,
+    offset: number,
+    limit: number
+  ): Promise<Partial<PostViewModel>[]> {
     try {
+      // Используем `offset` и `limit` для пагинации
       const postWithPhotos = await this.prisma.post.findMany({
-        where: { userId },
-        include: { photos: true }, // Включаем фотографии
+        where: {
+          userId: userId,
+        },
+        include: {
+          photos: true, // Включаем фотографии
+        },
+        orderBy: {
+          createdAt: 'desc', // Сортируем по дате создания (от новых к старым)
+        },
+        skip: offset, // Начальная точка выборки
+        take: limit,  // Количество постов для выборки
       });
-
+      // Если посты не найдены, выбрасываем ошибку
       if (!postWithPhotos.length) {
         throw new Error('No posts found for the provided user ID');
       }
 
-      // Преобразуем посты в `PostViewModel` и возвращаем их публичную версию
-      return postWithPhotos.map(post => {
+      // возвращаем их публичную версию
+      return postWithPhotos.map((post) => {
         const viewModel = new PostViewModel(post);
-        return viewModel.getPublicVersion();
+        return viewModel.getPublicVersion(); // Возвращаем только публичные данные
       });
     } catch (error) {
-      console.log("ошибка в репозитории при получении постов:", error.message);
+      console.error("Error in repository when fetching posts:", error.message);
+      throw new Error('Failed to fetch posts'); // Перебрасываем ошибку для верхнего уровня
     }
-
   }
 
 
