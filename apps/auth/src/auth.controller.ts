@@ -51,10 +51,10 @@ export class AuthController {
       console.log(result.refreshToken)
       res
         .cookie("refreshToken", result.refreshToken, {
-          httpOnly: process.env.HTTP_ONLY,
-          secure: process.env.NODE_ENV === 'production', // Обязательно для production
-          maxAge: 24 * 60 * 60 * 1000, // Время жизни
-          sameSite: 'Strict', // Или 'Lax' в зависимости от вашего случая
+          httpOnly: false, //process.env.HTTP_ONLY,
+          secure: false //process.env.NODE_ENV === 'production', // Обязательно для production
+          //maxAge: 24 * 60 * 60 * 1000, // Время жизни
+          //sameSite: 'Strict', // Или 'Lax' в зависимости от вашего случая
         })
         .status(200)
         .send({ accessToken: result.accessToken });
