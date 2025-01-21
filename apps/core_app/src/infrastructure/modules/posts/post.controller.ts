@@ -36,7 +36,7 @@ export class PostController {
 
     try {
       // Выполняем команду, передавая userId, offset и limit
-      const posts = await this.commandBus.execute(new GetPostsCommand(userId, pageNumber, pageSize));
+      const posts = await this.commandBus.execute(new GetPostsCommand(userId, pageSize, pageNumber));
 
       // Если постов нет, выбрасываем ошибку
       if (!posts || posts.length === 0) {
