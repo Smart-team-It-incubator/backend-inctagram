@@ -51,10 +51,11 @@ export class AuthController {
       console.log(result.refreshToken)
       res
         .cookie("refreshToken", result.refreshToken, {
-          httpOnly: process.env.HTTP_ONLY,
-          secure: process.env.NODE_ENV === 'production', // Обязательно для production
-          maxAge: 24 * 60 * 60 * 1000, // Время жизни
-          sameSite: 'Strict', // Или 'Lax' в зависимости от вашего случая
+          httpOnly: false, //process.env.HTTP_ONLY,
+          secure: false, //process.env.NODE_ENV === 'production', // Обязательно для production
+          domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
+          //maxAge: 24 * 60 * 60 * 1000, // Время жизни
+          //sameSite: 'Strict', // Или 'Lax' в зависимости от вашего случая
         })
         .status(200)
         .send({ accessToken: result.accessToken });
@@ -367,7 +368,31 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Private Policy' }) // Описание эндпоинта
   @Get('/private')
-  async PrivatePolicy() {
+  async PrivatePolicy(
+    @Body('token') tokenRecaptcha: string, 
+    @Ip() remoteIp: string
+  ) {
+    //Это метод для Recaptcha
+    const isValid = await this.recaptchaAdapter.validateToken(tokenRecaptcha, remoteIp);
+    if (!isValid) {
+      throw new HttpException('Invalid reCAPTCHA token', HttpStatus.BAD_REQUEST);
+    }
+   return "Политика конфиденциальности"
+  }
+
+  
+  @ApiOperation({ summary: 'Private Policy' }) // Описание эндпоинта
+  @Post('/recaptcha')
+  async exampleRecaptcha(
+    @Body('token') tokenRecaptcha: string, 
+    @Ip() remoteIp: string
+  ) {
+    //Это метод для Recaptcha
+    console.log("Я token из рекапчи:", tokenRecaptcha)
+    const isValid = await this.recaptchaAdapter.validateToken(tokenRecaptcha, remoteIp);
+    if (!isValid) {
+      throw new HttpException('Invalid reCAPTCHA token', HttpStatus.BAD_REQUEST);
+    }
    return "Политика конфиденциальности"
   }
 }

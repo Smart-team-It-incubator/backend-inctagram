@@ -56,13 +56,15 @@ export class GithubAuthController {
 
       // Отправляем accessToken и refreshToken в cookies
       res.cookie('accessToken', loginResult.accessToken, {
-        httpOnly: process.env.HTTP_ONLY,
-        secure: process.env.NODE_ENV === 'production',
+        httpOnly: false, //process.env.HTTP_ONLY,
+        secure: false, //process.env.NODE_ENV === 'production',
+        domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
       res.cookie('refreshToken', loginResult.refreshToken, {
-        httpOnly: process.env.HTTP_ONLY,
-        secure: process.env.NODE_ENV === 'production',
+        httpOnly: false, //process.env.HTTP_ONLY,
+        secure: false, //process.env.NODE_ENV === 'production',
+        domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
 
@@ -78,13 +80,15 @@ export class GithubAuthController {
       const loginResult = await this.AuthApiService.login({ email, password: 'emptyPassword', githubId, isGithubRequest },);
       // Отправляем accessToken и refreshToken в cookies
       res.cookie('accessToken', loginResult.accessToken, {
-        httpOnly: process.env.HTTP_ONLY,
-        secure: process.env.NODE_ENV === 'production',
+        httpOnly: false, //process.env.HTTP_ONLY,
+        secure: false, //process.env.NODE_ENV === 'production',
+        domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
       res.cookie('refreshToken', loginResult.refreshToken, {
-        httpOnly: process.env.HTTP_ONLY,
-        secure: process.env.NODE_ENV === 'production',
+        httpOnly: false, //process.env.HTTP_ONLY,
+        secure: false, //process.env.NODE_ENV === 'production',
+        domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
 
@@ -116,13 +120,15 @@ export class GithubAuthController {
 
       // Отправляем accessToken и refreshToken в cookies
       res.cookie('accessToken', loginResult.accessToken, {
-        httpOnly: process.env.HTTP_ONLY,
-        secure: process.env.NODE_ENV === 'production',
+        httpOnly: false, //process.env.HTTP_ONLY,
+        secure: false, //process.env.NODE_ENV === 'production',
+        domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
       res.cookie('refreshToken', loginResult.refreshToken, {
-        httpOnly: process.env.HTTP_ONLY,
-        secure: process.env.NODE_ENV === 'production',
+        httpOnly: false, //process.env.HTTP_ONLY,
+        secure: false, //process.env.NODE_ENV === 'production',
+        domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
 
