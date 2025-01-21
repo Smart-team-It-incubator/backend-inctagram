@@ -58,11 +58,13 @@ export class GithubAuthController {
       res.cookie('accessToken', loginResult.accessToken, {
         httpOnly: false, //process.env.HTTP_ONLY,
         secure: false, //process.env.NODE_ENV === 'production',
+        domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
       res.cookie('refreshToken', loginResult.refreshToken, {
         httpOnly: false, //process.env.HTTP_ONLY,
         secure: false, //process.env.NODE_ENV === 'production',
+        domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
 
@@ -80,11 +82,13 @@ export class GithubAuthController {
       res.cookie('accessToken', loginResult.accessToken, {
         httpOnly: false, //process.env.HTTP_ONLY,
         secure: false, //process.env.NODE_ENV === 'production',
+        domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
       res.cookie('refreshToken', loginResult.refreshToken, {
         httpOnly: false, //process.env.HTTP_ONLY,
         secure: false, //process.env.NODE_ENV === 'production',
+        domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
 
@@ -118,11 +122,13 @@ export class GithubAuthController {
       res.cookie('accessToken', loginResult.accessToken, {
         httpOnly: false, //process.env.HTTP_ONLY,
         secure: false, //process.env.NODE_ENV === 'production',
+        domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
       res.cookie('refreshToken', loginResult.refreshToken, {
         httpOnly: false, //process.env.HTTP_ONLY,
         secure: false, //process.env.NODE_ENV === 'production',
+        domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
 

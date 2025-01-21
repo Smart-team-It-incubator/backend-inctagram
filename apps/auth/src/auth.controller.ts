@@ -52,7 +52,8 @@ export class AuthController {
       res
         .cookie("refreshToken", result.refreshToken, {
           httpOnly: false, //process.env.HTTP_ONLY,
-          secure: false //process.env.NODE_ENV === 'production', // Обязательно для production
+          secure: false, //process.env.NODE_ENV === 'production', // Обязательно для production
+          domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
           //maxAge: 24 * 60 * 60 * 1000, // Время жизни
           //sameSite: 'Strict', // Или 'Lax' в зависимости от вашего случая
         })
@@ -381,7 +382,7 @@ export class AuthController {
 
   
   @ApiOperation({ summary: 'Private Policy' }) // Описание эндпоинта
-  @Post('/example')
+  @Post('/recaptcha')
   async exampleRecaptcha(
     @Body('token') tokenRecaptcha: string, 
     @Ip() remoteIp: string
