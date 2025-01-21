@@ -367,7 +367,31 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Private Policy' }) // Описание эндпоинта
   @Get('/private')
-  async PrivatePolicy() {
+  async PrivatePolicy(
+    @Body('token') tokenRecaptcha: string, 
+    @Ip() remoteIp: string
+  ) {
+    //Это метод для Recaptcha
+    const isValid = await this.recaptchaAdapter.validateToken(tokenRecaptcha, remoteIp);
+    if (!isValid) {
+      throw new HttpException('Invalid reCAPTCHA token', HttpStatus.BAD_REQUEST);
+    }
+   return "Политика конфиденциальности"
+  }
+
+  
+  @ApiOperation({ summary: 'Private Policy' }) // Описание эндпоинта
+  @Post('/example')
+  async exampleRecaptcha(
+    @Body('token') tokenRecaptcha: string, 
+    @Ip() remoteIp: string
+  ) {
+    //Это метод для Recaptcha
+    console.log("Я token из рекапчи:", tokenRecaptcha)
+    const isValid = await this.recaptchaAdapter.validateToken(tokenRecaptcha, remoteIp);
+    if (!isValid) {
+      throw new HttpException('Invalid reCAPTCHA token', HttpStatus.BAD_REQUEST);
+    }
    return "Политика конфиденциальности"
   }
 }
