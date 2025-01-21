@@ -10,8 +10,8 @@ export class PostsRepository {
 
   async getAllPostsByUserId(
     userId: string,
-    offset: number,
-    limit: number
+    pageNumber: number,
+    pageSize: number
   ): Promise<Partial<PostViewModel>[]> {
     try {
       // Используем `offset` и `limit` для пагинации
@@ -25,8 +25,8 @@ export class PostsRepository {
         orderBy: {
           createdAt: 'desc', // Сортируем по дате создания (от новых к старым)
         },
-        skip: offset, // Начальная точка выборки
-        take: limit,  // Количество постов для выборки
+        skip: (pageNumber - 1) * pageSize, // Количество постов для выборки
+        take: pageSize  //размер
       });
       // Если посты не найдены, выбрасываем ошибку
       if (!postWithPhotos.length) {

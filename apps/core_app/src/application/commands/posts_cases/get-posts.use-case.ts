@@ -6,9 +6,9 @@ import { PostViewModel } from "../../services/post/post-interface"
 
 export class GetPostsCommand {
     constructor(
-      public userId: string, // ID пользователя
-      public offset: number, // Начальная точка выборки
-      public limit: number,  // Количество постов для выборки
+      public userId: string,
+      public pageSize: number,
+      public pageNumber: number,
     ) {}
 }
 
@@ -17,8 +17,8 @@ export class GetPostsUseCase {
     constructor(protected postsRepository: PostsRepository) {}
 
     async execute(command: GetPostsCommand): Promise<Partial<PostViewModel>[] | null> {
-        const { userId, offset, limit } = command;
-        return await this.postsRepository.getAllPostsByUserId(userId, offset, limit);
+        const { userId, pageSize, pageNumber } = command;
+        return await this.postsRepository.getAllPostsByUserId(userId, pageNumber, pageSize);
     }
 }
 

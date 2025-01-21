@@ -29,14 +29,14 @@ export class PostController {
   @Get(':userId')  // Указываем параметр пути
   async getAllPostsByUserId(
     @Param('userId') userId: string,  // Извлекаем параметр пути
-    @Query('offset') offset = 0,
-    @Query('limit') limit = 8,
+    @Query('pageNumber') pageNumber =  1,
+    @Query('pageSize') pageSize = 8,
   ): Promise<Partial<PostViewModel>[] | null> {
 
 
     try {
       // Выполняем команду, передавая userId, offset и limit
-      const posts = await this.commandBus.execute(new GetPostsCommand(userId, offset, limit));
+      const posts = await this.commandBus.execute(new GetPostsCommand(userId, pageNumber, pageSize));
 
       // Если постов нет, выбрасываем ошибку
       if (!posts || posts.length === 0) {
