@@ -180,7 +180,7 @@ export class UserController {
       required: ['confirmationCode'],
     },
   })
-  @Get('/emailConfirmation')
+  @Post('/emailConfirmation')
   async emailConfirmation(@Query('code') confirmationCode: string): Promise<{ message: string }> {
     console.log('confirmationCode:', confirmationCode);
     if (!confirmationCode) {

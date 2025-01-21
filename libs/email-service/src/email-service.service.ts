@@ -62,7 +62,8 @@ export class EmailAdapterService {
 		const htmlMessage = `
 <h1>Thanks for your registration</h1>
 <p>To finish registration please confirm your email by clicking the link below:
-  <a href="https://${domainRoot}/users/emailConfirmation?code=${confirmationCode}">Confirm email</a>
+
+  <a href="http://localhost:3000/auth/signUp/emailConfirmation?code=${confirmationCode}">Confirm email</a>
 </p>
 <p>
   <a href="https://${domainRoot}/users/unsubscribe">Unsubscribe</a>
