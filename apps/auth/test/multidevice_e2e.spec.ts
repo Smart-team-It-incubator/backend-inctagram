@@ -101,7 +101,7 @@ describe('E2e Multidevice Flow', () => {
             const user2 = await postRequest(appCoreApp, RouteNames.USERS.REGISTRATION.full)
                 .send(userForTest2)
                 .expect(201);
-        });
+        }); 
 
         it('Осуществляем активацию пользователя, верифицируем email', async () => {
             // Получение пользователя после регистрации
