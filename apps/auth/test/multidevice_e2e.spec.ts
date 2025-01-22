@@ -110,15 +110,15 @@ describe('E2e Multidevice Flow', () => {
             
             // Проверка подтверждения email для первого пользователя
             const pathWithQuery = `${RouteNames.USERS.EMAIL_CONFIRMATION.full}?code=${user1AfterRegistration.body.emailConfirmationCode}`;    
-            const emailConfirmation1 = await getRequest(appCoreApp, pathWithQuery);
-            expect(emailConfirmation1.status).toBe(200); // Проверка статуса ответа
+            const emailConfirmation1 = await postRequest(appCoreApp, pathWithQuery);
+            expect(emailConfirmation1.status).toBe(201); // Проверка статуса ответа
             expect(emailConfirmation1.body).toHaveProperty('message', 'Email successfully confirmed'); // Проверка сообщения
 
             // Проверка подтверждения email для второго пользователя
             const pathWithQuery2 = `${RouteNames.USERS.EMAIL_CONFIRMATION.full}?code=${user2AfterRegistration.body.emailConfirmationCode}`;    
-            const emailConfirmation2 = await getRequest(appCoreApp, pathWithQuery2);
+            const emailConfirmation2 = await postRequest(appCoreApp, pathWithQuery2);
 
-            expect(emailConfirmation2.status).toBe(200); // Проверка статуса ответа
+            expect(emailConfirmation2.status).toBe(201); // Проверка статуса ответа
             expect(emailConfirmation2.body).toHaveProperty('message', 'Email successfully confirmed'); // Проверка сообщения
         });
 

@@ -195,8 +195,8 @@ describe('E2E registration SINGLE user/auth flow', () => {
 
       // Проверка подтверждения email для первого пользователя
       const pathWithQuery = `${RouteNames.USERS.EMAIL_CONFIRMATION.full}?code=${userAfterRegistration.body.emailConfirmationCode}`;    
-      const emailConfirmation1 = await getRequest(appCoreApp, pathWithQuery);
-      expect(emailConfirmation1.status).toBe(200); // Проверка статуса ответа
+      const emailConfirmation1 = await postRequest(appCoreApp, pathWithQuery);
+      expect(emailConfirmation1.status).toBe(201); // Проверка статуса ответа
       expect(emailConfirmation1.body).toHaveProperty('message', 'Email successfully confirmed'); // Проверка сообщения
   });
     it("Производим вход в систему, получаем токены", async () => {
@@ -221,7 +221,8 @@ describe('E2E registration SINGLE user/auth flow', () => {
       globalRefreshToken = refreshTokenCookie.split(';')[0].split('=')[1];
       expect(refreshTokenCookie).toBeDefined();
       expect(refreshTokenCookie).toContain('refreshToken='); // Проверяем, что cookie содержит refreshToken
-      expect(refreshTokenCookie).toContain('HttpOnly'); // Убедимся, что cookie защищены
+      //Закомментировали временно т.к отключили для фронтов защиту
+      //expect(refreshTokenCookie).toContain('HttpOnly'); // Убедимся, что cookie защищены
 
       // Проверяем формат accessToken
       const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;

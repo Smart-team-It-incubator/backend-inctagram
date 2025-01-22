@@ -51,9 +51,28 @@ export const RouteNames = {
 			value: 'getByEmail',
 			full: 'api/v1/users/getByEmail',
 		},
-		EMAIL_CONFIRMATION: { // GET 
+		EMAIL_CONFIRMATION: { // POST
 			value: 'email-confirmation',
 			full: 'api/v1/users/emailConfirmation',
+		}
+	},
+	POSTS: {
+		value: 'posts',
+		GET_ALL_POSTS_BY_USERID: { // GET
+			value: 'getAllPostsByUserId',
+			full: 'api/v1/posts', // {userId}
+		},
+		CREATE_NEW_POST: { // POST
+			value: 'createNewPost',
+			full: 'api/v1/posts',
+		},
+		DELETE_POST: { // DELETE
+			value: 'deletePost',
+			full: 'api/v1/posts', // {postId}
+		},
+		UPDATE_POST: { // PUT
+			value: 'updatePost',
+			full: 'api/v1/posts', // {postId}
 		}
 	}
 }

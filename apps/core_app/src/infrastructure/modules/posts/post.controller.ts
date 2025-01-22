@@ -83,38 +83,39 @@ export class PostController {
     @UploadedFiles() files: Array<Express.Multer.File>,
   ): Promise<Partial<UserViewModel>> {
     try {
-      //console.log(files); // Проверьте, выводятся ли здесь файлы
       const user = req.user;
-      // Загружаем фото через Files микросервис
-      const uploadedPhotos = await Promise.all(
-        files.map(async (file) => {
-          try {
-            const uploadedPhoto = await this.filesClientService.validateAndUploadPhoto(file.buffer);
-            //console.log("uploadedPhoto:",uploadedPhoto)
-            return {
-              photoUrl: uploadedPhoto.url,
-
-              // TODO -  Придумать как передать сюда не имя файла, а описание от Frontend
-              description: file?.originalname || 'empty description',
-            };
-          } catch (error) {
-            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-          }
-        }),
-      );
-
-      // Передаём ссылки на фото
-      createPostDto.photos = uploadedPhotos;
-      //console.log("Так выглядит createPostDto после обработки", createPostDto)
-
+  
+      // Если файлы не переданы, присваиваем пустой массив
+      if (!files || files.length === 0) {
+        createPostDto.photos = [];
+      } else {
+        // Загружаем фото через Files микросервис
+        const uploadedPhotos = await Promise.all(
+          files.map(async (file) => {
+            try {
+              const uploadedPhoto = await this.filesClientService.validateAndUploadPhoto(file.buffer);
+              return {
+                photoUrl: uploadedPhoto.url,
+                description: file?.originalname || 'empty description',
+              };
+            } catch (error) {
+              throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+            }
+          }),
+        );
+        // Передаем ссылки на фото
+        createPostDto.photos = uploadedPhotos;
+      }
+  
+      // Создаем пост
       const createdPost: Partial<UserViewModel> = await this.commandBus.execute(
         new CreatePostCommand(createPostDto, user.id),
       );
-
+  
       if (!createdPost) {
         throw new HttpException('Failed to create post', HttpStatus.BAD_REQUEST);
       }
-
+  
       return createdPost;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
