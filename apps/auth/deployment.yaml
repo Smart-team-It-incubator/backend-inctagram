@@ -107,6 +107,11 @@ spec:
                  secretKeyRef:
                    name: smart-team-backend-auth-production-config-secret
                    key: BOT_TOKEN
+             - name: NODE_ENV
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-auth-production-config-secret
+                   key: NODE_ENV
              - name: JWT_ACCESS_SECRET
                valueFrom:
                  secretKeyRef:
