@@ -12,7 +12,7 @@ export class FilesController {
   @MessagePattern({ cmd: 'get_files' }) // Обработка команды 'get_files'
   getFiles(data: any) {
 
-    console.log('Получен запрос:', data);
+    //console.log('Получен запрос:', data);
     return { message: 'Список файлов', data };
   }
 
@@ -20,7 +20,7 @@ export class FilesController {
   @ApiExcludeEndpoint()
   @MessagePattern({ cmd: 'upload_file' })
   async uploadFile(@Payload() file: Express.Multer.File) { // @Payload декоратор
-    console.log('Получен файл:', file);
+    //console.log('Получен файл:', file);
     return await this.s3Service.uploadFile(file); // Вызов метода uploadFile из S3Service
   }
   

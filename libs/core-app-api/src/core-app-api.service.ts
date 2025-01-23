@@ -53,7 +53,7 @@ export class CoreAppApiService {
 
         async updateUser(userId: string, UpdateUserDto: UpdateUserDto): Promise<any> {
             try {
-                console.log("Мы попали в библиотеку, метод UpdateUser", userId, UpdateUserDto, );
+                //console.log("Мы попали в библиотеку, метод UpdateUser", userId, UpdateUserDto, );
                 const response = await firstValueFrom(
                     this.httpService.put(`${this.coreAppUrl}/users/update/${userId}`,
                         UpdateUserDto, // Передаем данные в тело запроса

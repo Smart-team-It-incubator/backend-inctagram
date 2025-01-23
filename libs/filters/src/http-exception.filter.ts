@@ -12,7 +12,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
-    //console.log("Попадание в HttpExceptionFilter", exception);
+
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
@@ -20,21 +20,28 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const responseBody =
       exception instanceof HttpException ? exception.getResponse() : null;
-    // console.log(responseBody)
-    // Формируем сообщение об ошибке
-    // Проверяем тип responseBody и извлекаем значения
+
+    // Проверяем, является ли это ошибка от class-validator, если да, то возвращаем без изменений
+    if (
+      exception instanceof HttpException &&
+      typeof responseBody === 'object' &&
+      responseBody !== null &&
+      responseBody['message'] === 'Validation failed' &&
+      Array.isArray(responseBody['errors']) // Ошибки class-validator содержат массив "errors"
+    ) {
+      return response.status(status).json(responseBody); // Возвращаем без изменений
+    }
+
+    // Формируем сообщение об ошибке для остальных исключений
     let message: string;
     let field: string | null = null;
 
     if (typeof responseBody === 'string') {
-      // Если responseBody - строка, используем ее как сообщение
       message = responseBody;
     } else if (typeof responseBody === 'object' && responseBody !== null) {
-      // Если это объект, берем поле message и field
       message = responseBody['message'] || 'Internal server error';
       field = responseBody['field'] || null;
     } else {
-      // На случай, если ничего не подошло
       message = 'Internal server error';
     }
 

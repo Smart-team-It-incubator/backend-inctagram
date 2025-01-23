@@ -27,7 +27,7 @@ export class JwtAuthGuard implements CanActivate {
             if (bearer !== 'Bearer' || !token) {
                 throw new UnauthorizedException({message: 'Invalid authorization format'});
             }
-            console.log("Попали в JWT Guard, токен есть, готовится проверка")
+            //console.log("Попали в JWT Guard, токен есть, готовится проверка")
             // Декодируем токен и проверяем полезную нагрузку
             const decodedPayload = await this.jwtServiceClass.verify(token, { secret: process.env.JWT_ACCESS_SECRET });
             if (!decodedPayload || !decodedPayload.username) {

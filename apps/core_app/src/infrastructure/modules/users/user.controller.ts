@@ -38,7 +38,7 @@ export class UserController {
   async getUsers(): Promise<PublicUserProfileDto[] | null> {
     const users: Partial<UserViewModel>[] | null = await this.commandBus.execute(new GetUsersCommand());
     if (!users || users.length === 0) {
-      throw new HttpException('Users not found', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'Users not found'}, HttpStatus.BAD_REQUEST);
     }
     // Обязательно мапим под нужный DTO, чтобы вернуть только необходимые поля + сгенерировать swagger
     return users.map(mapToPublicUserProfileDto);
@@ -55,7 +55,7 @@ export class UserController {
   async registration(@Body() body: CreateUserDto): Promise<Partial<UserViewModel> | null> {
     const createUser: Partial<UserViewModel> | null = await this.commandBus.execute(new CreateUserCommand(body.email, body.password, body.username, body.firstName, body.lastName, body.city, body.country, body.dateOfBirthday));
     if (!createUser) {
-      throw new HttpException('User not created', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'User not created'}, HttpStatus.BAD_REQUEST);
 
     }
     else if (createUser) {
@@ -81,8 +81,8 @@ export class UserController {
       const updateUser = await this.commandBus.execute(new UpdateUserCommand(userId, updateUserDto));
       return mapToPublicUserProfileDto(updateUser)
     } catch (error) {
-      console.log("ошибка при обновлении пользователя в контроллере", error.message);
-      throw new HttpException('User not updated, maybe user not found', HttpStatus.BAD_REQUEST);
+      //console.log("ошибка при обновлении пользователя в контроллере", error.message);
+      throw new HttpException({message: 'User not updated, maybe user not found'}, HttpStatus.BAD_REQUEST);
     }
 
   }
@@ -101,8 +101,8 @@ export class UserController {
       const deletedUser = await this.commandBus.execute(new DeleteUserCommand(userId));
       return deletedUser
     } catch (error) {
-      console.log("ошибка при удалении пользователя в контроллере", error.message);
-      throw new HttpException('User not deleted, maybe user not found', HttpStatus.BAD_REQUEST);
+      //console.log("ошибка при удалении пользователя в контроллере", error.message);
+      throw new HttpException({message: 'User not deleted, maybe user not found'}, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -118,7 +118,7 @@ export class UserController {
     const user = await this.commandBus.execute(new GetUserByUsernameCommand(username));
 
     if (!user || !user.username) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException({message: 'User not found'}, HttpStatus.NOT_FOUND);
     }
 
     return user
@@ -133,7 +133,7 @@ export class UserController {
   async findUserByEmail(@Param('email') email: string): Promise<string> {
     const user = await this.commandBus.execute(new GetUserByEmailCommand(email));
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'User not found'}, HttpStatus.BAD_REQUEST);
     }
     return user
   }
@@ -144,10 +144,10 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'response with required user' }) // Описание ответа
   @Get("/getByGithubId/:githubId")
   async findUserByGithubId(@Param('githubId') githubId: string): Promise<string> {
-    console.log("попадание в GetGitHubUser")
+    ////console.log("попадание в GetGitHubUser")
     const user = await this.commandBus.execute(new GetUserByGithubIdCommand(githubId));
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'User not found'}, HttpStatus.BAD_REQUEST);
     }
     return user
   }
@@ -158,10 +158,10 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'response with required user' }) // Описание ответа
   @Get("/getByResetPasswordToken/:resetPasswordToken")
   async findUserByResetPasswordToken(@Param('resetPasswordToken') resetPasswordToken: string): Promise<string> {
-    console.log("попадание в resetPasswordToken Get User, resetPasswordToken:", resetPasswordToken)
+    //console.log("попадание в resetPasswordToken Get User, resetPasswordToken:", resetPasswordToken)
     const user = await this.commandBus.execute(new GetUserByResetPasswordTokenCommand(resetPasswordToken));
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'User not found'}, HttpStatus.BAD_REQUEST);
     }
     return user
   }
@@ -182,9 +182,9 @@ export class UserController {
   })
   @Post('/emailConfirmation')
   async emailConfirmation(@Query('code') confirmationCode: string): Promise<{ message: string }> {
-    console.log('confirmationCode:', confirmationCode);
+    //console.log('confirmationCode:', confirmationCode);
     if (!confirmationCode) {
-      throw new HttpException('Confirmation code is required', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'Confirmation code is required'}, HttpStatus.BAD_REQUEST);
     }
 
     const result = await this.commandBus.execute(new ConfirmEmailCommand(confirmationCode));
@@ -192,7 +192,7 @@ export class UserController {
     if (result) {
       return { message: 'Email successfully confirmed' };
     } else {
-      throw new HttpException('Invalid confirmation code or code expired', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'Invalid confirmation code or code expired', field: "confirmationCode"}, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -220,7 +220,7 @@ export class UserController {
     if (result) {
       return { message: 'Confirmation code was successfully resent' };
     } else {
-      throw new HttpException('User not found or User already activated', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'User not found or User already activated'}, HttpStatus.BAD_REQUEST);
     }
   }
 

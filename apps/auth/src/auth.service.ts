@@ -4,7 +4,6 @@ import { JwtService } from '@nestjs/jwt';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs'; // Импортируем firstValueFrom из RxJS
 import { AuthForm } from '@app/shared-dto/dtos/auth/auth-form.dto';
-import { CustomConfigService } from '../../../libs/shared-dto/src/config-service';
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { JwtPayload } from '@app/shared-dto/dtos/auth/jwt-payload.dto';
 import { randomUUID } from 'crypto';
@@ -15,17 +14,12 @@ const { v4: uuidv4 } = require('uuid');
 
 @Injectable()
 export class AuthService {
-  private jwtAccessSecret: string
-  private jwtRefreshSecret: string
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
-    private readonly configService: CustomConfigService,
     private readonly coreAppApiService: CoreAppApiService,
     private readonly emailAdapterService: EmailAdapterService
   ) {
-    this.jwtAccessSecret = this.configService.getJwtAccessSecret();
-    this.jwtRefreshSecret = this.configService.getJwtRefreshSecret();
   }
 
 
@@ -160,11 +154,11 @@ export class AuthService {
     // Получаем данные пользователя через HTTP запрос в Core_app
     const user = await this.coreAppApiService.getUserByUsername(username);
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException({message: 'User not found'}, HttpStatus.NOT_FOUND);
     }
     const payload = { userId: user.id, username: user.username, role: user.role, deviceId };
     const accessToken = this.jwtService.sign(payload, {
-      secret: this.jwtAccessSecret, // Секретный ключ для Access Token
+      secret: process.env.JWT_ACCESS_SECRET, // Секретный ключ для Access Token
       expiresIn: '15m', // Время жизни токена, например, 15 минут
     });
     return accessToken
@@ -175,11 +169,11 @@ export class AuthService {
     // Получаем данные пользователя через HTTP запрос в Core_app
     const user = await this.coreAppApiService.getUserByUsername(username);
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException({message: 'User not found'}, HttpStatus.NOT_FOUND);
     }
     const payload = { userId: user.id, username: user.username, role: user.role, deviceId };
     const refreshToken = this.jwtService.sign(payload, {
-      secret: this.jwtRefreshSecret, // Секретный ключ для Refresh Token
+      secret: process.env.JWT_REFRESH_SECRET, // Секретный ключ для Refresh Token
       expiresIn: '7d', // Время жизни refresh токена, например, 7 дней
     });
     return refreshToken
@@ -209,7 +203,7 @@ export class AuthService {
   // Метод для извлечения payload из токена
   async extractPayloadFromToken(token: string, isAccessToken: boolean = true): Promise<any> {
     try {
-      const secret = isAccessToken ? this.jwtAccessSecret : this.jwtRefreshSecret;
+      const secret = isAccessToken ? process.env.JWT_ACCESS_SECRET : process.env.JWT_REFRESH_SECRET;
       const decoded = this.jwtService.verify(token, { secret });
 
       return new JwtPayload(decoded); // Создаём экземпляр класса - это необходимо для использования метода expirationDate
@@ -254,11 +248,11 @@ export class AuthService {
       // Отправляем письмо
       return this.emailAdapterService.sendPasswordRecoveryMessage(userEmail, recoveryCode)
       } catch (error) {
-        console.log("Что-то произошло при отправке письма для восстановления пароля", error)
+        //console.log("Что-то произошло при отправке письма для восстановления пароля", error)
       }
     }
     else {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException({message: 'User not found'}, HttpStatus.NOT_FOUND);
     }
     
   }
@@ -267,26 +261,26 @@ export class AuthService {
     // Ищем пользователя по коду восстановления
     const userByResetPasswordToken = await this.coreAppApiService.getUserByResetPasswordToken(recoveryCode);
     if (userByResetPasswordToken.resetPasswordExpires < new Date()) {
-      throw new HttpException('Recovery code expired', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'Recovery code expired', field: "recoveryCode"}, HttpStatus.BAD_REQUEST);
     }
-    console.log(userByResetPasswordToken)
+    //console.log(userByResetPasswordToken)
     if (userByResetPasswordToken) {
       const hashedPassword = await this._generateHash(newPassword);
       const userUpdate = await this.coreAppApiService.updateUser(userByResetPasswordToken.id, {password: hashedPassword, resetPasswordToken: null, resetPasswordExpires: null});
       return userUpdate
     }
     else {
-      throw new HttpException('User not found or recovery code invalid', HttpStatus.NOT_FOUND);
+      throw new HttpException({message: 'User not found or recovery code invalid'}, HttpStatus.NOT_FOUND);
     }
   }
   async changePassword (oldPassword: string, newPassword: string, username: string) {
     const user = await this.coreAppApiService.getUserByUsername(username);
     if (!user) {
-      throw new HttpException('User not found by username (token is invalid)', HttpStatus.NOT_FOUND);
+      throw new HttpException({message: 'User not found by username (token is invalid)'}, HttpStatus.NOT_FOUND);
     }
     const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
     if (!isPasswordValid) {
-      throw new HttpException('Old password is incorrect', HttpStatus.UNAUTHORIZED);
+      throw new HttpException({message: 'Old password is incorrect'}, HttpStatus.UNAUTHORIZED);
     }
     const hashedPassword = await this._generateHash(newPassword);
     const userUpdate = await this.coreAppApiService.updateUser(user.id, {password: hashedPassword});

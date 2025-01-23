@@ -18,21 +18,9 @@ import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { HttpModule } from '@nestjs/axios';
 import { FilesClientService } from './infrastructure/config/files-client-proxy';
 
-// const ENV = process.env.NODE_ENV;
-// console.log(ENV);
-
 
 @Module({
-  imports: [
-  //   ClientsModule.register([{
-  //   name: 'FILES_SERVICE',
-  //   transport: Transport.TCP,
-  //   options: {
-  //     host: process.env.FILES_SERVICE_HOST || '0.0.0.0',
-  //     port: Number(process.env.FILES_SERVICE_PORT) || 3695,
-  //   },
-  // }]),
-    
+  imports: [    
     PrismaModule, UserModule, GlobalModule, PostModule, HttpModule,
     
     ConfigModule.forRoot({

@@ -21,7 +21,7 @@ export class DeleteUserUseCase {
         try {
 
             const deleteResult = await this.usersRepository.deleteUser(command.userId)
-            //console.log(updateResult)
+            ////console.log(updateResult)
             return deleteResult
         }
         catch (error) {

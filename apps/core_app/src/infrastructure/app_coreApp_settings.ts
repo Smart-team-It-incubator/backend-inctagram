@@ -28,6 +28,4 @@ export async function app_coreApp_settings(app: INestApplication) {
   // и была возможность внедрять классы в класс проверки
   // https://medium.com/yavar/custom-validation-with-database-in-nestjs-ac008f96abe2
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
-  //await app.listen(process.env.PORT_CORE ?? 3000);
-  // console.log(`Приложение запущено на порту ${process.env.PORT} ?? 3000`);
 }

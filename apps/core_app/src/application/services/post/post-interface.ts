@@ -7,6 +7,7 @@ export interface IPostInterface {
     photos: { id: string; url: string; photoDescription: string | null }[];
   }
   
+  //TODO ДОбавить в сваггер
   export class PostViewModel {
     id: string;
     text: string | null;

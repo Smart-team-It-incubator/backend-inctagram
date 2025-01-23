@@ -44,16 +44,16 @@ export class AuthController {
   })
   async login(@Body() loginDto: AuthForm, @Res() res, @Req() req) {
     try {
-      console.log("Попадание в Login")
+      //console.log("Попадание в Login")
       const ip = req.ip
       const useragent = req.headers['user-agent'];
       const refreshTokenExist = req.cookies?.refreshToken; // Получаем токен из Cookie
       const result = await this.authService.login(loginDto, useragent, ip, refreshTokenExist);
-      console.log(result.refreshToken)
+      //console.log(result.refreshToken)
       res
         .cookie("refreshToken", result.refreshToken, {
-          httpOnly: false, //process.env.HTTP_ONLY,
-          secure: false, //process.env.NODE_ENV === 'production', // Обязательно для production
+          httpOnly: process.env.HTTP_ONLY,
+          secure: process.env.NODE_ENV === 'PRODUCTION',
           domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
           //maxAge: 24 * 60 * 60 * 1000, // Время жизни
           //sameSite: 'Strict', // Или 'Lax' в зависимости от вашего случая
@@ -94,7 +94,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK) // Устанавливаем код 200 для успешного выхода
   async logout(@Req() req) {
     const refreshToken = req.cookies?.refreshToken; // Получаем токен из Cookie
-    //console.log(req.cookies)
+    ////console.log(req.cookies)
 
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token not found');
@@ -132,15 +132,16 @@ export class AuthController {
       const ip = req.ip
       const useragent = req.headers['user-agent'];
       const refreshToken = req.cookies?.refreshToken; // Получаем токен из Cookie
-      //console.log("К нам пришел refresh token /auth/refresh-token:",refreshToken)
+      ////console.log("К нам пришел refresh token /auth/refresh-token:",refreshToken)
       if (!refreshToken) {
         throw new UnauthorizedException('Refresh token not found');
       }
       const { accessToken, newRefreshToken } = await this.authService.updateRefreshToken(refreshToken, useragent, ip);
   
       res.cookie('refreshToken', newRefreshToken, {
-        httpOnly: true,
-        secure: true, // включить в продакшене
+        httpOnly: process.env.HTTP_ONLY,
+        secure: process.env.NODE_ENV === 'PRODUCTION',
+        domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         //sameSite: 'strict',
         //path: '/auth/refresh',
       });
@@ -193,19 +194,12 @@ export class AuthController {
   async resetPassword(
     @Query('recoveryCode') recoveryCode: string,
     @Body('newPassword') newPassword: string,
-    //@Body('token') tokenRecaptcha: string, 
-    //@Ip() remoteIp: string
   ): Promise<{ message: string }> {
-    // Это метод для Recaptcha
-    //const isValid = await this.recaptchaAdapter.validateToken(tokenRecaptcha, remoteIp);
-    // if (!isValid) {
-    //   throw new HttpException('Invalid reCAPTCHA token', HttpStatus.BAD_REQUEST);
-    // }
-    console.log("recoveryCode:",recoveryCode, "newPassword:",newPassword)
+    //console.log("recoveryCode:",recoveryCode, "newPassword:",newPassword)
     const result = await this.authService.resetPassword(recoveryCode, newPassword)
     if (!result) {
       // Если результат отсутствует, токен может быть недействительным или истёкшим
-      throw new HttpException('Invalid or expired recovery code.', HttpStatus.BAD_REQUEST);
+      throw new HttpException({ message:'Invalid or expired recovery code.'}, HttpStatus.BAD_REQUEST);
     }
   
     // Возвращаем успешное сообщение
@@ -235,7 +229,7 @@ export class AuthController {
   ): Promise<{ message: string }> {
     // Проверяем, что пользователь аутентифицирован
     if (!req.user || !req.user.username) {
-      throw new HttpException('Unauthorized: User is not authenticated.', HttpStatus.UNAUTHORIZED);
+      throw new HttpException({message: 'Unauthorized: User is not authenticated.'}, HttpStatus.UNAUTHORIZED);
     }
   
     const username = req.user.username;
@@ -244,7 +238,7 @@ export class AuthController {
     const result = await this.authService.changePassword(currentPassword, newPassword, username);
   
     if (!result) {
-      throw new HttpException('Invalid current password or unable to change password.', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message:'Invalid current password or unable to change password.', field: "password"}, HttpStatus.BAD_REQUEST);
     }
   
     return { message: 'Password changed successfully.' };
@@ -293,9 +287,8 @@ export class AuthController {
   @ApiBody({ schema: { example: { sessionId: 'session1' } } })
   async revokeSession(@Param('sessionId') sessionId: string): Promise<{ message: string }> {
     try {
-      console.log(sessionId)
       const result = await this.authService.revokeSessionBySessionId(sessionId);
-      if (!result) throw new HttpException('Session not found', HttpStatus.NOT_FOUND);
+      if (!result) throw new HttpException({message: 'Session not found'}, HttpStatus.NOT_FOUND);
       return { message: `Session ${sessionId} revoked successfully.` };
     } catch (error) {
       // Обрабатываем ошибку, чтобы не возвращать 200
@@ -320,7 +313,7 @@ export class AuthController {
         throw new UnauthorizedException('Refresh token not found');
       }
       const result: boolean = await this.authService.revokeAllActiveSessions(refreshToken);
-      if (!result) throw new HttpException('Active sessions not found', HttpStatus.NOT_FOUND);
+      if (!result) throw new HttpException({message: 'Active sessions not found'}, HttpStatus.NOT_FOUND);
       return { message: 'All sessions revoked successfully.' };
     } catch (error) {
       // Обрабатываем ошибку, чтобы не возвращать 200
@@ -332,7 +325,7 @@ export class AuthController {
   @Post('/hash-password')
   async hashPassword(@Body('password') passwordByUser: string): Promise<string> {
     try {
-      console.log("мы попали в controller Auth hash-password", passwordByUser);
+      //console.log("мы попали в controller Auth hash-password", passwordByUser);
       const password = await this.authService._generateHash(passwordByUser);
       return password;
     } catch (error) {
@@ -371,14 +364,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Private Policy' }) // Описание эндпоинта
   @Get('/private')
   async PrivatePolicy(
-    @Body('token') tokenRecaptcha: string, 
-    @Ip() remoteIp: string
   ) {
-    //Это метод для Recaptcha
-    const isValid = await this.recaptchaAdapter.validateToken(tokenRecaptcha, remoteIp);
-    if (!isValid) {
-      throw new HttpException('Invalid reCAPTCHA token', HttpStatus.BAD_REQUEST);
-    }
    return "Политика конфиденциальности"
   }
 
@@ -390,10 +376,10 @@ export class AuthController {
     @Ip() remoteIp: string
   ) {
     //Это метод для Recaptcha
-    console.log("Я token из рекапчи:", tokenRecaptcha)
+    //console.log("Я token из рекапчи:", tokenRecaptcha)
     const isValid = await this.recaptchaAdapter.validateToken(tokenRecaptcha, remoteIp);
     if (!isValid) {
-      throw new HttpException('Invalid reCAPTCHA token', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message:'Invalid reCAPTCHA token'}, HttpStatus.BAD_REQUEST);
     }
    return "Политика конфиденциальности"
   }

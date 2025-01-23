@@ -24,7 +24,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
       const createdPost = await this.postsRepository.createPost(postDto, command.userId);
 
       if (!createdPost) {
-        throw new HttpException('Failed to create post', HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException({message: 'Failed to create post'}, HttpStatus.BAD_REQUEST);
       }
 
       // Убедимся, что все обязательные поля заполнены

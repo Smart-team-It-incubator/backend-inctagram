@@ -21,7 +21,7 @@ export class GithubAuthController {
   @ApiOperation({ summary: 'Login через Github' })
   @UseGuards(AuthGuard('github'))
   async githubLogin() {
-    console.log("Попадание в Github Login")
+    //console.log("Попадание в Github Login")
     // Redirect to GitHub login page
   }
 
@@ -34,21 +34,21 @@ export class GithubAuthController {
     const githubUser = req.user; // Данные пользователя из GitHub
     const { githubId, email, username } = githubUser;
     const isGithubRequest = true
-    //console.log("Попали в GitHub callback", githubUser);
+    ////console.log("Попали в GitHub callback", githubUser);
 
     // Генерация username, если он не пришел от GitHub
     let validUsername = username || generateUsernameFromEmail(email);
     // Проверка уникальности username
     validUsername = await getUniqueUsername(validUsername, this.CoreAppApiService);
-    //console.log("validUsername при регистрации через Github:", validUsername);
+    ////console.log("validUsername при регистрации через Github:", validUsername);
 
     // 1. Ищем пользователя по githubId
     let userByGithubId = await this.CoreAppApiService.getUserByGithubId(githubId);
-    //console.log("userByGithubId", userByGithubId);
+    ////console.log("userByGithubId", userByGithubId);
 
     // 2. Ищем пользователя по Email
     let userByEmail = await this.CoreAppApiService.getUserByEmail(email);
-    //console.log("userByEmail", userByEmail);
+    ////console.log("userByEmail", userByEmail);
 
     // 3. Пользователь найден по githubId, выполняем вход
     if (userByGithubId) {
@@ -56,14 +56,14 @@ export class GithubAuthController {
 
       // Отправляем accessToken и refreshToken в cookies
       res.cookie('accessToken', loginResult.accessToken, {
-        httpOnly: false, //process.env.HTTP_ONLY,
-        secure: false, //process.env.NODE_ENV === 'production',
+        httpOnly: process.env.HTTP_ONLY,
+        secure: process.env.NODE_ENV === 'PRODUCTION',
         domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
       res.cookie('refreshToken', loginResult.refreshToken, {
-        httpOnly: false, //process.env.HTTP_ONLY,
-        secure: false, //process.env.NODE_ENV === 'production',
+        httpOnly: process.env.HTTP_ONLY,
+        secure: process.env.NODE_ENV === 'PRODUCTION',
         domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
@@ -80,14 +80,14 @@ export class GithubAuthController {
       const loginResult = await this.AuthApiService.login({ email, password: 'emptyPassword', githubId, isGithubRequest },);
       // Отправляем accessToken и refreshToken в cookies
       res.cookie('accessToken', loginResult.accessToken, {
-        httpOnly: false, //process.env.HTTP_ONLY,
-        secure: false, //process.env.NODE_ENV === 'production',
+        httpOnly: process.env.HTTP_ONLY,
+        secure: process.env.NODE_ENV === 'PRODUCTION',
         domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
       res.cookie('refreshToken', loginResult.refreshToken, {
-        httpOnly: false, //process.env.HTTP_ONLY,
-        secure: false, //process.env.NODE_ENV === 'production',
+        httpOnly: process.env.HTTP_ONLY,
+        secure: process.env.NODE_ENV === 'PRODUCTION',
         domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
@@ -109,7 +109,7 @@ export class GithubAuthController {
       // Регистрируем пользователя
       const newUser = await this.CoreAppApiService.registerUserByGithub(createUserDto);
 
-      // console.log("new user",newUser)
+      // //console.log("new user",newUser)
 
       // Верифицируем Email т.к он подтвержден Github
       const userUpdateDto: UpdateUserDto = { isEmailConfirmed: true };
@@ -120,14 +120,14 @@ export class GithubAuthController {
 
       // Отправляем accessToken и refreshToken в cookies
       res.cookie('accessToken', loginResult.accessToken, {
-        httpOnly: false, //process.env.HTTP_ONLY,
-        secure: false, //process.env.NODE_ENV === 'production',
+        httpOnly: process.env.HTTP_ONLY,
+        secure: process.env.NODE_ENV === 'PRODUCTION',
         domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });
       res.cookie('refreshToken', loginResult.refreshToken, {
-        httpOnly: false, //process.env.HTTP_ONLY,
-        secure: false, //process.env.NODE_ENV === 'production',
+        httpOnly: process.env.HTTP_ONLY,
+        secure: process.env.NODE_ENV === 'PRODUCTION',
         domain: '.smart-reg.org.ru', // Указывает основной домен и включает все субдомены
         maxAge: 24 * 60 * 60 * 1000, // 1 день
       });

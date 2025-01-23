@@ -125,7 +125,6 @@ describe('Post flow', () => {
         const loginAndGetToken = async (user: any) => {
             const authResponse = await postRequest(appAuth, RouteNames.AUTH.LOGIN.full)
                 .send({ email: user.email, password: userForTest1.password });
-            console.log("authResponse:", authResponse)
             return authResponse.body.accessToken;
         };
 
@@ -203,18 +202,13 @@ describe('Post flow', () => {
 
             const postsResponseBeforeDelete = await getUserPosts(user.id, token);
 
-            console.log('Количество постов до удаления:', postsResponseBeforeDelete.body.length);
-
             // Удаляем 3 поста
             const postsToDelete = postsResponseBeforeDelete.body.slice(0, 3); // Выбираем первые 3 поста
             for (const post of postsToDelete) {
                 await deletePost(post.id, token);
-                console.log(`Удален пост с ID: ${post.id}`);
             }
 
             const postsResponseAfterDelete = await getUserPosts(user.id, token);
-
-            console.log('Количество постов после удаления:', postsResponseAfterDelete.body.length);
 
             expect(postsResponseAfterDelete.body.length).toBe(7);
 
@@ -228,16 +222,12 @@ describe('Post flow', () => {
             });
             // Получаем все посты пользователя до создания нового
             const postsResponseBeforeCreate = await getUserPosts(user.id, tokenGlobal);
-            console.log('Количество постов до создания:', postsResponseBeforeCreate.body.length);
             // Создаем новый пост
             const response = await createPost(postForTest, tokenGlobal);
 
             // Получаем все посты пользователя после создания нового
             const postsResponseAfterCreate = await getUserPosts(user.id, tokenGlobal);
-
-            // Логируем количество постов после создания
-            console.log('Количество постов после создания:', postsResponseAfterCreate.body.length);
-
+            
             // Проверяем, что количество постов увеличилось
             expect(postsResponseAfterCreate.body.length).toBeGreaterThan(postsResponseBeforeCreate.body.length);
 

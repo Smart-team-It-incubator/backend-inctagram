@@ -23,7 +23,7 @@ export class RecaptchaAdapter {
    */
   async validateToken(token: string, remoteIp?: string): Promise<boolean> {
     if (!token) {
-      throw new HttpException('Missing reCAPTCHA token', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message:'Missing reCAPTCHA token', field: "recaptcha token" }, HttpStatus.BAD_REQUEST);
     }
 
     try {
@@ -38,7 +38,6 @@ export class RecaptchaAdapter {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         },
       );
-      console.log(response)
       const { success, 'error-codes': errorCodes } = response.data;
 
       if (!success) {
@@ -49,7 +48,7 @@ export class RecaptchaAdapter {
       return true;
     } catch (error) {
       console.error('Error validating reCAPTCHA:', error.message);
-      throw new HttpException('Failed to validate reCAPTCHA', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException({message: 'Failed to validate reCAPTCHA'}, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

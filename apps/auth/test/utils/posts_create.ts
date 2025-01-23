@@ -42,5 +42,5 @@ export async function seedPosts(prisma: PrismaClient, userId: string) {
     });
   }
 
-  console.log('10 posts created successfully');
+  //console.log('10 posts created successfully');
 }
