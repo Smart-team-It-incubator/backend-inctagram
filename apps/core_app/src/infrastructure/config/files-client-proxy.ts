@@ -40,7 +40,7 @@ export class FilesClientService {
     // Преобразуем Observable в Promise и загружаем файл
     const photoUrl = await this.sendFileToFilesService(file).toPromise();
 
-    console.log("photoUrl из SendFileService:", photoUrl)
+    //console.log("photoUrl из SendFileService:", photoUrl)
   
     return { url: photoUrl };  // Возвращаем URL загруженного файла
   }

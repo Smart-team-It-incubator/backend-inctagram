@@ -139,14 +139,14 @@ export class UsersRepository {
           where: { id: userId },
           data: fieldsToUpdate,
         });
-        //console.log("updatedUser",updatedUser)
+        ////console.log("updatedUser",updatedUser)
         if (!updatedUser) {
           return null
         }
     
         return updatedUser ;
       } catch (error) {
-        console.log(error.message)
+        //console.log(error.message)
         throw new Error(`Failed to update user: ${error.message}`);
       }
     }
@@ -156,14 +156,14 @@ export class UsersRepository {
         const deletedUser = await this.prisma.user.delete({
           where: { id: userId },
         });
-        //console.log("updatedUser",updatedUser)
+        ////console.log("updatedUser",updatedUser)
         if (!deletedUser) {
           return null
         }
     
         return deletedUser ;
       } catch (error) {
-        console.log(error.message)
+        //console.log(error.message)
         throw new Error(`Failed to delete user: ${error.message}`);
       }
     }
@@ -178,7 +178,7 @@ async dropDb() {
       this.prisma.post.deleteMany({}),
       // Добавьте другие таблицы, из которых нужно удалить данные
     ]);
-    console.log('Данные успешно удалены из таблиц User');
+    //console.log('Данные успешно удалены из таблиц User');
   } catch (error) {
     console.error('Ошибка при удалении данных:', error);
   }

@@ -15,7 +15,7 @@ export class AuthApiService {
   // Метод для хеширования пароля
   async hashPassword(password: string): Promise<string> {
     try {
-      console.log(`${this.authAppUrl}/hash-password`, { password }, "Запрос попал в библиотеку метод hash-password"); 
+      //console.log(`${this.authAppUrl}/hash-password`, { password }, "Запрос попал в библиотеку метод hash-password"); 
       const response = await firstValueFrom(
         this.httpService.post(`${this.authAppUrl}/auth/hash-password`, { password }),
       );
@@ -33,14 +33,14 @@ export class AuthApiService {
   // Логин пока используется под Github OAuth
   async login (loginDto: AuthForm) {
     try {
-      console.log(`${this.authAppUrl}/login`, loginDto, "Запрос попал в библиотеку метод Login"); 
+      //console.log(`${this.authAppUrl}/login`, loginDto, "Запрос попал в библиотеку метод Login"); 
       const response = await firstValueFrom(
         this.httpService.post(`${this.authAppUrl}/auth/login`, loginDto, {
           withCredentials: true, // Это обеспечит передачу кук с запросом
         }),
       );
-      console.log("Мы в библиотеке, метод Login - resonse.data", response.data)
-      // console.log("полный response", response)
+      //console.log("Мы в библиотеке, метод Login - resonse.data", response.data)
+      // //console.log("полный response", response)
       return {
         accessToken: response.data,
         refreshToken: response.headers['set-cookie'][0]

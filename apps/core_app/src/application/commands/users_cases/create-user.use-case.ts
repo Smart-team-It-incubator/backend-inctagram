@@ -34,7 +34,7 @@ export class CreateUserUseCase {
 
     async execute(command: CreateUserCommand): Promise<Partial<UserViewModel>> {
         const hashedPassword = await this.authApiService.hashPassword(command.password);
-        //console.log("hashedPassword", hashedPassword)   
+
         const user: CreateUserDto = {
             email: command.email,
             password: hashedPassword,
@@ -50,11 +50,23 @@ export class CreateUserUseCase {
 
         // Проверяем, занят ли username
         if (await this.usersRepository.isFieldTaken('username', command.username)) {
-            throw new HttpException('User with this username is already registered', HttpStatus.CONFLICT);
+            throw new HttpException(
+                {
+                  message: 'User with this username is already registered',
+                  field: 'username',
+                },
+                HttpStatus.CONFLICT,
+              );
         }
         // Проверяем, занят ли email
         if (await this.usersRepository.isFieldTaken('email', command.email)) {
-            throw new HttpException('User with this email is already registered', HttpStatus.CONFLICT);
+            throw new HttpException(
+                {
+                  message: 'User with this email is already registered',
+                  field: 'email',
+                },
+                HttpStatus.CONFLICT,
+              );
         }
         const createdUserView = await this.usersRepository.createUser(user)
         if (createdUserView === null) {

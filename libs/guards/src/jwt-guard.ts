@@ -21,23 +21,23 @@ export class JwtAuthGuard implements CanActivate {
             // Проверяем наличие и формат заголовка Authorization
             const authHeader = req.headers.authorization;
             if (!authHeader || !authHeader.startsWith('Bearer ')) {
-                throw new UnauthorizedException('Authorization header is missing or invalid');
+                throw new UnauthorizedException({message: 'Authorization header is missing or invalid'});
             }
             const [bearer, token] = authHeader.split(' ');
             if (bearer !== 'Bearer' || !token) {
-                throw new UnauthorizedException('Invalid authorization format');
+                throw new UnauthorizedException({message: 'Invalid authorization format'});
             }
-            console.log("Попали в JWT Guard, токен есть, готовится проверка")
+            //console.log("Попали в JWT Guard, токен есть, готовится проверка")
             // Декодируем токен и проверяем полезную нагрузку
             const decodedPayload = await this.jwtServiceClass.verify(token, { secret: process.env.JWT_ACCESS_SECRET });
             if (!decodedPayload || !decodedPayload.username) {
-                throw new UnauthorizedException('Invalid token payload');
+                throw new UnauthorizedException({message: 'Invalid token payload'});
             }
 
             // Получаем пользователя
             const user = await this.coreAppServiceApi.getUserByUsername(decodedPayload.username);
             if (!user) {
-                throw new UnauthorizedException('User not found');
+                throw new UnauthorizedException({message: 'User not found'});
             }
 
             // Присваиваем пользователя запросу
@@ -45,7 +45,7 @@ export class JwtAuthGuard implements CanActivate {
             return true;
         } catch (e) {
             console.error('JWT Auth Guard error:', e.message);
-            throw new UnauthorizedException('Authentication failed');
+            throw new UnauthorizedException({message: 'Authentication failed'});
         }
     }
 }

@@ -29,15 +29,13 @@ export class UpdateUserUseCase {
             }, {});
 
             if (Object.keys(fieldsToUpdate).length === 0) {
-                throw new HttpException('No fields provided for update', HttpStatus.BAD_REQUEST);
+                throw new HttpException({message: 'No fields provided for update'}, HttpStatus.BAD_REQUEST);
             }
-            //console.log("В репозиторий отдаем",fieldsToUpdate)
             const updateResult = await this.usersRepository.updateUser(command.userId,fieldsToUpdate)
-            //console.log(updateResult)
             return updateResult
         }
         catch (error) {
-            throw new HttpException('Обновление упало в сервисе, возможно пользователь не существует', HttpStatus.NOT_FOUND);
+            throw new HttpException({message: 'Обновление упало в сервисе, возможно пользователь не существует'}, HttpStatus.NOT_FOUND);
         }
     }
 }

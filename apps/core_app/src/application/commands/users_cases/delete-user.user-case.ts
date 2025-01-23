@@ -21,11 +21,11 @@ export class DeleteUserUseCase {
         try {
 
             const deleteResult = await this.usersRepository.deleteUser(command.userId)
-            //console.log(updateResult)
+            ////console.log(updateResult)
             return deleteResult
         }
         catch (error) {
-            throw new HttpException('Обновление упало в сервисе, возможно пользователь не существует', HttpStatus.NOT_FOUND);
+            throw new HttpException({message: 'Удаление упало в сервисе, возможно пользователь не существует'}, HttpStatus.NOT_FOUND);
         }
     }
 }

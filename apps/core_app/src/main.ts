@@ -56,7 +56,6 @@ async function bootstrap() {
       }
     ); // Укажи путь к документации
   } catch (error) {
-    console.log(error)
     console.log("Документация не поднялась т.к сервер auth не запущен");
   }
 

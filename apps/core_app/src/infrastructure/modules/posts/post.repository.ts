@@ -68,7 +68,7 @@ export class PostsRepository {
       // Преобразуем созданный пост в PostViewModel и возвращаем публичную версию
       return new PostViewModel(createdPost).getPublicVersion();
     } catch (error) {
-      console.log("Ошибка в репозитории при создании поста:", error.message);
+      //console.log("Ошибка в репозитории при создании поста:", error.message);
     }
   }
 
@@ -84,7 +84,7 @@ export class PostsRepository {
 
       return new PostViewModel(updatedPost).getPublicVersion();
     } catch (error) {
-      console.log("Ошибка в репозитории при обновлении поста:", error.message);
+      //console.log("Ошибка в репозитории при обновлении поста:", error.message);
     }
 
   }
@@ -96,7 +96,7 @@ export class PostsRepository {
       });
       return deletedPost ? true : null;
     } catch (error) {
-      console.log("Ошибка в репозитории при удалении поста:", error.message);
+      //console.log("Ошибка в репозитории при удалении поста:", error.message);
     }
   }
 }

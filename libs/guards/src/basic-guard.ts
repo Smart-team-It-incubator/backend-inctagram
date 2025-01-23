@@ -6,7 +6,7 @@ export class BasicAuthGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const headerAuth = req.headers.authorization;
 
-    console.log("Попал в Basic Guard, проверяем авторизацию");
+    //console.log("Попал в Basic Guard, проверяем авторизацию");
 
     // Логин и пароль для проверки
     const validUsername = 'admin';
@@ -14,7 +14,7 @@ export class BasicAuthGuard implements CanActivate {
 
     // Проверяем наличие заголовка Authorization
     if (!headerAuth || !headerAuth.startsWith('Basic ')) {
-      throw new HttpException('Missing Authorization Header', HttpStatus.UNAUTHORIZED);
+      throw new HttpException({message: 'Missing Authorization Header'}, HttpStatus.UNAUTHORIZED);
     }
 
     // Извлекаем закодированные данные
@@ -24,7 +24,7 @@ export class BasicAuthGuard implements CanActivate {
 
     // Сравниваем с валидными данными
     if (username !== validUsername || password !== validPassword) {
-      throw new HttpException('Incorrect username or password', HttpStatus.UNAUTHORIZED);
+      throw new HttpException({message: 'Incorrect username or password'}, HttpStatus.UNAUTHORIZED);
     }
 
     return true;

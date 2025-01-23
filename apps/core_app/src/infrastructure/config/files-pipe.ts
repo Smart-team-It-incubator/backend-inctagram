@@ -5,12 +5,12 @@ export class FileSizeValidationPipe implements PipeTransform {
 
   transform(file: Express.Multer.File): Express.Multer.File {
     if (!file) {
-      throw new HttpException('File is required', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'File is required' }, HttpStatus.BAD_REQUEST);
     }
 
     if (file.size > this.maxSize) {
-      throw new HttpException(
-        `File size exceeds the maximum allowed size of ${this.maxSize} bytes`,
+      throw new HttpException( {message: `File size exceeds the maximum allowed size of ${this.maxSize} bytes`}
+        ,
         HttpStatus.BAD_REQUEST,
       );
     }

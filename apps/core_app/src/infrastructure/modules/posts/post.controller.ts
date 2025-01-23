@@ -40,7 +40,7 @@ export class PostController {
 
       // Если постов нет, выбрасываем ошибку
       if (!posts || posts.length === 0) {
-        throw new HttpException('Posts not found', HttpStatus.BAD_REQUEST);
+        throw new HttpException({message: 'Posts not found'}, HttpStatus.BAD_REQUEST);
       }
 
       // Возвращаем посты
@@ -48,7 +48,7 @@ export class PostController {
     } catch (error) {
       // Обработка ошибок
       console.error('Error fetching posts:', error.message);
-      throw new HttpException('Failed to fetch posts', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException({message: 'Failed to fetch posts'}, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -99,7 +99,7 @@ export class PostController {
                 description: file?.originalname || 'empty description',
               };
             } catch (error) {
-              throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+              throw new HttpException({message: 'Failed to upload photo'}, HttpStatus.BAD_REQUEST);
             }
           }),
         );
@@ -113,7 +113,7 @@ export class PostController {
       );
   
       if (!createdPost) {
-        throw new HttpException('Failed to create post', HttpStatus.BAD_REQUEST);
+        throw new HttpException({message: 'Failed to create post'}, HttpStatus.BAD_REQUEST);
       }
   
       return createdPost;
@@ -136,10 +136,10 @@ export class PostController {
     @Param('postId') postId: string,
   ) {
     const user = req.user;
-    console.log(postId); // Теперь будет корректно выводить идентификатор поста
+    //console.log(postId); // Теперь будет корректно выводить идентификатор поста
     const result = await this.commandBus.execute(new UpdatePostCommand(updatePostDto, user.id, postId));
     if (!result) {
-      throw new HttpException('Failed to update post', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'Failed to update post'}, HttpStatus.BAD_REQUEST);
     }
     return result;
   }
@@ -166,7 +166,7 @@ export class PostController {
     const user = req.user;
     const result = await this.commandBus.execute(new DeletePostCommand(user.id, postId));
     if (!result) {
-      throw new HttpException('Failed to delete post', HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'Failed to delete post'}, HttpStatus.BAD_REQUEST);
     }
     return result;
   }
@@ -175,7 +175,7 @@ export class PostController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadPhotoTest(@UploadedFile() file: Express.Multer.File) {
     const result = await this.filesClientService.sendFileToFilesService(file).toPromise(); // Преобразуем Observable в Promise
-    console.log("result загрузки:", result);
+    //console.log("result загрузки:", result);
     return result;
   }
 

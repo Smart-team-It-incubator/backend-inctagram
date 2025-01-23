@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { AuthModule } from '../src/auth.module';
 import { PrismaService } from '../prisma/prisma.service';
-import { getFieldInErrorObject, getRequest, postRequest } from './utils/common';
 import { RouteNames } from '../src/routesConfig/routeNames';
 import { clearAuthDB, clearCoreDB } from './utils/clearDB';
 import { PrismaCoreAppService } from '@core_app/prisma/prisma.service';
@@ -11,6 +10,7 @@ import { AppModule } from '@core_app/src/app.module';
 import { app_auth_settings } from '@auth/src/app_auth_settings';
 import { app_coreApp_settings } from '@core_app/src/infrastructure/app_coreApp_settings';
 import { isEmail } from 'class-validator';
+import { getFieldInErrorObject, getRequest, postRequest } from './utils/common';
 
 describe('E2E registration SINGLE user/auth flow', () => {
   jest.setTimeout(20000);
@@ -72,29 +72,6 @@ describe('E2E registration SINGLE user/auth flow', () => {
     await clearCoreDB(appCoreApp)
   });
 
-  // it('should connect to the database AUTH successfully', async () => {
-  //   try {
-  //     await prismaServiceAuth.$connect();
-  //     console.log('Database connected successfully!');
-  //   } catch (error) {
-  //     console.error('Database connection failed:', error);
-  //     throw error;
-  //   }
-  // });
-  // it('should connect to the database CORE_APP successfully', async () => {
-  //   try {
-  //     await prismaServiceCoreApp.$connect();
-  //     console.log('Database connected successfully!');
-  //   } catch (error) {
-  //     console.error('Database connection failed:', error);
-  //     throw error;
-  //   }
-  // });
-
-  // beforeEach(async () => {
-  // 	await clearAuthDB(appAuth)
-  //   await clearCoreDB(appCoreApp)
-  // })
 
   afterAll(async () => {
     await prismaServiceAuth.$disconnect();
@@ -119,17 +96,6 @@ describe('E2E registration SINGLE user/auth flow', () => {
     });
   })
 
-  // it('проверяем наличие hash-password', async () => {
-  //   console.log("AppCore путь", appAuth.getHttpServer().address());
-  //   const axios = require('axios');
-  //   const response1 = await axios.post('http://127.0.0.1:4000/api/v1/auth/hash-password', {
-  //     password: 'Testpassword1!',
-  //   });
-  //   console.log(response1.data);
-  //   const response = await postRequest(appAuth, "api/v1/auth/hash-password")
-  //     .send({ password: 'Testpassword1!' })
-  //     .expect(201);
-  // })
 
   describe("Регистрация пользователя, вход в систему, получение токенов", () => {
     it("Should return 400 if dto incorrect", async () => {
@@ -140,13 +106,13 @@ describe('E2E registration SINGLE user/auth flow', () => {
         .send(incorrectDtoForRegistation)
         .expect(400)
 
-      // Вытаскиваем текст ошибки из ErrorResponse
-      const [nameFieldErrText, passwordFieldErrText, emailFieldErrText] =
-        getFieldInErrorObject(badResponse.body, ['username', 'password', 'email'])
-      // Берем первый элемент т.к возвращается строка в массиве
-      expect(nameFieldErrText[0]).toBe('Username must be at least 6 characters long')
-      expect(passwordFieldErrText[0]).toBe('Password must be at least 6 characters long')
-      expect(emailFieldErrText[0]).toBe('email must be an email')
+      //Вытаскиваем текст ошибки из ErrorResponse (Ошибки изменены, нужно доработать тесты на новый вид ошибок)
+       const [nameFieldErrText, passwordFieldErrText, emailFieldErrText] =
+       getFieldInErrorObject(badResponse.body, ['username', 'password', 'email'])
+      // //Берем первый элемент т.к возвращается строка в массиве
+       expect(nameFieldErrText[0]).toBe('Username must be at least 6 characters long')
+       expect(passwordFieldErrText[0]).toBe('Password must be at least 6 characters long')
+       expect(emailFieldErrText[0]).toBe('email must be an email')
 
     })
     it("Осуществляем регистрацию пользователя в USERS модуле", async () => {
@@ -222,7 +188,7 @@ describe('E2E registration SINGLE user/auth flow', () => {
       expect(refreshTokenCookie).toBeDefined();
       expect(refreshTokenCookie).toContain('refreshToken='); // Проверяем, что cookie содержит refreshToken
       //Закомментировали временно т.к отключили для фронтов защиту
-      //expect(refreshTokenCookie).toContain('HttpOnly'); // Убедимся, что cookie защищены
+      expect(refreshTokenCookie).toContain('HttpOnly'); // Убедимся, что cookie защищены
 
       // Проверяем формат accessToken
       const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
