@@ -90,6 +90,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/guards/tsconfig.lib.json"
       }
+    },
+    "filters": {
+      "type": "library",
+      "root": "libs/filters",
+      "entryFile": "index",
+      "sourceRoot": "libs/filters/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/filters/tsconfig.lib.json"
+      }
     }
   }
 }

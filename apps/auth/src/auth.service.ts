@@ -32,16 +32,16 @@ export class AuthService {
 
   async login(loginDto: AuthForm, useragent: string, ip: string, refreshTokenExist?: string,): Promise<{ accessToken: string; refreshToken: string }> {
     const { email, password } = loginDto;
-    console.log("Тесты LOGIN DTO", loginDto)
+    //console.log("Тесты LOGIN DTO", loginDto)
     // Шаг 1: Получение данных пользователя из Core_app
     const userResponse = await this.coreAppApiService.getUserByEmail(email);
     if (!userResponse) {
-      throw new HttpException('User with this email not found', HttpStatus.UNAUTHORIZED);
+      throw new HttpException({message: 'User with this email not found', field: "email"}, HttpStatus.UNAUTHORIZED);
     }
 
     // Шаг 1.1: Проверка email на подтверждение, в случае если это Github запрос то Email автоматически подтверждается
     if (!userResponse.isEmailConfirmed && !loginDto.isGithubRequest) {
-      throw new HttpException('Email not confirmed, check your email or use resending method', HttpStatus.UNAUTHORIZED);
+      throw new HttpException({message: 'Email not confirmed, check your email or use resending method', field: "email"}, HttpStatus.UNAUTHORIZED);
     }
 
     const { password: passwordHash } = userResponse;
@@ -49,7 +49,7 @@ export class AuthService {
     // Шаг 2: Проверка пароля, сравниваем hash с введенным паролем, но только если он не через Гитхаб
     const isPasswordValid = await bcrypt.compare(password, passwordHash);
     if (!isPasswordValid && !loginDto.isGithubRequest) {
-      throw new HttpException('The email or password are incorrect try again please', HttpStatus.UNAUTHORIZED);
+      throw new HttpException({message: 'The email or password are incorrect try again please', field: "password"}, HttpStatus.UNAUTHORIZED);
     }
 
 
@@ -59,7 +59,7 @@ export class AuthService {
       const existingSession = await this.authRepository.findOneActiveSession(userResponse.userId, existRefreshTokenPayload?.deviceId);
       //console.log("existingSession:", existingSession);
       if (existingSession) {
-        throw new Error('Active session exists, if you want to update, please use refresh-token');
+        throw new HttpException({message: 'Active session exists, if you want to update, please use refresh-token'}, HttpStatus.BAD_REQUEST);
       }
     }
 

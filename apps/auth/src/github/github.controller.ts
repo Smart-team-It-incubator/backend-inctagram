@@ -40,7 +40,7 @@ export class GithubAuthController {
     let validUsername = username || generateUsernameFromEmail(email);
     // Проверка уникальности username
     validUsername = await getUniqueUsername(validUsername, this.CoreAppApiService);
-    console.log("validUsername при регистрации через Github:", validUsername);
+    //console.log("validUsername при регистрации через Github:", validUsername);
 
     // 1. Ищем пользователя по githubId
     let userByGithubId = await this.CoreAppApiService.getUserByGithubId(githubId);

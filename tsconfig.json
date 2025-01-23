@@ -62,6 +62,12 @@
       ],
       "@app/guards/*": [
         "libs/guards/src/*"
+      ],
+      "@app/filters": [
+        "libs/filters/src"
+      ],
+      "@app/filters/*": [
+        "libs/filters/src/*"
       ]
     }
   }

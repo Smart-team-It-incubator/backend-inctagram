@@ -22,9 +22,9 @@
     "start:auth": "cross-env NODE_ENV=PRODUCTION node dist/apps/auth/main",
     "start:files": "cross-env ENV_FILE=./apps/files/.production.env node dist/apps/files/main",
     "start:dev:core_app": "cross-env NODE_ENV=DEV nest start core_app --watch --debug=9009",
-    "start:dev:auth": "cross-env NODE_ENV=DEV nest start auth --watch --debug",  
+    "start:dev:auth": "cross-env NODE_ENV=DEV nest start auth --watch --debug",
     "start:dev:files": "cross-env ENV_FILE=./apps/files/.development.env nest start files --watch",
-    "start:test:core_app": "cross-env NODE_ENV=TEST nest start core_app --watch --debug=9009",    
+    "start:test:core_app": "cross-env NODE_ENV=TEST nest start core_app --watch --debug=9009",
     "start:test:auth": "cross-env NODE_ENV=TEST nest start auth --watch --debug",
     "migrate:core_app:dev": "dotenv -e ./apps/core_app/.development.env -- npx prisma migrate dev --schema=./apps/core_app/prisma/schema.prisma",
     "migrate:core_app:prod": "dotenv -e ./apps/core_app/.production.env -- npx prisma migrate deploy --schema=./apps/core_app/prisma/schema.prisma",
@@ -37,7 +37,7 @@
     "migrate:auth:test": "dotenv -e ./apps/auth/.test.env -- npx prisma migrate dev --schema=./apps/auth/prisma/schema.prisma",
     "generate:auth": "dotenv -e ./apps/core_app/.development.env -- npx prisma generate --schema=./apps/auth/prisma/schema.prisma",
     "generate:core_app": "dotenv -e ./apps/core_app/.development.env -- npx prisma generate --schema=./apps/core_app/prisma/schema.prisma",
-    "libs:builds": "nest build shared-dto && nest build auth-api && nest build core-app-api && nest build email-service && nest build guards"
+    "libs:builds": "nest build shared-dto && nest build auth-api && nest build core-app-api && nest build email-service && nest build guards && nest build filters"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.726.1",
@@ -129,7 +129,8 @@
       "@core_app(|/.*)$": "<rootDir>/apps/core_app/$1",
       "@auth(|/.*)$": "<rootDir>/apps/auth/$1",
       "^@app/email-service(|/.*)$": "<rootDir>/libs/email-service/src/$1",
-      "^@app/guards(|/.*)$": "<rootDir>/libs/guards/src/$1"
+      "^@app/guards(|/.*)$": "<rootDir>/libs/guards/src/$1",
+      "^@app/filters(|/.*)$": "<rootDir>/libs/filters/src/$1"
     }
   },
   "main": "index.js",

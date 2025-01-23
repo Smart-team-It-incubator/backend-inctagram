@@ -25,7 +25,7 @@ export class DeleteUserUseCase {
             return deleteResult
         }
         catch (error) {
-            throw new HttpException('Обновление упало в сервисе, возможно пользователь не существует', HttpStatus.NOT_FOUND);
+            throw new HttpException({message: 'Удаление упало в сервисе, возможно пользователь не существует'}, HttpStatus.NOT_FOUND);
         }
     }
 }

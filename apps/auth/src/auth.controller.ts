@@ -44,6 +44,7 @@ export class AuthController {
   })
   async login(@Body() loginDto: AuthForm, @Res() res, @Req() req) {
     try {
+      console.log("Попадание в Login")
       const ip = req.ip
       const useragent = req.headers['user-agent'];
       const refreshTokenExist = req.cookies?.refreshToken; // Получаем токен из Cookie
@@ -61,9 +62,10 @@ export class AuthController {
         .send({ accessToken: result.accessToken });
     } catch (error) {
       if (error.message === 'Active session exists, if you want to update, please use refresh-token') {
-        throw new HttpException('Уже существует активная сессия для устройства с этим Refresh Token, если нужно обновить, обратись на refresh-token.', HttpStatus.CONFLICT);
+        throw new HttpException({message: 'Уже существует активная сессия для устройства с этим Refresh Token, если нужно обновить, обратись на refresh-token.'}, HttpStatus.CONFLICT);
       }
-      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+      // Здесь возвращаем Error.response, так как ошибка происходит на уровне сервиса и важно передать весь объект
+      throw new HttpException(error.response, HttpStatus.UNAUTHORIZED);
     }
   }
 
