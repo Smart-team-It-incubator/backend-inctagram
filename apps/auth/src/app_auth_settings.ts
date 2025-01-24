@@ -9,7 +9,8 @@ import { HttpExceptionFilter } from "@app/filters/http-exception.filter";
 export async function app_auth_settings(app: INestApplication) {
     app.enableCors({
         origin: [ '*'],
-        methods: 'GET,POST,PUT,DELETE',
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+        allowedHeaders: 'Content-Type, Accept, Authorization',
         credentials: true, // Разрешение на использование куков
     })
     app.setGlobalPrefix('api/v1');
