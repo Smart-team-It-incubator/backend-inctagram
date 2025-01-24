@@ -7,11 +7,10 @@ import { HttpExceptionFilter } from "@app/filters/http-exception.filter";
 
 export async function app_coreApp_settings(app: INestApplication) {
   app.enableCors({
-    origin: '*', // Разрешает запросы с любого домена
-    methods: '*', // Разрешает все HTTP методы
-    allowedHeaders: '*', // Разрешает любые заголовки
-    credentials: true, // Включить, если нужно использовать куки или авторизационные данные
-  });
+    origin: '*',
+    methods: 'GET,POST,PUT,DELETE',
+    credentials: true, // Разрешение на использование куков
+  })
   app.setGlobalPrefix('api/v1');
   app.use(cookieParser());
   app.useGlobalPipes(

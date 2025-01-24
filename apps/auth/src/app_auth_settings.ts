@@ -8,21 +8,16 @@ import { HttpExceptionFilter } from "@app/filters/http-exception.filter";
 
 export async function app_auth_settings(app: INestApplication) {
     app.enableCors({
-        origin: '*', // Разрешает запросы с любого домена
-        methods: '*', // Разрешает все HTTP методы
-        allowedHeaders: '*', // Разрешает любые заголовки
-        credentials: true, // Включить, если нужно использовать куки или авторизационные данные
-      });
+        origin: ['http://localhost:3000', '*'],
+        methods: 'GET,POST,PUT,DELETE',
+        credentials: true, // Разрешение на использование куков
+    })
     app.setGlobalPrefix('api/v1');
     app.use(cookieParser());
     app.useGlobalPipes(
         new CustomValidationPipe(),
       );
     app.useGlobalFilters(new HttpExceptionFilter())
-    app.use((req, res, next) => {
-        console.log('Headers:', req.headers);
-        next();
-      });
     // Это нужно чтобы в проверки через class-validator можно было делать асинхронными
     // и была возможность внедрять классы в класс проверки
     // https://medium.com/yavar/custom-validation-with-database-in-nestjs-ac008f96abe2
