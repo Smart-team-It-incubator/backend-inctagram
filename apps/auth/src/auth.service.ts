@@ -252,7 +252,8 @@ export class AuthService {
       }
     }
     else {
-      throw new HttpException({message: 'User not found'}, HttpStatus.NOT_FOUND);
+      console.log("Попали в смену пароля и пользователь не найден")
+      throw new HttpException({message: 'User not found when try sending password recovery message'}, HttpStatus.NOT_FOUND);
     }
     
   }
