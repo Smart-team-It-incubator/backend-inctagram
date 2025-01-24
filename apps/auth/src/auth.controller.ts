@@ -192,7 +192,7 @@ export class AuthController {
     },
   })
   async resetPassword(
-    @Query('recoveryCode') recoveryCode: string,
+    @Body('recoveryCode') recoveryCode: string,
     @Body('newPassword') newPassword: string,
   ): Promise<{ message: string }> {
     //console.log("recoveryCode:",recoveryCode, "newPassword:",newPassword)
