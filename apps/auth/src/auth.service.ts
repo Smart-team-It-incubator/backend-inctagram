@@ -246,12 +246,14 @@ export class AuthService {
       // Создаем для юзера код восстановления + срок по которому можем определить актуальность этого запроса
       const userUpdate = await this.coreAppApiService.updateUser(userByEmail.id, {resetPasswordToken: recoveryCode, resetPasswordExpires: new Date(Date.now() + 300000)}); // 5 минут
       // Отправляем письмо
+      console.log("userUpdate", userUpdate)
       return this.emailAdapterService.sendPasswordRecoveryMessage(userEmail, recoveryCode)
       } catch (error) {
         //console.log("Что-то произошло при отправке письма для восстановления пароля", error)
       }
     }
     else {
+      console.log("userEmail",  userEmail)
       console.log("Попали в смену пароля и пользователь не найден")
       throw new HttpException({message: 'User not found when try sending password recovery message'}, HttpStatus.NOT_FOUND);
     }
