@@ -6,8 +6,20 @@ import { AppModule } from "../app.module";
 import { HttpExceptionFilter } from "@app/filters/http-exception.filter";
 
 export async function app_coreApp_settings(app: INestApplication) {
-  app.enableCors({
-    origin: '*',
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://smart-reg.org.ru',
+    'https://auth.smart-reg.org.ru',
+  ];
+app.enableCors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
     methods: 'GET,POST,PUT,DELETE',
     credentials: true, // Разрешение на использование куков
   })
