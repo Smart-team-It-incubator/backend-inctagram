@@ -5,6 +5,7 @@ import { AuthForm } from '@app/shared-dto/dtos/auth/auth-form.dto';
 import { EmailAdapterService } from '@app/email-service';
 import { RecaptchaAdapter } from './utils/recaptcha_adapter';
 import { JwtAuthGuard } from '@app/guards';
+import { privacyPolicy, termsOfService } from './utils/private_terms';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -196,6 +197,7 @@ export class AuthController {
     @Body('newPassword') newPassword: string,
   ): Promise<{ message: string }> {
     //console.log("recoveryCode:",recoveryCode, "newPassword:",newPassword)
+    console.log(recoveryCode)
     const result = await this.authService.resetPassword(recoveryCode, newPassword)
     if (!result) {
       // Если результат отсутствует, токен может быть недействительным или истёкшим
@@ -358,14 +360,14 @@ export class AuthController {
   @ApiOperation({ summary: 'Terms of Service' }) // Описание эндпоинта
   @Get('/terms')
   async termOfService() {
-   return "Условия предоставления услуг"
+   return termsOfService
   }
 
   @ApiOperation({ summary: 'Private Policy' }) // Описание эндпоинта
   @Get('/private')
   async PrivatePolicy(
   ) {
-   return "Политика конфиденциальности"
+   return privacyPolicy
   }
 
   
