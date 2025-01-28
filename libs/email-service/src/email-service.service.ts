@@ -12,7 +12,7 @@ export class EmailAdapterService {
 		private readonly telegramService: TelegramService
 	) {
 		this.transporter = nodemailer.createTransport({
-			host: 'mail.hosting.reg.ru', // Хост вашего почтового сервиса
+			host: 'smtp.gmail.com',//'mail.hosting.reg.ru', // Хост вашего почтового сервиса
 			port: 587, // Порт (обычно 587 для TLS)
 			secure: false, // true для 465, false для других портов
 			tls: {
