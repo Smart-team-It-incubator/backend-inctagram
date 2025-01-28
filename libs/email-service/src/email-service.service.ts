@@ -22,6 +22,9 @@ export class EmailAdapterService {
 				user: process.env.EMAIL_USER, // Ваш почтовый адрес
 				pass: process.env.EMAIL_PASSWORD, // Пароль
 			},
+			connectionTimeout: 15000, // Увеличено время ожидания на соединение
+			socketTimeout: 15000, // Увеличено время ожидания на сокет
+			debug: true,               // Включение отладки
 			
 		});
 	}
