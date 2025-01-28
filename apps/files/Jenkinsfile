@@ -88,7 +88,7 @@ pipeline {
                                 // Проверяем доступ к порту 587
             sh """
             echo 'Checking access to port 587...'
-            if nc -zv smtp.example.com 587; then
+            if nc -zv mail.hosting.reg.ru 587; then
                 echo 'Port 587 is accessible!'
             else
                 echo 'Port 587 is not accessible, deployment aborted.'
