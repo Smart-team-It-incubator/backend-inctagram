@@ -18,13 +18,16 @@ import { GetUserByResetPasswordTokenUseCase } from '@core_app/src/application/co
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { JwtService } from '@nestjs/jwt';
 import { DeleteUserUseCase } from '@core_app/src/application/commands/users_cases/delete-user.user-case';
+import { EmailConsumerService } from '@app/email-service/rabbitMQ/email-consumer-service';
+import { EmailProducerService } from '@app/email-service/rabbitMQ/email-producer-service';
+import { RabbitMQModule } from '@app/email-service/rabbitMQ/rabbit.module';
 
 
 const useCasesUsers = [GetUserByResetPasswordTokenUseCase,
   GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, DeleteUserUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase, GetUserByGithubIdUseCase, UpdateUserUseCase, ResendConfirmationCodeUseCase]
 @Module({
-  imports: [CqrsModule,HttpModule,],
-  providers: [ PrismaCoreAppService, UsersRepository, ...useCasesUsers, AuthApiService, JwtService, CoreAppApiService],
+  imports: [CqrsModule, HttpModule, RabbitMQModule],
+  providers: [ PrismaCoreAppService, UsersRepository, ...useCasesUsers, AuthApiService, JwtService, CoreAppApiService, EmailProducerService, EmailConsumerService,],
   controllers: [UserController]
 })
 export class UserModule {}

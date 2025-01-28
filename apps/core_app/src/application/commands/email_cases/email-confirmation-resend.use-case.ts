@@ -1,4 +1,5 @@
 import { EmailAdapterService } from "@app/email-service";
+import { EmailProducerService } from "@app/email-service/rabbitMQ/email-producer-service";
 import { UserViewModel } from "@core_app/src/domain/interfaces/view_models/UserViewModel";
 import { UsersRepository } from "@core_app/src/infrastructure/modules/users/user.repository";
 import { CommandHandler } from "@nestjs/cqrs";
@@ -14,7 +15,8 @@ export class ResendConfirmationCodeCommand {
 @CommandHandler(ResendConfirmationCodeCommand)
 export class ResendConfirmationCodeUseCase {
     constructor(protected usersRepository: UsersRepository,
-        private readonly emailService: EmailAdapterService
+        private readonly emailService: EmailAdapterService, 
+        private readonly emailProducerService: EmailProducerService // Используем RabbitMQ сервис
     ) { }
 
     async execute(command: ResendConfirmationCodeCommand): Promise<boolean | null> {
@@ -34,10 +36,13 @@ export class ResendConfirmationCodeUseCase {
             return null // Проверяем, если пользователь не создан, то отправлять email не нужно
         }
 
-        // Запуск отправки Email в фоне, т.к возможно из-за VPN проблемы связи с email-server, для повторной отправки сделаем Email-Resending
+        //Запуск отправки Email в фоне, т.к возможно из-за VPN проблемы связи с email-server, для повторной отправки сделаем Email-Resending
         this.emailService.sendEmailConfirmationMessage(command.email, resultUserUpdate.emailConfirmationCode).catch((error) => {
             console.error('Failed to send email:', error);
         });
+        // await this.emailProducerService.sendEmailConfirmationMessage({email: command.email, confirmationCode: resultUserUpdate.emailConfirmationCode}).catch((error) => {
+        //     console.error('Failed to send email:', error);
+        // })
 
         return true
     }
