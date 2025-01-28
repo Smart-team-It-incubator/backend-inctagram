@@ -15,7 +15,7 @@ WORKDIR /home/node/dist/${SERVICE}
 
 # Install netcat for runtime network diagnostics
 USER root
-RUN apk add --no-cache netcat
+RUN apk add --no-cache netcat-openbsd
 USER node
 
 # Install app dependencies
