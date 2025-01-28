@@ -37,12 +37,8 @@ export class ResendConfirmationCodeUseCase {
         }
 
         //Запуск отправки Email в фоне, т.к возможно из-за VPN проблемы связи с email-server, для повторной отправки сделаем Email-Resending
-        this.emailService.sendEmailConfirmationMessage(command.email, resultUserUpdate.emailConfirmationCode).catch((error) => {
-            console.error('Failed to send email:', error);
-        });
-        // await this.emailProducerService.sendEmailConfirmationMessage({email: command.email, confirmationCode: resultUserUpdate.emailConfirmationCode}).catch((error) => {
-        //     console.error('Failed to send email:', error);
-        // })
+        this.emailService.sendEmailConfirmationMessage(command.email, resultUserUpdate.emailConfirmationCode)
+        // await this.emailProducerService.sendEmailConfirmationMessage({email: command.email, confirmationCode: resultUserUpdate.emailConfirmationCode})
 
         return true
     }
