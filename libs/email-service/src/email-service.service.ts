@@ -13,8 +13,8 @@ export class EmailAdapterService {
 	) {
 		this.transporter = nodemailer.createTransport({
 			host: 'mail.hosting.reg.ru', // Хост вашего почтового сервиса
-			port: 465, // Порт (обычно 587 для TLS)
-			secure: true, // true для 465, false для других портов
+			port: 587, // Порт (обычно 587 для TLS)
+			secure: false, // true для 465, false для других портов
 			tls: {
 				ciphers: 'SSLv3',
 			},
