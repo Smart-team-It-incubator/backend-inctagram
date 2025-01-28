@@ -1,37 +1,41 @@
-# Check out https://hub.docker.com/_/node to select a new base image
+# Указываем базовый образ
 FROM node:20.11-alpine
+
+# Аргументы сборки
 ARG port
 ARG service
 ENV SERVICE=$service
 ENV PORT=$port
-# Set to a non-root built-in user `node`
 
+# Устанавливаем пользователя node
 USER node
 
-# Create app directory (with user `node`)
+# Создаем директорию приложения
 RUN mkdir -p /home/node/dist/${SERVICE}
 
 WORKDIR /home/node/dist/${SERVICE}
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-
-
-
+# Устанавливаем зависимости
 COPY --chown=node package*.json ./
-
 RUN npm install --force
 
-# Bundle app source code
+# Копируем исходный код приложения
 COPY --chown=node . .
 
+# Собираем приложение
 RUN npm run libs:builds
 RUN npm run generate:core_app
 RUN npm run build:${SERVICE}
 
-# Bind to all network interfaces so that it can be mapped to the host OS
+# Добавляем скрипт для проверки порта
+USER root
+RUN apk add --no-cache bash curl
 
+COPY --chown=node ./check-port.sh /usr/local/bin/check-port.sh
+RUN chmod +x /usr/local/bin/check-port.sh
+
+# Открываем порт
 EXPOSE ${PORT}
 
-CMD npm run 'start:core_app'
+# Команда запуска с проверкой порта
+CMD /usr/local/bin/check-port.sh 587 && npm run start:core_app
