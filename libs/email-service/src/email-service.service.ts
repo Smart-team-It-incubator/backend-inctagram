@@ -22,10 +22,6 @@ export class EmailAdapterService {
 				user: process.env.EMAIL_USER, // Ваш почтовый адрес
 				pass: process.env.EMAIL_PASSWORD, // Пароль
 			},
-			// Настройки таймаутов
-			connectionTimeout: 60 * 1000, // Время ожидания подключения (мс)
-			greetingTimeout: 30 * 1000,   // Время ожидания приветствия от сервера (мс)
-			socketTimeout: 120 * 1000,    // Максимальное время ожидания ответа сервера (мс)
 		});
 	}
 
