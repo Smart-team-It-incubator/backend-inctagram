@@ -13,6 +13,11 @@ RUN mkdir -p /home/node/dist/${SERVICE}
 
 WORKDIR /home/node/dist/${SERVICE}
 
+# Install netcat for runtime network diagnostics
+USER root
+RUN apk add --no-cache netcat-openbsd
+USER node
+
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)

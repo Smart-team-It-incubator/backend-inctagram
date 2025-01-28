@@ -85,6 +85,16 @@ pipeline {
         stage('Deploy to Kubernetes') {
              steps {
                  withKubeConfig([credentialsId: 'prod-kubernetes']) {
+                                                    // Проверяем доступ к порту 587
+            sh """
+            echo 'Checking access to port 587...'
+            if nc -zv mail.hosting.reg.ru 587; then
+                echo 'Port 587 is accessible!'
+            else
+                echo 'Port 587 is not accessible, deployment aborted.'
+                exit 1
+            fi
+            """
                     sh "kubectl apply -f ./apps/${env.SERVICE}/deployment.yaml"
                     sh "kubectl rollout status deployment/${env.DEPLOYMENT_NAME} --namespace=${env.NAMESPACE}"
                     sh "kubectl get services -o wide"
