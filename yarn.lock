@@ -2026,6 +2026,13 @@
   resolved "https://registry.npmjs.org/@tsconfig/node16/-/node16-1.0.4.tgz"
   integrity sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==
 
+"@types/aws-sdk2-types@*":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@types/aws-sdk2-types/-/aws-sdk2-types-0.0.5.tgz#2950ee74277e70d013ad14847672d87be724223d"
+  integrity sha512-FIOe05YZpdvafyZxlAmflV5jStj2TJoyFBtLJvXJnQauxQGFSVrazauVws1mlLRwS0GnITlFipNh0kHWdnUU1g==
+  dependencies:
+    "@types/node" "*"
+
 "@types/babel__core@^7.1.14":
   version "7.20.5"
   resolved "https://registry.npmjs.org/@types/babel__core/-/babel__core-7.20.5.tgz"
@@ -2204,6 +2211,39 @@
   integrity sha512-V09KvXxFiutGp6B7XkpaDXlNadZxrzajcY50EuoLIpQ6WWYCSvf19lVIazzfIzQvhUN2HjX12spLojTnhuKlGg==
   dependencies:
     undici-types "~6.20.0"
+
+"@types/nodemailer-direct-transport@*":
+  version "1.0.35"
+  resolved "https://registry.yarnpkg.com/@types/nodemailer-direct-transport/-/nodemailer-direct-transport-1.0.35.tgz#e6ce91c536b0626f75a62e175acba82de5aecf2e"
+  integrity sha512-D3CqXuU4WcHflbFF/ZMG4gXRU2OJKzv44XgPKX3FxLxU1nWz6l+hsAkN7dcBvBSu74muXUxd8EGioBW04iWZ5g==
+  dependencies:
+    "@types/nodemailer" "^3"
+
+"@types/nodemailer-ses-transport@*":
+  version "1.5.5"
+  resolved "https://registry.yarnpkg.com/@types/nodemailer-ses-transport/-/nodemailer-ses-transport-1.5.5.tgz#b2a7dc789e50a18842cc7e1cff5a2742e827d3e9"
+  integrity sha512-QL1SjkySMfpjnPEkPLZHY/wZleEboGsEruuZzDCI2dk/VDShoizX2smF859MDFLbtA/yHE/u7+7U/lkNgSe0Gg==
+  dependencies:
+    "@types/aws-sdk2-types" "*"
+    "@types/nodemailer" "^3"
+
+"@types/nodemailer-smtp-transport@*", "@types/nodemailer-smtp-transport@^2.7.8":
+  version "2.7.8"
+  resolved "https://registry.yarnpkg.com/@types/nodemailer-smtp-transport/-/nodemailer-smtp-transport-2.7.8.tgz#9f3eab693286008123a18930f319bb10de11510e"
+  integrity sha512-r+6LLaO4VtzP2FFLjOZGXpsm1Oz4wm5U9BdiMPfOFiIJhpPRmNKFXrzuBZUufRJoHhNi+NnS7Igy+m8ZyrADQg==
+  dependencies:
+    "@types/node" "*"
+    "@types/nodemailer" "^3"
+
+"@types/nodemailer@^3":
+  version "3.1.14"
+  resolved "https://registry.yarnpkg.com/@types/nodemailer/-/nodemailer-3.1.14.tgz#8482420dbc4a2fa28ffe08bb3482b9dfacabe713"
+  integrity sha512-8PYFpsjpGMOk3i4XRPM0piXa1OtGckjDjrvXAuKYZjXuvAI6XcrD/cN3f5MrqNVPDZGyxtlvQdhGzXo/D/uS/Q==
+  dependencies:
+    "@types/node" "*"
+    "@types/nodemailer-direct-transport" "*"
+    "@types/nodemailer-ses-transport" "*"
+    "@types/nodemailer-smtp-transport" "*"
 
 "@types/oauth@*":
   version "0.9.6"
