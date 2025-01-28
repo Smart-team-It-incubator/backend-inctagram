@@ -44,8 +44,12 @@ export class EmailAdapterService {
 			const telegramMessage = `📧 Email отправлен:\nTo: ${to}\nSubject: ${subject}\nBody: ${text}`;
 			await this.telegramService.sendMessage('490130518', telegramMessage);
 
-			return this.transporter.sendMail(mailOptions);
+			const response = await this.transporter.sendMail(mailOptions);
+    
+			// Логирование успешного ответа
+			console.log('Email отправлен успешно:', response);
 		} catch (error) {
+			console.error('Ошибка отправки письма:', error);
 			throw new HttpException(`Ошибка отправки письма: ${error.message}`, HttpStatus.BAD_REQUEST);
 		}
 	}
