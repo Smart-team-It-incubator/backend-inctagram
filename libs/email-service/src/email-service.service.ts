@@ -47,7 +47,7 @@ export class EmailAdapterService {
 			const telegramMessage = `📧 Email отправлен:\nTo: ${to}\nSubject: ${subject}\nBody: ${text}`;
 			await this.telegramService.sendMessage('490130518', telegramMessage);
 
-			return await this.transporter.sendMail(mailOptions);
+			return this.transporter.sendMail(mailOptions);
 		} catch (error) {
 			throw new HttpException(`Ошибка отправки письма: ${error.message}`, HttpStatus.BAD_REQUEST);
 		}
@@ -75,7 +75,7 @@ export class EmailAdapterService {
 		// Дублирование сообщения в Telegram
 		// const telegramMessage = `📧 Email отправлен:\nTo: ${userEmail}\nBody: ${htmlMessage}`;
 		// await this.telegramService.sendMessage('490130518', telegramMessage);
-		return await this.sendEmail(userEmail, subject, textMessage, htmlMessage);
+		return this.sendEmail(userEmail, subject, textMessage, htmlMessage);
 	}
 
 	/**
@@ -96,6 +96,6 @@ export class EmailAdapterService {
 		// Дублирование сообщения в Telegram
 		// const telegramMessage = `📧 Email отправлен:\nTo: ${userEmail}\nBody: ${htmlMessage}`;
 		// await this.telegramService.sendMessage('490130518', telegramMessage);
-		return await this.sendEmail(userEmail, subject, textMessage, htmlMessage);
+		return this.sendEmail(userEmail, subject, textMessage, htmlMessage);
 	}
 }
