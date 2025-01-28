@@ -73,9 +73,7 @@ export class CreateUserUseCase {
             return null // Проверяем, если пользователь не создан, то отправлять email не нужно
         }
         // Запуск отправки Email в фоне, т.к возможно из-за VPN проблемы связи с email-server, для повторной отправки сделаем Email-Resending
-        this.emailService.sendEmailConfirmationMessage(command.email, user.emailConfirmationCode).catch((error) => {
-            console.error('Failed to send email:', error);
-        });
+        this.emailService.sendEmailConfirmationMessage(command.email, user.emailConfirmationCode)
 
         return createdUserView
     }

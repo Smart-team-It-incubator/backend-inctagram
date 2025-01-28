@@ -249,7 +249,7 @@ export class AuthService {
       console.log("userUpdate", userUpdate)
       return this.emailAdapterService.sendPasswordRecoveryMessage(userEmail, recoveryCode)
       } catch (error) {
-        //console.log("Что-то произошло при отправке письма для восстановления пароля", error)
+        console.log("Что-то произошло при отправке письма для восстановления пароля", error)
       }
     }
     else {
