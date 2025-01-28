@@ -73,7 +73,13 @@ export class EmailAdapterService {
 		// Дублирование сообщения в Telegram
 		// const telegramMessage = `📧 Email отправлен:\nTo: ${userEmail}\nBody: ${htmlMessage}`;
 		// await this.telegramService.sendMessage('490130518', telegramMessage);
-		return this.sendEmail(userEmail, subject, textMessage, htmlMessage);
+
+		try {
+			return this.sendEmail(userEmail, subject, textMessage, htmlMessage);
+		} catch (error) {
+			console.log(error)
+		}
+		
 	}
 
 	/**
