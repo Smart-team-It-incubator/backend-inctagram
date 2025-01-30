@@ -14,7 +14,7 @@
     "test": "jest --testPathIgnorePatterns='.*' --passWithNoTests",
     "test:watch": "jest --watch",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "cross-env NODE_ENV=TEST jest --runInBand --apps/core_app/testPathIgnorePatterns='.*' --passWithNoTests",
+    "test:e2e": "cross-env NODE_ENV=TEST jest --runInBand --testPathIgnorePatterns='.*' --passWithNoTests",
     "build:files": "nest build files",
     "build:auth": "nest build auth",
     "build:core_app": "nest build core_app",
