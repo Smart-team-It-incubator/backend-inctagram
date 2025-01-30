@@ -112,6 +112,11 @@ spec:
                  secretKeyRef:
                    name: smart-team-backend-auth-production-config-secret
                    key: NODE_ENV
+             - name: RESEND_API_KEY
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-auth-production-config-secret
+                   key: RESEND_API_KEY
              - name: JWT_ACCESS_SECRET
                valueFrom:
                  secretKeyRef:
