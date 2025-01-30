@@ -18,12 +18,13 @@ import { GetUserByResetPasswordTokenUseCase } from '@core_app/src/application/co
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { JwtService } from '@nestjs/jwt';
 import { DeleteUserUseCase } from '@core_app/src/application/commands/users_cases/delete-user.user-case';
+import { LogModule } from 'apps/log-service/src/log-service.module';
 
 
 const useCasesUsers = [GetUserByResetPasswordTokenUseCase,
   GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, DeleteUserUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase, GetUserByGithubIdUseCase, UpdateUserUseCase, ResendConfirmationCodeUseCase]
 @Module({
-  imports: [CqrsModule,HttpModule,],
+  imports: [CqrsModule,HttpModule,LogModule],
   providers: [ PrismaCoreAppService, UsersRepository, ...useCasesUsers, AuthApiService, JwtService, CoreAppApiService],
   controllers: [UserController]
 })

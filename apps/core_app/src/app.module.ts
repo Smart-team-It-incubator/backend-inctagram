@@ -17,11 +17,12 @@ import { JwtService } from '@nestjs/jwt';
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { HttpModule } from '@nestjs/axios';
 import { FilesClientService } from './infrastructure/config/files-client-proxy';
+import { LogModule } from 'apps/log-service/src/log-service.module';
 
 
 @Module({
   imports: [    
-    PrismaModule, UserModule, GlobalModule, PostModule, HttpModule,
+    PrismaModule, UserModule, GlobalModule, PostModule, HttpModule, LogModule,
     
     ConfigModule.forRoot({
       isGlobal: true,

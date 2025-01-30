@@ -1,28 +1,31 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators/core';
+import { Resend } from 'resend';
 import * as nodemailer from 'nodemailer';
 import { TelegramService } from './telegram-service';
+
 
 @Injectable()
 export class EmailAdapterService {
 	private transporter;
 	private isEmailEnabled = process.env.ENABLE_EMAIL_SENDING === 'true';
+	readonly  resend = new Resend(process.env.RESEND_API_KEY);
 
 	constructor(
 		private readonly telegramService: TelegramService
 	) {
-		this.transporter = nodemailer.createTransport({
-			host: 'mail.hosting.reg.ru', // Хост вашего почтового сервиса
-			port: 587, // Порт (обычно 587 для TLS)
-			secure: false, // true для 465, false для других портов
-			tls: {
-				ciphers: 'SSLv3',
-			},
-			auth: {
-				user: process.env.EMAIL_USER, // Ваш почтовый адрес
-				pass: process.env.EMAIL_PASSWORD, // Пароль
-			},
-		});
+		// this.transporter = nodemailer.createTransport({
+		// 	host: 'mail.hosting.reg.ru', // Хост вашего почтового сервиса
+		// 	port: 587, // Порт (обычно 587 для TLS)
+		// 	secure: false, // true для 465, false для других портов
+		// 	tls: {
+		// 		ciphers: 'SSLv3',
+		// 	},
+		// 	auth: {
+		// 		user: process.env.EMAIL_USER, // Ваш почтовый адрес
+		// 		pass: process.env.EMAIL_PASSWORD, // Пароль
+		// 	},
+		// });
 	}
 
 	/**
@@ -43,7 +46,13 @@ export class EmailAdapterService {
 			const telegramMessage = `📧 Email отправлен:\nTo: ${to}\nSubject: ${subject}\nBody: ${text}`;
 			await this.telegramService.sendMessage('490130518', telegramMessage);
 
-			return this.transporter.sendMail(mailOptions);
+			//return this.transporter.sendMail(mailOptions);
+			await this.resend.emails.send({
+				from: mailOptions.from,
+				to: mailOptions.to,
+				subject: mailOptions.subject,
+				html: mailOptions.html
+			  });
 		} catch (error) {
 			throw new HttpException(`Ошибка отправки письма: ${error.message}`, HttpStatus.BAD_REQUEST);
 		}
