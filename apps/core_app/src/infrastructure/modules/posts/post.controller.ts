@@ -4,7 +4,7 @@ import { GetPostsCommand } from '@core_app/src/application/commands/posts_cases/
 import { UserViewModel } from '@core_app/src/domain/interfaces/view_models/UserViewModel';
 import { Controller, Get, Post, Body, HttpException, HttpStatus, UploadedFile, UseInterceptors, Query, Req, UseGuards, Put, Param, Delete, UploadedFiles } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiExcludeEndpoint, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilesClientService } from '../../config/files-client-proxy';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { PostViewModel } from '@core_app/src/application/services/post/post-interface';
@@ -171,6 +171,7 @@ export class PostController {
     return result;
   }
 
+  @ApiExcludeEndpoint()
   @Post('photosUpload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadPhotoTest(@UploadedFile() file: Express.Multer.File) {
