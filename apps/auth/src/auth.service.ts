@@ -289,4 +289,5 @@ export class AuthService {
     const userUpdate = await this.coreAppApiService.updateUser(user.id, {password: hashedPassword});
     return userUpdate
   }
+
 }

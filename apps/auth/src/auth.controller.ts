@@ -6,6 +6,9 @@ import { EmailAdapterService } from '@app/email-service';
 import { RecaptchaAdapter } from './utils/recaptcha_adapter';
 import { JwtAuthGuard } from '@app/guards';
 import { privacyPolicy, termsOfService } from './utils/private_terms';
+import { User } from '@core_app/src/domain/entities/user-entities';
+import { PublicUserProfileDto } from '@app/shared-dto/dtos/user/public-profile-user.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -334,6 +337,19 @@ export class AuthController {
       return error.message
     }
 
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Получить данные текущего пользователя' })
+  @ApiResponse({ status: 200, description: 'Успешно', type: PublicUserProfileDto })
+  @ApiResponse({ status: 401, description: 'Неавторизован' })
+  @ApiBearerAuth() // Показывает, что нужно передавать JWT-токен
+  @Post('/me')
+  async me(@Req() req): Promise<PublicUserProfileDto> {
+    console.log(req.user)
+    return plainToInstance(PublicUserProfileDto, req.user, {
+      excludeExtraneousValues: true, // Убирает ненужные поля
+    });
   }
 
   // For Dev
