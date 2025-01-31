@@ -68,6 +68,12 @@
       ],
       "@app/filters/*": [
         "libs/filters/src/*"
+      ],
+      "@app/rabbit_client_logger": [
+        "libs/rabbit_client_logger/src"
+      ],
+      "@app/rabbit_client_logger/*": [
+        "libs/rabbit_client_logger/src/*"
       ]
     }
   }

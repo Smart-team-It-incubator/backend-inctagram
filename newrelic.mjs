@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+console.log("New Relic configuration is loaded");
 console.log("inctagram:", process.env.NEW_RELIC_APP_NAME);
 if (!process.env.NEW_RELIC_APP_NAME || !process.env.NEW_RELIC_LICENSE_KEY) {
     console.error('ERROR: NEW_RELIC_APP_NAME or NEW_RELIC_LICENSE_KEY is missing!');
@@ -8,10 +9,21 @@ if (!process.env.NEW_RELIC_APP_NAME || !process.env.NEW_RELIC_LICENSE_KEY) {
   }
 
 'use strict';
-exports.config = {
+export const config = {
   app_name: [process.env.NEW_RELIC_APP_NAME],  // Название вашего приложения в New Relic
   license_key: process.env.NEW_RELIC_LICENSE_KEY,  // Ваш лицензионный ключ New Relic
-  logging: {
-    level: 'info',  // Уровень логирования (можно поменять на 'debug', 'warn', 'error')
+  distributed_tracing: {
+    enabled: true,
   },
+  logging: {
+    level: 'debug',
+  },
+  application_logging: {
+    enabled: true,
+    forwarding: {
+      enabled: true,
+      max_samples_stored: 10000,
+    },
+  },
+  allow_all_headers: true,
 };

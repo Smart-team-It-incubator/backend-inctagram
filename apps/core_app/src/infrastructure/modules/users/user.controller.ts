@@ -20,6 +20,7 @@ import { PublicUserProfileDto } from '@app/shared-dto/dtos/user/public-profile-u
 import { mapToPublicUserProfileDto } from '../../utils/user-mapper';
 import { DeleteUserCommand } from '@core_app/src/application/commands/users_cases/delete-user.user-case';
 import { LogService } from 'apps/log-service/src/log-service.service';
+import { RabbitClientLoggerService } from '@app/rabbit_client_logger';
 
 
 
@@ -27,7 +28,7 @@ import { LogService } from 'apps/log-service/src/log-service.service';
 @Controller('users')
 export class UserController {
   constructor(private commandBus: CommandBus,
-    private readonly logService: LogService
+    private readonly logService: RabbitClientLoggerService
   ) { }
 
 
@@ -39,8 +40,15 @@ export class UserController {
   })
   @Get()
   async getUsers(): Promise<PublicUserProfileDto[] | null> {
+
     // Тест логгера в микросервисе
-    this.logService.log('Тестовое сообщение');
+    try {
+      // Логика, которая может привести к ошибке
+      throw new Error('Произошла ошибка!');
+    } catch (error) {
+      // Отправляем ошибку в логирующий микросервис
+      this.logService.error(error.message);
+    }
     const users: Partial<UserViewModel>[] | null = await this.commandBus.execute(new GetUsersCommand());
     if (!users || users.length === 0) {
       throw new HttpException({message: 'Users not found'}, HttpStatus.BAD_REQUEST);

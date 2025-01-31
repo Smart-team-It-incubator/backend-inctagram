@@ -108,6 +108,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/log-service/tsconfig.app.json"
       }
+    },
+    "rabbit_client_logger": {
+      "type": "library",
+      "root": "libs/rabbit_client_logger",
+      "entryFile": "index",
+      "sourceRoot": "libs/rabbit_client_logger/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/rabbit_client_logger/tsconfig.lib.json"
+      }
     }
   }
 }

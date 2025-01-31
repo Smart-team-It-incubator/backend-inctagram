@@ -18,7 +18,7 @@
     "build:files": "nest build files",
     "build:auth": "nest build auth",
     "build:core_app": "nest build core_app",
-    "start:log": "NEW_RELIC_APP_NAME=${process.env.NEW_RELIC_APP_NAME} NEW_RELIC_LICENSE_KEY=${process.env.NEW_RELIC_LICENSE_KEY} nest start log-service --watch --experimental-loader=newrelic/esm-loader.mjs",
+    "start:log": "cross-env NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED=true NEW_RELIC_APP_NAME=${process.env.NEW_RELIC_APP_NAME} NEW_RELIC_LICENSE_KEY=${process.env.NEW_RELIC_LICENSE_KEY} nest start log-service --watch --experimental-loader=newrelic/esm-loader.mjs",
     "start:core_app": "cross-env NODE_ENV=PRODUCTION nest start core_app --watch",
     "start:auth": "cross-env NODE_ENV=PRODUCTION nest start auth --watch",
     "start:files": "cross-env ENV_FILE=./apps/files/.production.env node dist/apps/files/main",
@@ -38,7 +38,7 @@
     "migrate:auth:test": "dotenv -e ./apps/auth/.test.env -- npx prisma migrate dev --schema=./apps/auth/prisma/schema.prisma",
     "generate:auth": "dotenv -e ./apps/core_app/.development.env -- npx prisma generate --schema=./apps/auth/prisma/schema.prisma",
     "generate:core_app": "dotenv -e ./apps/core_app/.development.env -- npx prisma generate --schema=./apps/core_app/prisma/schema.prisma",
-    "libs:builds": "nest build shared-dto && nest build auth-api && nest build core-app-api && nest build email-service && nest build guards && nest build filters"
+    "libs:builds": "nest build shared-dto && nest build auth-api && nest build core-app-api && nest build email-service && nest build guards && nest build filters && nest build rabbit_client_logger"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.726.1",
@@ -53,9 +53,11 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.4.15",
     "@nestjs/swagger": "^8.1.1",
+    "@newrelic/winston-enricher": "^4.0.1",
     "@prisma/client": "^6.2.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.8",
+    "@types/newrelic": "^9.14.7",
     "@types/passport-github2": "^1.2.9",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
@@ -141,7 +143,8 @@
       "@auth(|/.*)$": "<rootDir>/apps/auth/$1",
       "^@app/email-service(|/.*)$": "<rootDir>/libs/email-service/src/$1",
       "^@app/guards(|/.*)$": "<rootDir>/libs/guards/src/$1",
-      "^@app/filters(|/.*)$": "<rootDir>/libs/filters/src/$1"
+      "^@app/filters(|/.*)$": "<rootDir>/libs/filters/src/$1",
+      "^@app/rabbit_client_logger(|/.*)$": "<rootDir>/libs/rabbit_client_logger/src/$1"
     }
   },
   "main": "index.js",
