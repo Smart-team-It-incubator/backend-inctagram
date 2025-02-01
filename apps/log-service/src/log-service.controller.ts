@@ -9,10 +9,22 @@ export class LogController {
   @EventPattern('log_event')
   handleLog(@Payload() data: any) {
     console.log('Получен лог:', data);
-    if (data.level === 'error') {
-      this.logService.error(data);
-    } else {
-      this.logService.log(data);
+    
+    // В зависимости от уровня логирования вызываем разные методы логирования
+    switch (data.level) {
+      case 'error':
+        this.logService.error(data);
+        break;
+      case 'warn':
+        this.logService.warn(data);
+        break;
+      case 'debug':
+        this.logService.debug(data);
+        break;
+      case 'info':
+      default:
+        this.logService.info(data);
+        break;
     }
   }
 }

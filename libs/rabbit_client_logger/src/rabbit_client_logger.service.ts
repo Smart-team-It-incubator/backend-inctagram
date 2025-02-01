@@ -19,6 +19,7 @@ export class RabbitClientLoggerService {
           level: 'info',
           message: data.message,
           timestamp: new Date().toISOString(),
+          additionalInfo: data.additionalInfo,
         });
       }
       
@@ -28,6 +29,7 @@ export class RabbitClientLoggerService {
           level: 'error',
           message: data.message,
           timestamp: new Date().toISOString(),
+          additionalInfo: data.additionalInfo,
         });
       }
 }

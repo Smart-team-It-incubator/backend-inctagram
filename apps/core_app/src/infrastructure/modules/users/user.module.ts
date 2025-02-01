@@ -23,9 +23,11 @@ import { RabbitClientLoggerModule } from '@app/rabbit_client_logger';
 
 const useCasesUsers = [GetUserByResetPasswordTokenUseCase,
   GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, DeleteUserUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase, GetUserByGithubIdUseCase, UpdateUserUseCase, ResendConfirmationCodeUseCase]
+
 @Module({
-  imports: [CqrsModule,HttpModule,RabbitClientLoggerModule],
-  providers: [ PrismaCoreAppService, UsersRepository, ...useCasesUsers, AuthApiService, JwtService, CoreAppApiService],
-  controllers: [UserController]
+  imports: [CqrsModule,HttpModule],
+  providers: [PrismaCoreAppService, UsersRepository, ...useCasesUsers, AuthApiService, JwtService, CoreAppApiService],
+  controllers: [UserController],
+  exports: []
 })
 export class UserModule {}

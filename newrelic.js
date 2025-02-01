@@ -13,7 +13,7 @@ export const config = {
     enabled: true,
   },
   logging: {
-    level: 'debug',
+    level: 'info',
   },
   application_logging: {
     enabled: true,
