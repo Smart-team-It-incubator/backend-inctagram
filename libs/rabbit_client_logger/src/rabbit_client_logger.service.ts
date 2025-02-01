@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
 import { Injectable } from '@nestjs/common';
 import { Client, Transport, ClientProxy } from '@nestjs/microservices';
 
@@ -14,22 +16,28 @@ export class RabbitClientLoggerService {
       client: ClientProxy;
     
       log(data: any) {
-        console.log('Отправляем лог:', data);  // Логируем отправляемые данные
+        console.log("Rabbit Клиент отправил Log");  // Логируем отправляемые данные
         this.client.emit('log_event', {
           level: 'info',
           message: data.message,
           timestamp: new Date().toISOString(),
           additionalInfo: data.additionalInfo,
+        }).toPromise()
+        .catch(error => {
+            console.error('Ошибка отправки лога:', error);
         });
-      }
-      
-      error(data: any) {
-        console.log('Отправляем ошибку:', data);  // Логируем отправляемые данные
+    }
+    
+    error(data: any) {
+        console.log("Rabbit Клиент отправил ошибку");  // Логируем отправляемые данные
         this.client.emit('log_event', {
           level: 'error',
           message: data.message,
           timestamp: new Date().toISOString(),
           additionalInfo: data.additionalInfo,
+        }).toPromise()
+        .catch(error => {
+            console.error('Ошибка отправки ошибки:', error);
         });
-      }
+    }
 }

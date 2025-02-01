@@ -29,7 +29,7 @@ export async function app_auth_settings(app: INestApplication) {
     app.useGlobalPipes(
         new CustomValidationPipe(),
       );
-    app.useGlobalFilters(new HttpExceptionFilter())
+    //app.useGlobalFilters(new HttpExceptionFilter())
     // Это нужно чтобы в проверки через class-validator можно было делать асинхронными
     // и была возможность внедрять классы в класс проверки
     // https://medium.com/yavar/custom-validation-with-database-in-nestjs-ac008f96abe2

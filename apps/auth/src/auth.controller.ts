@@ -6,16 +6,17 @@ import { EmailAdapterService } from '@app/email-service';
 import { RecaptchaAdapter } from './utils/recaptcha_adapter';
 import { JwtAuthGuard } from '@app/guards';
 import { privacyPolicy, termsOfService } from './utils/private_terms';
-import { User } from '@core_app/src/domain/entities/user-entities';
 import { PublicUserProfileDto } from '@app/shared-dto/dtos/user/public-profile-user.dto';
 import { plainToInstance } from 'class-transformer';
+import { RabbitClientLoggerService } from '@app/rabbit_client_logger';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService,
       private readonly emailService: EmailAdapterService,
-      private readonly recaptchaAdapter: RecaptchaAdapter
+      private readonly recaptchaAdapter: RecaptchaAdapter,
+      private readonly logService: RabbitClientLoggerService
   ) { }
 
 
@@ -47,6 +48,23 @@ export class AuthController {
     description: 'Сессия уже существует для этого устройства.',
   })
   async login(@Body() loginDto: AuthForm, @Res() res, @Req() req) {
+    
+    // Тест логгера в микросервисе
+    try {
+      // Логика, которая может привести к ошибке
+      throw new Error('Произошла ошибка в Auth сервисе!');
+    } catch (error) {
+      // Отправляем ошибку в логирующий микросервис
+      this.logService.error({
+        message: error.message,   // Передаем только строку с сообщением об ошибке
+        timestamp: new Date().toISOString(),  // Время возникновения ошибки (по желанию)
+        additionalInfo: {
+          userId: 12345,  // Пример дополнительной информации
+          requestId: 'abc123',  // Пример requestId
+          errorStack: error.stack,  // Стек вызовов ошибки для более детального анализа
+        }
+      });
+    }
     try {
       //console.log("Попадание в Login")
       const ip = req.ip

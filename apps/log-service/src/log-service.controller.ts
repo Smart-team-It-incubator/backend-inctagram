@@ -8,7 +8,7 @@ export class LogController {
 
   @EventPattern('log_event')
   handleLog(@Payload() data: any) {
-    console.log('Получен лог:', data);
+    console.log("Rabbit consumer получил данные одает в log-service");
     
     // В зависимости от уровня логирования вызываем разные методы логирования
     switch (data.level) {

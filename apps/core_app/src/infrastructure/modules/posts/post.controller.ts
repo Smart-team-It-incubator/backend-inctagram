@@ -1,6 +1,6 @@
 import { CreatePostDto } from '@app/shared-dto/dtos/post/post-create.dto';
 import { CreatePostCommand } from '@core_app/src/application/commands/posts_cases/create-post.use-case';
-import { GetPostsCommand } from '@core_app/src/application/commands/posts_cases/get-posts.use-case';
+import { GetPostsCommand } from '@core_app/src/application/queries/posts_query/get-posts.use-case';
 import { UserViewModel } from '@core_app/src/domain/interfaces/view_models/UserViewModel';
 import { Controller, Get, Post, Body, HttpException, HttpStatus, UploadedFile, UseInterceptors, Query, Req, UseGuards, Put, Param, Delete, UploadedFiles } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';

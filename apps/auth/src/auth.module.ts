@@ -16,6 +16,9 @@ import { GithubStrategy } from './github/github.adapter';
 import { PassportModule } from '@nestjs/passport';
 import { AuthApiService } from 'auth-api/auth-api';
 import { TelegramService } from '@app/email-service/telegram-service';
+import { HttpExceptionFilter } from '@app/filters/http-exception.filter';
+import { RabbitClientLoggerService } from '@app/rabbit_client_logger';
+import { APP_FILTER } from '@nestjs/core';
 
 
 @Module({
@@ -24,7 +27,13 @@ import { TelegramService } from '@app/email-service/telegram-service';
     envFilePath: process.env.ENV_FILE, // Загружаем файл из переменной окружения, если нужно
   }), PrismaModule, HttpModule, PassportModule],
   controllers: [AuthController, GithubAuthController],
-  providers: [PrismaService, AuthService, AuthRepository, JwtService, CoreAppApiService, AuthApiService, EmailAdapterService, RecaptchaAdapter, GithubStrategy, TelegramService],
+  providers: [PrismaService, AuthService, AuthRepository, JwtService, CoreAppApiService, AuthApiService, EmailAdapterService, RecaptchaAdapter, GithubStrategy, TelegramService,
+        RabbitClientLoggerService,  // Регистрация сервиса для инжекции в фильтр
+        {
+          provide: APP_FILTER,
+          useClass: HttpExceptionFilter,  // Использование фильтра в качестве глобального
+        },
+  ],
   exports: [ RecaptchaAdapter]
 })
 export class AuthModule {}
