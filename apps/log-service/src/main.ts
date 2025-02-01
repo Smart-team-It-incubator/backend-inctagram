@@ -19,7 +19,7 @@ async function bootstrap() {
     },
   });
 
-  console.log('🚀 Log Microservice запущен...');
   await app.listen();
+  console.log('🚀 Log Microservice запущен...');
 }
 bootstrap();

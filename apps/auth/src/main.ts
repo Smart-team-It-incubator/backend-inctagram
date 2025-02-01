@@ -26,7 +26,7 @@ async function bootstrap() {
   ); // Swagger будет доступен по /api
 
   await app.listen(process.env.PORT ?? 4000);
-  console.log(`Приложение Auth запущено, ${process.env.PORT} ?? 4000`)
+  console.log(`Микросервис Auth запущен 🚀 на порту ${process.env.PORT ?? 4000}`)
 
 }
 bootstrap();
