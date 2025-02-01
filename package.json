@@ -18,7 +18,7 @@
     "build:files": "nest build files",
     "build:auth": "nest build auth",
     "build:core_app": "nest build core_app",
-    "start:log": "cross-env NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED=true NEW_RELIC_APP_NAME=${process.env.NEW_RELIC_APP_NAME} NEW_RELIC_LICENSE_KEY=${process.env.NEW_RELIC_LICENSE_KEY} nest start log-service --watch --experimental-loader=newrelic/esm-loader.mjs",
+    "start:log": "nest start log-service --watch",
     "start:core_app": "cross-env NODE_ENV=PRODUCTION nest start core_app --watch",
     "start:auth": "cross-env NODE_ENV=PRODUCTION nest start auth --watch",
     "start:files": "cross-env ENV_FILE=./apps/files/.production.env node dist/apps/files/main",

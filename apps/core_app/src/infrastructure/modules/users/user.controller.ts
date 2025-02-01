@@ -43,11 +43,14 @@ export class UserController {
 
     // Тест логгера в микросервисе
     try {
-      // Логика, которая может привести к ошибке
+    // Логика, которая может привести к ошибке
       throw new Error('Произошла ошибка!');
     } catch (error) {
-      // Отправляем ошибку в логирующий микросервис
-      this.logService.error(error.message);
+    // Отправляем ошибку в логирующий микросервис
+      this.logService.error({
+        message: error.message,   // Передаем только строку с сообщением об ошибке
+        timestamp: new Date().toISOString(),  // Время возникновения ошибки (по желанию)
+      });
     }
     const users: Partial<UserViewModel>[] | null = await this.commandBus.execute(new GetUsersCommand());
     if (!users || users.length === 0) {
