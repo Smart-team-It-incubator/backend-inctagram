@@ -16,6 +16,7 @@ async function bootstrap() {
       urls: [process.env.RABBITMQ_URL],
       queue: 'log_queue',
       queueOptions: { durable: true, autoDelete: false },
+      maxConnectionAttempts: 5,
     },
   });
 
