@@ -18,6 +18,7 @@
     "build:files": "nest build files",
     "build:auth": "nest build auth",
     "build:core_app": "nest build core_app",
+    "build:log-service": "nest build log-service",
     "start:log": "nest start log-service --watch",
     "start:core_app": "cross-env NODE_ENV=PRODUCTION nest start core_app --watch",
     "start:auth": "cross-env NODE_ENV=PRODUCTION nest start auth --watch",
