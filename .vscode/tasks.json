@@ -34,7 +34,7 @@
       {
         "label": "Start Log-Service",
         "type": "shell",
-        "command": "yarn start:log-service",
+        "command": "yarn start:log",
         "group": {
           "kind": "build",
           "isDefault": false
