@@ -1,34 +1,31 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './infrastructure/modules/users/user.module';
-
-import { UserController } from './infrastructure/modules/users/user.controller';
 import { ConfigModule } from '@nestjs/config';
 import { GlobalModule } from './infrastructure/modules/global_module/global_module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { FilesGatewayController } from './infrastructure/modules/files_gateway/controllers/files.controller';
-import { PrismaCoreAppService } from '../prisma/prisma.service';
-import { PrismaModule } from '../prisma/prisma.module';
-import { EmailAdapterService } from '@app/email-service';
-import { PostModule } from './infrastructure/modules/posts/post.module';
+import { HttpExceptionFilter } from '@app/filters/http-exception.filter';
+import { RabbitClientLoggerService } from '@app/rabbit_client_logger';
+import { APP_FILTER } from '@nestjs/core';
+import { UserController } from './infrastructure/modules/users/user.controller';
 import { PostController } from './infrastructure/modules/posts/post.controller';
-import { JwtService } from '@nestjs/jwt';
-import { CoreAppApiService } from '@core-app-api/core-app-api';
-import { HttpModule } from '@nestjs/axios';
-import { FilesClientService } from './infrastructure/config/files-client-proxy';
-
+import { UserModule } from './infrastructure/modules/users/user.module';
+import { PostModule } from './infrastructure/modules/posts/post.module';
 
 @Module({
   imports: [    
-    PrismaModule, UserModule, GlobalModule, PostModule, HttpModule,
-    
+    GlobalModule, UserModule, PostModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: process.env.ENV_FILE, // Загружаем файл из переменной окружения, если нужно
-    })
-  ,],
-  controllers: [AppController, UserController, FilesGatewayController, PostController],
-  providers: [AppService, PrismaCoreAppService, JwtService, CoreAppApiService, FilesClientService],
+    })],
+  controllers: [AppController, UserController, PostController],
+  providers: [AppService,
+    RabbitClientLoggerService,  // Регистрация сервиса для инжекции в фильтр
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,  // Использование фильтра в качестве глобального
+    },
+  ],
+  exports: [RabbitClientLoggerService]
 })
 export class AppModule {}

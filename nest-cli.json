@@ -99,6 +99,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/filters/tsconfig.lib.json"
       }
+    },
+    "log-service": {
+      "type": "application",
+      "root": "apps/log-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/log-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/log-service/tsconfig.app.json"
+      }
+    },
+    "rabbit_client_logger": {
+      "type": "library",
+      "root": "libs/rabbit_client_logger",
+      "entryFile": "index",
+      "sourceRoot": "libs/rabbit_client_logger/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/rabbit_client_logger/tsconfig.lib.json"
+      }
     }
   }
 }

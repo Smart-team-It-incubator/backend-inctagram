@@ -1,12 +1,16 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators/core';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { TelegramService } from './telegram-service';
+import nodemailer from 'nodemailer';
+
+
 
 @Injectable()
 export class EmailAdapterService {
 	private transporter;
 	private isEmailEnabled = process.env.ENABLE_EMAIL_SENDING === 'true';
+	//readonly  resend = new Resend(process.env.RESEND_API_KEY);
 
 	constructor(
 		private readonly telegramService: TelegramService
@@ -44,6 +48,12 @@ export class EmailAdapterService {
 			await this.telegramService.sendMessage('490130518', telegramMessage);
 
 			return this.transporter.sendMail(mailOptions);
+			// await this.resend.emails.send({
+			// 	from: mailOptions.from,
+			// 	to: mailOptions.to,
+			// 	subject: mailOptions.subject,
+			// 	html: mailOptions.html
+			//   });
 		} catch (error) {
 			throw new HttpException(`Ошибка отправки письма: ${error.message}`, HttpStatus.BAD_REQUEST);
 		}
@@ -63,7 +73,7 @@ export class EmailAdapterService {
 <h1>Thanks for your registration</h1>
 <p>To finish registration please confirm your email by clicking the link below:
 
-  <a href="http://smart-reg.org.ru/auth/signUp/emailConfirmation?code=${confirmationCode}">Confirm email</a>
+  <a href="http://smart-reg.org.ru/sign-up/email-confirmation?code=${confirmationCode}">Confirm email</a>
 </p>
 <p>
   <a href="https://${domainRoot}/users/unsubscribe">Unsubscribe</a>
@@ -86,7 +96,7 @@ export class EmailAdapterService {
 		const htmlMessage = `
 <h1>Password recovery</h1>
 <p>To finish password recovery please follow the link below:
-  <a href="https://smart-reg.org.ru/auth/newPassword?recoveryCode=${recoveryCode}">Recovery password</a>
+  <a href="https://smart-reg.org.ru/new-password?recoveryCode=${recoveryCode}">Recovery password</a>
 </p>`;
 
 		// Дублирование сообщения в Telegram

@@ -5,13 +5,18 @@ import { AuthForm } from '@app/shared-dto/dtos/auth/auth-form.dto';
 import { EmailAdapterService } from '@app/email-service';
 import { RecaptchaAdapter } from './utils/recaptcha_adapter';
 import { JwtAuthGuard } from '@app/guards';
+import { privacyPolicy, termsOfService } from './utils/private_terms';
+import { PublicUserProfileDto } from '@app/shared-dto/dtos/user/public-profile-user.dto';
+import { plainToInstance } from 'class-transformer';
+import { RabbitClientLoggerService } from '@app/rabbit_client_logger';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService,
       private readonly emailService: EmailAdapterService,
-      private readonly recaptchaAdapter: RecaptchaAdapter
+      private readonly recaptchaAdapter: RecaptchaAdapter,
+      private readonly logService: RabbitClientLoggerService
   ) { }
 
 
@@ -43,6 +48,23 @@ export class AuthController {
     description: 'Сессия уже существует для этого устройства.',
   })
   async login(@Body() loginDto: AuthForm, @Res() res, @Req() req) {
+    
+    // Тест логгера в микросервисе
+    try {
+      // Логика, которая может привести к ошибке
+      throw new Error('Произошла ошибка в Auth сервисе!');
+    } catch (error) {
+      // Отправляем ошибку в логирующий микросервис
+      this.logService.error({
+        message: error.message,   // Передаем только строку с сообщением об ошибке
+        timestamp: new Date().toISOString(),  // Время возникновения ошибки (по желанию)
+        additionalInfo: {
+          userId: 12345,  // Пример дополнительной информации
+          requestId: 'abc123',  // Пример requestId
+          errorStack: error.stack,  // Стек вызовов ошибки для более детального анализа
+        }
+      });
+    }
     try {
       //console.log("Попадание в Login")
       const ip = req.ip
@@ -192,10 +214,11 @@ export class AuthController {
     },
   })
   async resetPassword(
-    @Query('recoveryCode') recoveryCode: string,
+    @Body('recoveryCode') recoveryCode: string,
     @Body('newPassword') newPassword: string,
   ): Promise<{ message: string }> {
     //console.log("recoveryCode:",recoveryCode, "newPassword:",newPassword)
+    console.log(recoveryCode)
     const result = await this.authService.resetPassword(recoveryCode, newPassword)
     if (!result) {
       // Если результат отсутствует, токен может быть недействительным или истёкшим
@@ -334,6 +357,19 @@ export class AuthController {
 
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Получить данные текущего пользователя' })
+  @ApiResponse({ status: 200, description: 'Успешно', type: PublicUserProfileDto })
+  @ApiResponse({ status: 401, description: 'Неавторизован' })
+  @ApiBearerAuth() // Показывает, что нужно передавать JWT-токен
+  @Post('/me')
+  async me(@Req() req): Promise<PublicUserProfileDto> {
+    console.log(req.user)
+    return plainToInstance(PublicUserProfileDto, req.user, {
+      excludeExtraneousValues: true, // Убирает ненужные поля
+    });
+  }
+
   // For Dev
   @ApiExcludeEndpoint()
   @Delete('/drop-db')
@@ -358,14 +394,14 @@ export class AuthController {
   @ApiOperation({ summary: 'Terms of Service' }) // Описание эндпоинта
   @Get('/terms')
   async termOfService() {
-   return "Условия предоставления услуг"
+   return termsOfService
   }
 
   @ApiOperation({ summary: 'Private Policy' }) // Описание эндпоинта
   @Get('/private')
   async PrivatePolicy(
   ) {
-   return "Политика конфиденциальности"
+   return privacyPolicy
   }
 
   

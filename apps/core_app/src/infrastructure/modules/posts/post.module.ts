@@ -4,7 +4,7 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PostController } from './post.controller';
 import { PostsRepository } from './post.repository';
-import { GetPostsUseCase } from '@core_app/src/application/commands/posts_cases/get-posts.use-case';
+import { GetPostsUseCase } from '@core_app/src/application/queries/posts_query/get-posts.use-case';
 import { CreatePostUseCase } from '@core_app/src/application/commands/posts_cases/create-post.use-case';
 import { FilesClientService } from '../../config/files-client-proxy';
 import { JwtService } from '@nestjs/jwt';

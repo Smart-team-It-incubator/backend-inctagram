@@ -14,7 +14,7 @@ async function bootstrap() {
   const PORT = process.env.PORT || 3695;
 
   await app.listen();
-  console.log(`Приложение Files запущено на порту ${PORT}`);
+  console.log(`Микросервис Files запущен 🚀 на порту ${PORT}`);
 }
 bootstrap();
 

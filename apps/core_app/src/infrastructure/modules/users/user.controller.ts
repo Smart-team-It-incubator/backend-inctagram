@@ -1,31 +1,35 @@
 import { Controller, Get, Post, Body, HttpException, HttpStatus, Put, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { GetUsersCommand } from '@core_app/src/application/commands/users_cases/get-users.use-case';
+import { GetUsersCommand } from '@core_app/src/application/queries/users_query/get-users.use-case';
 import { CreateUserCommand } from '@core_app/src/application/commands/users_cases/create-user.use-case';
 import { ApiBearerAuth, ApiBody, ApiCookieAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserViewModel } from '@core_app/src/domain/interfaces/view_models/UserViewModel';
-import { GetUserByUsernameCommand } from '@core_app/src/application/commands/users_cases/get-user-by-username.use-case';
+import { GetUserByUsernameCommand } from '@core_app/src/application/queries/users_query/get-user-by-username.use-case';
 import { CreateUserDto } from '@app/shared-dto';
-import { GetUserByGithubIdCommand } from '@core_app/src/application/commands/users_cases/get-user-by-github.use-case';
+import { GetUserByGithubIdCommand } from '@core_app/src/application/queries/users_query/get-user-by-github.use-case';
 import { DropDBCommand } from '@core_app/src/application/commands/users_cases/drop_user_db.use-case';
 import { ConfirmEmailCommand } from '@core_app/src/application/commands/users_cases/confirm-email.use-case';
-import { GetUserByEmailCommand } from '@core_app/src/application/commands/users_cases/get-user-by-email.use-case';
+import { GetUserByEmailCommand } from '@core_app/src/application/queries/users_query/get-user-by-email.use-case';
 import { UpdateUserDto } from '@app/shared-dto/dtos/user/update-user.dto';
 import { UpdateUserCommand } from '@core_app/src/application/commands/users_cases/update-user.user-case';
 import { ResendConfirmationCodeDto } from '@app/shared-dto/dtos/email/resend-email.dto';
 import { ResendConfirmationCodeCommand } from '@core_app/src/application/commands/email_cases/email-confirmation-resend.use-case';
-import { GetUserByResetPasswordTokenCommand } from '@core_app/src/application/commands/users_cases/get-user-by-resetToken.use-case';
+import { GetUserByResetPasswordTokenCommand } from '@core_app/src/application/queries/users_query/get-user-by-resetToken.use-case';
 import { JwtAuthGuard } from '@app/guards';
 import { PublicUserProfileDto } from '@app/shared-dto/dtos/user/public-profile-user.dto';
 import { mapToPublicUserProfileDto } from '../../utils/user-mapper';
 import { DeleteUserCommand } from '@core_app/src/application/commands/users_cases/delete-user.user-case';
+import { LogService } from 'apps/log-service/src/log-service.service';
+import { RabbitClientLoggerService } from '@app/rabbit_client_logger';
 
 
 
 @ApiTags('Users API') // Группировка в Swagger
 @Controller('users')
 export class UserController {
-  constructor(private commandBus: CommandBus) { }
+  constructor(private commandBus: CommandBus,
+    private readonly logService: RabbitClientLoggerService
+  ) { }
 
 
   @ApiOperation({ summary: 'Get all users' }) // Описание эндпоинта
@@ -36,9 +40,26 @@ export class UserController {
   })
   @Get()
   async getUsers(): Promise<PublicUserProfileDto[] | null> {
+
+    // Тест логгера в микросервисе
+    try {
+      // Логика, которая может привести к ошибке
+      throw new Error('Произошла ошибка!');
+    } catch (error) {
+      // Отправляем ошибку в логирующий микросервис
+      this.logService.error({
+        message: error.message,   // Передаем только строку с сообщением об ошибке
+        timestamp: new Date().toISOString(),  // Время возникновения ошибки (по желанию)
+        additionalInfo: {
+          userId: 12345,  // Пример дополнительной информации
+          requestId: 'abc123',  // Пример requestId
+          errorStack: error.stack,  // Стек вызовов ошибки для более детального анализа
+        }
+      });
+    }
     const users: Partial<UserViewModel>[] | null = await this.commandBus.execute(new GetUsersCommand());
     if (!users || users.length === 0) {
-      throw new HttpException({message: 'Users not found'}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({ message: 'Users not found' }, HttpStatus.BAD_REQUEST);
     }
     // Обязательно мапим под нужный DTO, чтобы вернуть только необходимые поля + сгенерировать swagger
     return users.map(mapToPublicUserProfileDto);
@@ -55,7 +76,7 @@ export class UserController {
   async registration(@Body() body: CreateUserDto): Promise<Partial<UserViewModel> | null> {
     const createUser: Partial<UserViewModel> | null = await this.commandBus.execute(new CreateUserCommand(body.email, body.password, body.username, body.firstName, body.lastName, body.city, body.country, body.dateOfBirthday));
     if (!createUser) {
-      throw new HttpException({message: 'User not created'}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({ message: 'User not created' }, HttpStatus.BAD_REQUEST);
 
     }
     else if (createUser) {
@@ -82,7 +103,7 @@ export class UserController {
       return mapToPublicUserProfileDto(updateUser)
     } catch (error) {
       //console.log("ошибка при обновлении пользователя в контроллере", error.message);
-      throw new HttpException({message: 'User not updated, maybe user not found'}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({ message: 'User not updated, maybe user not found' }, HttpStatus.BAD_REQUEST);
     }
 
   }
@@ -102,7 +123,7 @@ export class UserController {
       return deletedUser
     } catch (error) {
       //console.log("ошибка при удалении пользователя в контроллере", error.message);
-      throw new HttpException({message: 'User not deleted, maybe user not found'}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({ message: 'User not deleted, maybe user not found' }, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -118,7 +139,7 @@ export class UserController {
     const user = await this.commandBus.execute(new GetUserByUsernameCommand(username));
 
     if (!user || !user.username) {
-      throw new HttpException({message: 'User not found'}, HttpStatus.NOT_FOUND);
+      throw new HttpException({ message: 'User not found' }, HttpStatus.NOT_FOUND);
     }
 
     return user
@@ -133,7 +154,7 @@ export class UserController {
   async findUserByEmail(@Param('email') email: string): Promise<string> {
     const user = await this.commandBus.execute(new GetUserByEmailCommand(email));
     if (!user) {
-      throw new HttpException({message: 'User not found'}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({ message: 'User not found' }, HttpStatus.BAD_REQUEST);
     }
     return user
   }
@@ -147,7 +168,7 @@ export class UserController {
     ////console.log("попадание в GetGitHubUser")
     const user = await this.commandBus.execute(new GetUserByGithubIdCommand(githubId));
     if (!user) {
-      throw new HttpException({message: 'User not found'}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({ message: 'User not found' }, HttpStatus.BAD_REQUEST);
     }
     return user
   }
@@ -161,7 +182,7 @@ export class UserController {
     //console.log("попадание в resetPasswordToken Get User, resetPasswordToken:", resetPasswordToken)
     const user = await this.commandBus.execute(new GetUserByResetPasswordTokenCommand(resetPasswordToken));
     if (!user) {
-      throw new HttpException({message: 'User not found'}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({ message: 'User not found' }, HttpStatus.BAD_REQUEST);
     }
     return user
   }
@@ -184,7 +205,7 @@ export class UserController {
   async emailConfirmation(@Query('code') confirmationCode: string): Promise<{ message: string }> {
     //console.log('confirmationCode:', confirmationCode);
     if (!confirmationCode) {
-      throw new HttpException({message: 'Confirmation code is required'}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({ message: 'Confirmation code is required' }, HttpStatus.BAD_REQUEST);
     }
 
     const result = await this.commandBus.execute(new ConfirmEmailCommand(confirmationCode));
@@ -192,7 +213,7 @@ export class UserController {
     if (result) {
       return { message: 'Email successfully confirmed' };
     } else {
-      throw new HttpException({message: 'Invalid confirmation code or code expired', field: "confirmationCode"}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({ message: 'Invalid confirmation code or code expired', field: "confirmationCode" }, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -220,7 +241,7 @@ export class UserController {
     if (result) {
       return { message: 'Confirmation code was successfully resent' };
     } else {
-      throw new HttpException({message: 'User not found or User already activated'}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({ message: 'User not found or User already activated' }, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -233,7 +254,7 @@ export class UserController {
     return this.commandBus.execute(new DropDBCommand())
   }
   @ApiOperation({ summary: 'Проверка модуля Users на работоспособность' }) // Описание эндпоинта
-  @ApiResponse({ status: 200, description: 'status: ok, app is available' }) 
+  @ApiResponse({ status: 200, description: 'status: ok, app is available' })
   @Get('/health')
   async heath() {
     return { "status": "ok, app is available" }

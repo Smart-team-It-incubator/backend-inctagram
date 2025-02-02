@@ -30,6 +30,16 @@
           "isDefault": false
         },
         "problemMatcher": []
+      },
+      {
+        "label": "Start Log-Service",
+        "type": "shell",
+        "command": "yarn start:log",
+        "group": {
+          "kind": "build",
+          "isDefault": false
+        },
+        "problemMatcher": []
       }
     ]
   }
