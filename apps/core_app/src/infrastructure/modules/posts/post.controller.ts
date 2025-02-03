@@ -4,7 +4,7 @@ import { GetPostsCommand } from '@core_app/src/application/queries/posts_query/g
 import { UserViewModel } from '@core_app/src/domain/interfaces/view_models/UserViewModel';
 import { Controller, Get, Post, Body, HttpException, HttpStatus, UploadedFile, UseInterceptors, Query, Req, UseGuards, Put, Param, Delete, UploadedFiles } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { ApiBearerAuth, ApiBody, ApiExcludeEndpoint, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiExcludeEndpoint, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilesClientService } from '../../config/files-client-proxy';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { PostViewModel } from '@core_app/src/application/services/post/post-interface';
@@ -57,6 +57,7 @@ export class PostController {
   @ApiOperation({ summary: 'Create a new post' }) // Описание эндпоинта
   @ApiResponse({ status: 201, description: 'Post successfully created', type: PublicPostDto }) // Описание успешного ответа
   @ApiResponse({ status: 400, description: 'Invalid input data' }) // Описание ошибки
+  @ApiConsumes('multipart/form-data') // Важно! Сообщает, что принимаем файлы
   @ApiBody({ type: CreatePostDto })
   @ApiBearerAuth('access-token')
   //Валидация на количество файлов (10) и формат (PNG или JPEG)
@@ -87,7 +88,7 @@ export class PostController {
   
       // Если файлы не переданы, присваиваем пустой массив
       if (!files || files.length === 0) {
-        createPostDto.photos = [];
+        createPostDto.files = [];
       } else {
         // Загружаем фото через Files микросервис
         const uploadedPhotos = await Promise.all(
@@ -104,7 +105,7 @@ export class PostController {
           }),
         );
         // Передаем ссылки на фото
-        createPostDto.photos = uploadedPhotos;
+        createPostDto.files = uploadedPhotos;
       }
   
       // Создаем пост

@@ -23,7 +23,7 @@ export class CreatePostDto {
   //@IsArray()
   @ValidateNested({ each: true })
   @Type(() => PhotoDto)
-  photos: PhotoDto[];
+  files: PhotoDto[];
 
   // @ApiProperty({
   //   description: 'ID of the user creating the post',
