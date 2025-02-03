@@ -3,7 +3,6 @@ import { Controller, Get, HttpException, HttpStatus, Param, Query } from "@nestj
 import { PostsRepository } from "@core_app/src/infrastructure/modules/posts/post.repository";
 import { PublicPostDto } from "@app/shared-dto/dtos/post/public-post.dto";
 import { PostViewModel } from "@core_app/src/application/services/post/post-interface";
-import { UpdatePostCommand } from "@core_app/src/application/commands/posts_cases/update-post.use-case";
 
 @ApiTags('Public API')
 @Controller('public')
