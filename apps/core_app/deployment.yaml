@@ -102,6 +102,11 @@ spec:
                  secretKeyRef:
                    name: smart-team-backend-coreapp-production-config-secret
                    key: RESEND_API_KEY
+             - name: CORE_APP_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-coreapp-production-config-secret
+                   key: CORE_APP_URL
              - name: DATABASE_URL_CORE
                valueFrom:
                  secretKeyRef:
