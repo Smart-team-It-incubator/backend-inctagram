@@ -43,7 +43,44 @@ export class PostsRepository {
       throw new Error('Failed to fetch posts'); // Перебрасываем ошибку для верхнего уровня
     }
   }
+  //публичные
+  async getPosts(pageNumber: number, pageSize: number): Promise<Partial<PostViewModel>[]> {
+    try {
+      const posts = await this.prisma.post.findMany({
+        include: { photos: true },
+        orderBy: { createdAt: 'desc' },
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+      });
 
+      if (!posts.length) {
+        throw new Error('No posts found');
+      }
+
+      return posts.map(post => new PostViewModel(post).getPublicVersion());
+    } catch (error) {
+      console.error("Error in repository when fetching all posts:", error.message);
+      throw new Error('Failed to fetch posts');
+    }
+  }
+
+  async getPostById(postId: string): Promise<Partial<PostViewModel>> {
+    try {
+      const post = await this.prisma.post.findUnique({
+        where: { id: postId },
+        include: { photos: true },
+      });
+
+      if (!post) {
+        throw new Error('Post not found');
+      }
+
+      return new PostViewModel(post).getPublicVersion();
+    } catch (error) {
+      console.error("Error in repository when fetching post by ID:", error.message);
+      throw new Error('Failed to fetch post');
+    }
+  }
 
   async createPost(createPostDto: CreatePostDto, userId: string): Promise<Partial<PostViewModel>> {
     try {
