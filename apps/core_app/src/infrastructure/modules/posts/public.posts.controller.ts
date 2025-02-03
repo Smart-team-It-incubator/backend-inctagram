@@ -24,7 +24,7 @@ export class PublicController {
   @ApiResponse({ status: 200, description: 'Public post successfully retrieved', type: PublicPostDto })
   @Get('posts/:postId')
   async getPostById(@Param('postId') postId: string): Promise<Partial<PostViewModel>> {
-    return this.postRepository.getPostById(postId);
+    //return this.postRepository.getPostById(postId);
     const result = await this.postRepository.getPostById(postId);
     if (!result) {
       throw new HttpException({message: 'Failed to update post'}, HttpStatus.NOT_FOUND);
@@ -32,10 +32,10 @@ export class PublicController {
     return result;
   }
 
-  @ApiOperation({ summary: 'Get public user profile' })
-  @ApiResponse({ status: 200, description: 'Public user profile successfully retrieved' })
-  @Get('profiles/:userId')
-  async getUserProfile(@Param('userId') userId: string): Promise<any> {
-    return this.postRepository.getUserProfile(userId);
-  }
+  // @ApiOperation({ summary: 'Get public user profile' })
+  // @ApiResponse({ status: 200, description: 'Public user profile successfully retrieved' })
+  // @Get('profiles/:userId')
+  // async getUserProfile(@Param('userId') userId: string): Promise<any> {
+  //   return this.postRepository.getUserProfile(userId);
+  // }
 }
