@@ -146,6 +146,20 @@ export class UserController {
     return user
   }
 
+  @ApiOperation({ summary: 'Get public User by username' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'respone with required user' }) // Описание ответа
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @Get("/get-public-profile/:username") // Регистр username ВАЖЕН при поиске
+  async findPublicUserByUsername(@Param('username') username: string): Promise<PublicUserProfileDto> {
+    const user = await this.commandBus.execute(new GetUserByUsernameCommand(username));
+
+    if (!user || !user.username) {
+      throw new HttpException({ message: 'User not found' }, HttpStatus.NOT_FOUND);
+    }
+    const publicUser: PublicUserProfileDto = new UserViewModel(user).getPublicProfile();
+    return publicUser
+  }
+
   // Это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
   // Метод для получения пользователя по Email
   @ApiExcludeEndpoint()
