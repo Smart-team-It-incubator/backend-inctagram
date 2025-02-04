@@ -46,6 +46,11 @@ export class PublicUserProfileDto {
   @IsOptional()
   dateOfBirthday?: Date;
 
+  @Expose()
+  @ApiProperty({ example: 'https://example.url', required: false })
+  @IsOptional()
+  profileImageUrl?: string;
+
   constructor(
     id: string,
     email: string,
@@ -54,7 +59,8 @@ export class PublicUserProfileDto {
     lastName?: string,
     city?: string,
     country?: string,
-    dateOfBirthday?: Date
+    dateOfBirthday?: Date,
+    profileImageUrl?: string
   ) {
     this.id = id;
     this.email = email;
@@ -64,5 +70,6 @@ export class PublicUserProfileDto {
     this.city = city || null;
     this.country = country || null;
     this.dateOfBirthday = dateOfBirthday || null;
+    this.profileImageUrl = profileImageUrl || null;
   }
 }

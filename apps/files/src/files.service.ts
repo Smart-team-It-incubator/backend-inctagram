@@ -42,4 +42,5 @@ export class S3Service {
       throw new Error("Ошибка загрузки файла в S3");
     }
   }
+  
 }
