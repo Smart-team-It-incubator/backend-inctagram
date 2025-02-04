@@ -31,7 +31,8 @@ export class UserViewModel implements IUserInterface {
         lastName: this.user.lastName,
         city: this.user.city,
         country: this.user.country,
-        dateOfBirthday: this.user.dateOfBirthday
+        dateOfBirthday: this.user.dateOfBirthday,
+        profileImageUrl: this.user.profileImageUrl
       };
     }
     getPrivateProfile() {
@@ -49,7 +50,8 @@ export class UserViewModel implements IUserInterface {
         emailConfirmationCode: this.user.emailConfirmationCode,
         emailConfirmationCodeExpirationDate: this.user.emailConfirmationCodeExpirationDate,
         isEmailConfirmed: this.user.isEmailConfirmed,
-        githubId: this.githubId
+        githubId: this.user.githubId,
+        profileImageUrl: this.user.profileImageUrl || null
       };
     }
   }

@@ -15,5 +15,6 @@ export function mapToPublicUserProfileDto(user: Partial<UserViewModel>): PublicU
     user.lastName, 
     user.city, 
     user.country, 
-    user.dateOfBirthday);
+    user.dateOfBirthday,
+    user.profileImageUrl);
 }

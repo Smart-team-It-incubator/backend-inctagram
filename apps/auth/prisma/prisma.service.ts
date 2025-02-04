@@ -8,9 +8,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     console.log("Node ENV value:", process.env.NODE_ENV);
     let databaseUrl = ''
     if (process.env.NODE_ENV === 'TEST') {
-      databaseUrl = process.env.DATABASE_URL_TEST
+      databaseUrl = process.env.DATABASE_URL_AUTH_TEST
     }
-    if (process.env.NODE_ENV === 'DEV') {
+    else if (process.env.NODE_ENV === 'DEV') {
       databaseUrl = process.env.DATABASE_URL_AUTH_DEV
     }
     else {

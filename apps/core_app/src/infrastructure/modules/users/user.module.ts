@@ -18,9 +18,10 @@ import { GetUserByResetPasswordTokenUseCase } from '@core_app/src/application/qu
 import { CoreAppApiService } from '@core-app-api/core-app-api';
 import { JwtService } from '@nestjs/jwt';
 import { DeleteUserUseCase } from '@core_app/src/application/commands/users_cases/delete-user.user-case';
+import { UpdateAvatarUseCase } from '@core_app/src/application/commands/users_cases/update_avatar.use-case';
 
 
-const useCasesUsers = [GetUserByResetPasswordTokenUseCase,
+const useCasesUsers = [GetUserByResetPasswordTokenUseCase, UpdateAvatarUseCase,
   GetUsersUseCase, CreateUserUseCase, GetUserByUsernameUseCase, DeleteUserUseCase, GetUserByEmailUseCase, DropDBUseCase, ConfirmEmailUseCase, GetUserByGithubIdUseCase, UpdateUserUseCase, ResendConfirmationCodeUseCase]
 
 @Module({

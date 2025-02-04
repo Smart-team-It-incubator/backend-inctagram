@@ -27,6 +27,31 @@ spec:
                  secretKeyRef:
                    name: smart-team-backend-files-production-config-secret
                    key: FILES_SERVICE_PORT_ENV
+             - name: S3_BUCKET_NAME
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-files-production-config-secret
+                   key: S3_BUCKET_NAME
+             - name: S3_ACCESS_KEY_ID
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-files-production-config-secret
+                   key: S3_ACCESS_KEY_ID
+             - name: S3_SECRET_ACCESS_KEY
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-files-production-config-secret
+                   key: S3_SECRET_ACCESS_KEY
+             - name: S3_HOST
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-files-production-config-secret
+                   key: S3_HOST
+             - name: S3_REGION
+               valueFrom:
+                 secretKeyRef:
+                   name: smart-team-backend-files-production-config-secret
+                   key: S3_REGION
              - name: FILES_SERVICE_HOST_ENV
                valueFrom:
                  secretKeyRef:

@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, HttpException, HttpStatus, Put, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpException, HttpStatus, Put, Param, Delete, Query, UseGuards, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { GetUsersCommand } from '@core_app/src/application/queries/users_query/get-users.use-case';
 import { CreateUserCommand } from '@core_app/src/application/commands/users_cases/create-user.use-case';
-import { ApiBearerAuth, ApiBody, ApiCookieAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCookieAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserViewModel } from '@core_app/src/domain/interfaces/view_models/UserViewModel';
 import { GetUserByUsernameCommand } from '@core_app/src/application/queries/users_query/get-user-by-username.use-case';
 import { CreateUserDto } from '@app/shared-dto';
@@ -19,8 +19,9 @@ import { JwtAuthGuard } from '@app/guards';
 import { PublicUserProfileDto } from '@app/shared-dto/dtos/user/public-profile-user.dto';
 import { mapToPublicUserProfileDto } from '../../utils/user-mapper';
 import { DeleteUserCommand } from '@core_app/src/application/commands/users_cases/delete-user.user-case';
-import { LogService } from 'apps/log-service/src/log-service.service';
 import { RabbitClientLoggerService } from '@app/rabbit_client_logger';
+import { UpdateAvatarCommand } from '@core_app/src/application/commands/users_cases/update_avatar.use-case';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 
 
@@ -145,6 +146,20 @@ export class UserController {
     return user
   }
 
+  @ApiOperation({ summary: 'Get public User by username' }) // Описание эндпоинта
+  @ApiResponse({ status: 200, description: 'respone with required user' }) // Описание ответа
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @Get("/get-public-profile/:username") // Регистр username ВАЖЕН при поиске
+  async findPublicUserByUsername(@Param('username') username: string): Promise<PublicUserProfileDto> {
+    const user = await this.commandBus.execute(new GetUserByUsernameCommand(username));
+
+    if (!user || !user.username) {
+      throw new HttpException({ message: 'User not found' }, HttpStatus.NOT_FOUND);
+    }
+    const publicUser: PublicUserProfileDto = new UserViewModel(user).getPublicProfile();
+    return publicUser
+  }
+
   // Это внутренний метод который возвращает ЧУВСТВИТЕЛЬНЫЕ ДАННЫЕ
   // Метод для получения пользователя по Email
   @ApiExcludeEndpoint()
@@ -243,6 +258,40 @@ export class UserController {
     } else {
       throw new HttpException({ message: 'User not found or User already activated' }, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @Put('/update-avatar')
+  @ApiOperation({ summary: 'Обновление аватара пользователя' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Файл изображения для загрузки',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Аватар успешно обновлён', type: PublicUserProfileDto })
+  @ApiResponse({ status: 400, description: 'Файл обязателен' })
+  @ApiResponse({ status: 401, description: 'Неавторизованный доступ' })
+  async updateAvatar(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req
+  ): Promise<Partial<UserViewModel> | null> {
+    if (!file) {
+      throw new HttpException('File is required', HttpStatus.BAD_REQUEST);
+    }
+    const user = req.user;
+    //console.log("user", user, user.id)
+    const updateUser = await this.commandBus.execute(new UpdateAvatarCommand(user.id, file));
+    //console.log(updateUser)
+    return mapToPublicUserProfileDto(updateUser);
   }
 
 

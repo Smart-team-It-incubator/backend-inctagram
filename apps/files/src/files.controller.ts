@@ -19,8 +19,8 @@ export class FilesController {
 
   @ApiExcludeEndpoint()
   @MessagePattern({ cmd: 'upload_file' })
-  async uploadFile(@Payload() file: Express.Multer.File) { // @Payload декоратор
-    //console.log('Получен файл:', file);
+  async uploadFile(@Payload() file: Express.Multer.File): Promise <string> { // @Payload декоратор
+    console.log('Получен файл:', file);
     return await this.s3Service.uploadFile(file); // Вызов метода uploadFile из S3Service
   }
   

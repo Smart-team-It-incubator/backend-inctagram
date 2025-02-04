@@ -84,7 +84,7 @@ export class PostsRepository {
 
   async createPost(createPostDto: CreatePostDto, userId: string): Promise<Partial<PostViewModel>> {
     try {
-      const { text, location, photos} = createPostDto;
+      const { text, location, files} = createPostDto;
 
       // Создание нового поста в базе данных
       const createdPost = await this.prisma.post.create({
@@ -94,7 +94,7 @@ export class PostsRepository {
           userId,
           photos: {
             // Создание нескольких фотографий для поста из данных из createPostDto.photos
-            create: photos.map(photo => ({ url: photo.photoUrl, photoDescription: photo.description })),
+            create: files.map(photo => ({ url: photo.photoUrl, photoDescription: photo.description })),
         },
         },
         include: {
