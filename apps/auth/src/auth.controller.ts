@@ -362,7 +362,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Успешно', type: PublicUserProfileDto })
   @ApiResponse({ status: 401, description: 'Неавторизован' })
   @ApiBearerAuth() // Показывает, что нужно передавать JWT-токен
-  @Post('/me')
+  @Get('/me')
   async me(@Req() req): Promise<PublicUserProfileDto> {
     console.log(req.user)
     return plainToInstance(PublicUserProfileDto, req.user, {
