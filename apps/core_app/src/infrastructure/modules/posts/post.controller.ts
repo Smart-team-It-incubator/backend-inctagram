@@ -110,7 +110,7 @@ export class PostController {
   
       // Создаем пост
       const createdPost: Partial<UserViewModel> = await this.commandBus.execute(
-        new CreatePostCommand(createPostDto, user.id),
+        new CreatePostCommand(createPostDto, user.id, user.username),
       );
   
       if (!createdPost) {

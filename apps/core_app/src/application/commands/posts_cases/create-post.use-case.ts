@@ -7,7 +7,8 @@ import { PostViewModel, IPostInterface } from '../../services/post/post-interfac
 export class CreatePostCommand {
   constructor(
     public readonly postDto: CreatePostDto,
-    public readonly userId: string
+    public readonly userId: string,
+    public readonly username: string
   ) {}
 }
 
@@ -21,7 +22,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
 
     try {
       // Вызов метода создания поста в репозитории
-      const createdPost = await this.postsRepository.createPost(postDto, command.userId);
+      const createdPost = await this.postsRepository.createPost(postDto, command.userId, command.username);
 
       if (!createdPost) {
         throw new HttpException({message: 'Failed to create post'}, HttpStatus.BAD_REQUEST);
@@ -33,6 +34,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         text: createdPost.text!,
         location: createdPost.location!,
         createdAt: new Date(createdPost.createdAt), // Преобразуем строку в Date
+        author: createdPost.author!,
         userId: createdPost.userId!,
         photos: createdPost.photos!,
       };

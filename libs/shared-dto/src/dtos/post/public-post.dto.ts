@@ -31,6 +31,11 @@ export class PublicPostDto {
     description: 'Identifier of the user who created the post',
   })
   userId: string;
+  @ApiProperty({
+    example: 'John Doe',
+    description: 'username of the user who created the post',
+  })
+  author: string;
 
   @ApiProperty({
     example: [
