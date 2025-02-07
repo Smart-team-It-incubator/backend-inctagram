@@ -27,6 +27,7 @@ RUN npm install --force
 COPY --chown=node . .
 
 RUN npm run libs:builds
+RUN rm -rf apps/core_app/prisma/schema_generate
 RUN npm run generate:core_app
 RUN npm run build:${SERVICE}
 
