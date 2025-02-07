@@ -82,7 +82,7 @@ export class PostsRepository {
     }
   }
 
-  async createPost(createPostDto: CreatePostDto, userId: string): Promise<Partial<PostViewModel>> {
+  async createPost(createPostDto: CreatePostDto, userId: string, username: string): Promise<Partial<PostViewModel>> {
     try {
       const { text, location, files} = createPostDto;
 
@@ -92,6 +92,7 @@ export class PostsRepository {
           text,
           location,
           userId,
+          author: username,
           photos: {
             // Создание нескольких фотографий для поста из данных из createPostDto.photos
             create: files.map(photo => ({ url: photo.photoUrl, photoDescription: photo.description })),
