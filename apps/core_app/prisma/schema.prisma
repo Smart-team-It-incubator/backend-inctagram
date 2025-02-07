@@ -43,6 +43,7 @@ model Post {
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
   photos     Photo[]   // Связь с фотографиями
+  author     String?
   comments    Comment[] // Связь с комментариями
 }
 
@@ -59,6 +60,7 @@ model Comment {
   id       String  @id @default(uuid()) 
   post     Post    @relation(fields: [postId], references: [id], onDelete: Cascade) 
   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade) 
+  author   String
   userId   String
   postId   String
   text     String  
