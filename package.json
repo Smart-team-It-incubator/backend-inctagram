@@ -39,8 +39,8 @@
     "migrate:auth:dev": "dotenv -e ./apps/auth/.development.env -- npx prisma migrate dev --schema=./apps/auth/prisma/schema.prisma",
     "migrate:auth:prod": "dotenv -e ./apps/auth/.production.env -- npx prisma migrate deploy --schema=./apps/auth/prisma/schema.prisma",
     "migrate:auth:test": "dotenv -e ./apps/auth/.test.env -- npx prisma migrate dev --schema=./apps/auth/prisma/schema.prisma",
-    "generate:auth": "dotenv -e ./apps/auth/.test.env -- npx prisma generate --schema=./apps/auth/prisma/schema.prisma",
-    "generate:core_app": "dotenv -e ./apps/core_app/.test.env -- npx prisma generate --schema=./apps/core_app/prisma/schema.prisma",
+    "generate:auth": "dotenv -e ./apps/auth/.development.env -- npx prisma generate --schema=./apps/auth/prisma/schema.prisma",
+    "generate:core_app": "dotenv -e ./apps/core_app/.development.env -- npx prisma generate --schema=./apps/core_app/prisma/schema.prisma",
     "libs:builds": "nest build shared-dto && nest build auth-api && nest build core-app-api && nest build email-service && nest build guards && nest build filters && nest build rabbit_client_logger"
   },
   "dependencies": {
