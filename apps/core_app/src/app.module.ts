@@ -10,10 +10,11 @@ import { UserController } from './infrastructure/modules/users/user.controller';
 import { PostController } from './infrastructure/modules/posts/post.controller';
 import { UserModule } from './infrastructure/modules/users/user.module';
 import { PostModule } from './infrastructure/modules/posts/post.module';
+import { CommentModule } from './infrastructure/modules/comments/comment.module';
 
 @Module({
   imports: [    
-    GlobalModule, UserModule, PostModule,
+    GlobalModule, UserModule, PostModule, CommentModule, 
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: process.env.ENV_FILE, // Загружаем файл из переменной окружения, если нужно
