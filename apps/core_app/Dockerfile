@@ -28,7 +28,7 @@ COPY --chown=node . .
 
 # Очистка миграций Prisma
 RUN rm -rf node_modules/.prisma
-RUN npx prisma migrate reset --force
+RUN npx prisma migrate reset --force --schema=./apps/core_app/prisma/schema.prisma
 
 RUN npm run libs:builds
 RUN rm -rf apps/core_app/prisma/schema_generate
