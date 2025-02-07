@@ -26,6 +26,10 @@ RUN npm install --force
 # Bundle app source code
 COPY --chown=node . .
 
+# Очистка миграций Prisma
+RUN rm -rf node_modules/.prisma
+RUN npx prisma migrate reset --force
+
 RUN npm run libs:builds
 RUN rm -rf apps/core_app/prisma/schema_generate
 RUN npm run generate:core_app
