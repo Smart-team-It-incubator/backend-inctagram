@@ -42,8 +42,8 @@ model Post {
   createdAt  DateTime  @default(now())
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
-  photos     Photo[]   // Связь с фотографиями
   author     String?
+  photos     Photo[]   // Связь с фотографиями
   comments    Comment[] // Связь с комментариями
 }
 
