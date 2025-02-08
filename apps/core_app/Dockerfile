@@ -27,7 +27,10 @@ RUN npm install --force
 COPY --chown=node . .
 
 RUN npm run libs:builds
-RUN rm -rf apps/core_app/prisma/schema_generate
+# Очистка кешированных и устаревших файлов Prisma перед генерацией
+RUN rm -rf node_modules/.prisma \
+    apps/core_app/prisma/schema_generate \
+    apps/core_app/prisma/migrations
 RUN npm run generate:core_app
 RUN npm run build:${SERVICE}
 
