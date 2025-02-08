@@ -49,6 +49,7 @@ export class CommentController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @ApiOperation({ summary: 'Delete comment by ID' })
     @ApiResponse({ status: 204, description: 'Comment successfully deleted' })
     @ApiResponse({ status: 404, description: 'Comment not found' })
     @ApiBearerAuth('access-token')
