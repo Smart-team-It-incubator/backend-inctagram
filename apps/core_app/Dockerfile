@@ -20,8 +20,10 @@ WORKDIR /home/node/dist/${SERVICE}
 
 
 COPY --chown=node package*.json ./
-
-RUN npm install --force --unsafe-perm
+RUN mkdir -p /home/node/.npm && chown -R node:node /home/node/.npm
+USER root
+RUN npm install --force
+USER node
 
 # Bundle app source code
 COPY --chown=node . .
