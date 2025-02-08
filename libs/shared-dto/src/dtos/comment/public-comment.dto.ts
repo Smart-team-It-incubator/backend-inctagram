@@ -13,7 +13,7 @@ export class CommentPublicDto implements ICommentInterface {
   createdAt: Date;
 
   @ApiProperty({ example: 'Иван Иванов', description: 'username автора комментария' })
-  author: string;
+  comment_author: string;
 
   @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440001', description: 'ID пользователя, оставившего комментарий' })
   userId: string;

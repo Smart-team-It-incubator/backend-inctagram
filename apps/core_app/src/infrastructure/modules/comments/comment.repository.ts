@@ -14,7 +14,7 @@ export class CommentsRepository {
             const createdComment: CommentPublicDto = await this.prisma.comment.create({
                 data:
                 {
-                    author: username,
+                    comment_author: username,
                     user: { connect: { id: userId } },
                     post: { connect: { id: postId } },
                     text
