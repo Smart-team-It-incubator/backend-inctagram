@@ -13,7 +13,6 @@ import { UpdatePostDto } from '@app/shared-dto/dtos/post/post-update.dto';
 import { UpdatePostCommand } from '@core_app/src/application/commands/posts_cases/update-post.use-case';
 import { PublicPostDto } from '@app/shared-dto/dtos/post/public-post.dto';
 import { DeletePostCommand } from '@core_app/src/application/commands/posts_cases/delete-post.use-case';
-import { FileSizeValidationPipe } from '../../config/files-pipe';
 
 @ApiTags('Posts API') // Группировка в Swagger
 @Controller('posts')

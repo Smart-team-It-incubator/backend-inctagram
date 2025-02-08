@@ -31,18 +31,21 @@ model User {
   country                String?
   dateOfBirthday         DateTime?
   githubId        String?   @unique                         // Github ID
-  Post	Post[] 
+  Post	Post[]
+  Comment Comment[] 
 }
 
 model Post {
   id         String    @id @default(uuid())
   text       String?
   location   String?
+  
   createdAt  DateTime  @default(now())
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
   author     String?
   photos     Photo[]   // Связь с фотографиями
+  comments    Comment[] // Связь с комментариями
 }
 
 model Photo {
@@ -51,4 +54,16 @@ model Photo {
   post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   photoDescription String?
   postId   String
+}
+
+
+model Comment {
+  id       String  @id @default(uuid()) 
+  post     Post    @relation(fields: [postId], references: [id], onDelete: Cascade) 
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade) 
+  comment_author   String?
+  userId   String
+  postId   String
+  text     String  
+  createdAt DateTime @default(now())
 }
