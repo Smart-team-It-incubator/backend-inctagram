@@ -20,17 +20,14 @@ WORKDIR /home/node/dist/${SERVICE}
 
 
 COPY --chown=node package*.json ./
-RUN mkdir -p /home/node/.npm && chown -R node:node /home/node/.npm
-USER root
+
 RUN npm install --force
-USER node
 
 # Bundle app source code
 COPY --chown=node . .
 
 RUN npm run libs:builds
 # Очистка кешированных и устаревших файлов Prisma перед генерацией
-RUN npx prisma format --schema=./apps/core_app/prisma/schema.prisma
 RUN npm run generate:core_app
 RUN npm run build:${SERVICE}
 
